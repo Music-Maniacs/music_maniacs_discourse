@@ -18,15 +18,9 @@ export default class Artists extends DiscourseRoute{
       }
     );
 
-    const wikipediaData = fetch(wikipediaURL).then(
-      (result) => {
-        console.log("wikipeadia data then callback");
-        console.log(this.wikipediaData);
-        this.wikipediaData = result.json();
-        console.log("post update");
-        console.log(this.wikipediaData);
-      }
-    ).catch((e) => console.log("exception"));
+    const wikipediaData = fetch(wikipediaURL)
+      .then(response => response.json())
+      .then(data => this.wikipediaData = data.wikipediaExtract);
 
     const promises = {
       reviewsData,
