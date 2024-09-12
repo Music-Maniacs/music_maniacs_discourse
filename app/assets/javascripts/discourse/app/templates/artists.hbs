@@ -26,6 +26,7 @@
     </div>
   </div>
 </div>
+{{log this.model.artist}}
 <div class="right-side">
   <div class="entity-rels">
     {{#if this.model.artist.rels}}
@@ -39,14 +40,14 @@
       @entityMBID={{this.model.artist.mbid}}
     />
   </div>
-  <div class="artist-genres">
+  <div class="artist-genres tags">
     <h2>Genres</h2>
-    {{#if this.model.artist.genres}}
+    {{#if this.formattedTags}}
       <ul>
-        {{#each this.model.artist.genres as |genre|}}
+        {{#each this.formattedTags as |tag|}}
           <li>
-            {{genre.tag}}
-            <span class="genre-count">({{genre.count}} {{if (eq genre.count 1) "vote" "votes"}})</span>
+            {{tag.label}}
+            <span class="genre-count">({{tag.count}} {{if (eq tag.count 1) "vote" "votes"}})</span>
           </li>
         {{/each}}
       </ul>
