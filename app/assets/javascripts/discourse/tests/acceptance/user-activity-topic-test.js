@@ -1,8 +1,8 @@
 import { click, visit } from "@ember/test-helpers";
 import { test } from "qunit";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 import userFixtures from "../fixtures/user-fixtures";
-import { acceptance, exists, query, queryAll } from "../helpers/qunit-helpers";
+import { acceptance, query, queryAll } from "../helpers/qunit-helpers";
 
 acceptance("User Activity / Topics - bulk actions", function (needs) {
   const currentUser = "eviltrout";
@@ -29,10 +29,9 @@ acceptance("User Activity / Topics - bulk actions", function (needs) {
     await click(".bulk-select-topics-dropdown-trigger");
     await click(".dropdown-menu__item .close-topics");
 
-    assert.notOk(
-      exists("div.bulk-buttons"),
-      "The bulk actions modal was closed"
-    );
+    assert
+      .dom("div.bulk-buttons")
+      .doesNotExist("The bulk actions modal was closed");
   });
 });
 
@@ -61,7 +60,7 @@ acceptance("User Activity / Topics - empty state", function (needs) {
     await visit(`/u/${currentUser}/activity/topics`);
     assert.equal(
       query("div.empty-state span.empty-state-title").innerText,
-      I18n.t("user_activity.no_topics_title")
+      i18n("user_activity.no_topics_title")
     );
   });
 
@@ -69,7 +68,7 @@ acceptance("User Activity / Topics - empty state", function (needs) {
     await visit(`/u/${anotherUser}/activity/topics`);
     assert.equal(
       query("div.empty-state span.empty-state-title").innerText,
-      I18n.t("user_activity.no_topics_title_others", { username: anotherUser })
+      i18n("user_activity.no_topics_title_others", { username: anotherUser })
     );
   });
 });

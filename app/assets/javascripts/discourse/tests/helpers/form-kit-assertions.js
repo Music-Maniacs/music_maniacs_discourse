@@ -1,4 +1,5 @@
 import { capitalize } from "@ember/string";
+import { isBlank } from "@ember/utils";
 import QUnit from "qunit";
 import { query } from "discourse/tests/helpers/qunit-helpers";
 
@@ -50,7 +51,7 @@ class FieldHelper {
       case "image": {
         return this.element
           .querySelector(".form-kit__control-image a.lightbox")
-          .getAttribute("href");
+          ?.getAttribute("href");
       }
       case "radio-group": {
         return this.element.querySelector(".form-kit__control-radio:checked")
@@ -114,16 +115,17 @@ class FieldHelper {
     this.context.deepEqual(this.value, value, message);
   }
 
+  hasNoValue(message) {
+    this.context.true(isBlank(this.value), message);
+  }
+
   isDisabled(message) {
     this.context.ok(this.disabled, message);
   }
 
   get disabled() {
-    this.context
-      .dom(this.element)
-      .exists(`Could not find field (name: ${this.name}).`);
-
-    this.context.ok(this.element.dataset.disabled === "");
+    this.context.dom(this.element).exists();
+    return this.element.dataset.disabled === "";
   }
 
   hasTitle(title, message) {
@@ -142,12 +144,6 @@ class FieldHelper {
     }
   }
 
-  hasSubtitle(subtitle, message) {
-    this.context
-      .dom(this.element.querySelector(".form-kit__container-subtitle"))
-      .hasText(subtitle, message);
-  }
-
   hasDescription(description, message) {
     switch (this.element.dataset.controlType) {
       case "checkbox": {
@@ -162,7 +158,7 @@ class FieldHelper {
       }
       default: {
         this.context
-          .dom(this.element.querySelector(".form-kit__meta-description"))
+          .dom(this.element.querySelector(".form-kit__container-description"))
           .hasText(description, message);
       }
     }
@@ -180,7 +176,7 @@ class FieldHelper {
       .includesText(error, message);
   }
 
-  hasNoError(message) {
+  hasNoErrors(message) {
     this.context
       .dom(this.element.querySelector(".form-kit__errors"))
       .doesNotExist(message);

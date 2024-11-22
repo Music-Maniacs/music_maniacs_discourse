@@ -6,7 +6,8 @@ require "plugin/metadata"
 require "auth"
 
 class Plugin::CustomEmoji
-  CACHE_KEY ||= "plugin-emoji"
+  CACHE_KEY = "plugin-emoji"
+
   def self.cache_key
     @@cache_key ||= CACHE_KEY
   end
@@ -49,7 +50,6 @@ class Plugin::Instance
   # Memoized array readers
   %i[
     assets
-    color_schemes
     initializers
     javascripts
     locales
@@ -116,6 +116,18 @@ class Plugin::Instance
       location: location,
       use_new_show_route: opts.fetch(:use_new_show_route, false),
     }
+  end
+
+  def full_admin_route
+    route = self.admin_route
+    return unless route
+
+    route
+      .slice(:location, :label, :use_new_show_route)
+      .tap do |admin_route|
+        path = admin_route[:use_new_show_route] ? "show" : admin_route[:location]
+        admin_route[:full_location] = "adminPlugins.#{path}"
+      end
   end
 
   def configurable?
@@ -593,12 +605,6 @@ class Plugin::Instance
   end
 
   def notify_after_initialize
-    color_schemes.each do |c|
-      unless ColorScheme.where(name: c[:name]).exists?
-        ColorScheme.create_from_base(name: c[:name], colors: c[:colors])
-      end
-    end
-
     initializers.each do |callback|
       begin
         callback.call(self)
@@ -732,10 +738,6 @@ class Plugin::Instance
     service_workers << [File.join(File.dirname(path), "assets", file), opts]
   end
 
-  def register_color_scheme(name, colors)
-    color_schemes << { name: name, colors: colors }
-  end
-
   def register_seed_data(key, value)
     seed_data[key] = value
   end
@@ -845,6 +847,14 @@ class Plugin::Instance
     else
       @enabled_site_setting
     end
+  end
+
+  # Site setting areas are a way to group site settings below
+  # the setting category level. This is useful for creating focused
+  # config areas that update a small selection of settings, and otherwise
+  # grouping related settings in the UI.
+  def register_site_setting_area(area)
+    DiscoursePluginRegistry.site_setting_areas << area
   end
 
   def javascript_includes
@@ -1116,16 +1126,11 @@ class Plugin::Instance
   #   "chat_messages_30_days": 100,
   #   "chat_messages_count": 1000,
   # }
-  #
-  # The show_in_ui option (default false) is used to determine whether the
-  # group of stats is shown on the site About page in the Site Statistics
-  # table. Some stats may be needed purely for reporting purposes and thus
-  # do not need to be shown in the UI to admins/users.
-  def register_stat(name, show_in_ui: false, expose_via_api: false, &block)
+  def register_stat(name, expose_via_api: false, &block)
     # We do not want to register and display the same group multiple times.
     return if DiscoursePluginRegistry.stats.any? { |stat| stat.name == name }
 
-    stat = Stat.new(name, show_in_ui: show_in_ui, expose_via_api: expose_via_api, &block)
+    stat = Stat.new(name, expose_via_api: expose_via_api, &block)
     DiscoursePluginRegistry.register_stat(stat, self)
   end
 

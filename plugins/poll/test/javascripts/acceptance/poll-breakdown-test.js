@@ -1,11 +1,6 @@
 import { click, visit } from "@ember/test-helpers";
 import { test } from "qunit";
-import {
-  acceptance,
-  count,
-  exists,
-  query,
-} from "discourse/tests/helpers/qunit-helpers";
+import { acceptance, query } from "discourse/tests/helpers/qunit-helpers";
 
 acceptance("Poll breakdown", function (needs) {
   needs.user();
@@ -68,20 +63,22 @@ acceptance("Poll breakdown", function (needs) {
 
     await click(".widget-dropdown-header");
 
-    assert.ok(
-      exists("button.show-breakdown"),
-      "shows the breakdown button when poll_groupable_user_fields is non-empty"
-    );
+    assert
+      .dom("button.show-breakdown")
+      .exists(
+        "shows the breakdown button when poll_groupable_user_fields is non-empty"
+      );
 
     await click("button.show-breakdown");
 
-    assert.ok(exists(".poll-breakdown-total-votes"), "displays the vote count");
+    assert.dom(".poll-breakdown-total-votes").exists("displays the vote count");
 
-    assert.strictEqual(
-      count(".poll-breakdown-chart-container"),
-      2,
-      "renders a chart for each of the groups in group_results response"
-    );
+    assert
+      .dom(".poll-breakdown-chart-container")
+      .exists(
+        { count: 2 },
+        "renders a chart for each of the groups in group_results response"
+      );
 
     assert.ok(
       query(".poll-breakdown-chart-container > canvas").$chartjs,

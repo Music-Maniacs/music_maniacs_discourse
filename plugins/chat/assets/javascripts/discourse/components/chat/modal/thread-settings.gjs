@@ -8,7 +8,7 @@ import DButton from "discourse/components/d-button";
 import DModal from "discourse/components/d-modal";
 import { popupAjaxError } from "discourse/lib/ajax-error";
 import icon from "discourse-common/helpers/d-icon";
-import i18n from "discourse-common/helpers/i18n";
+import { i18n } from "discourse-i18n";
 
 export default class ChatModalThreadSettings extends Component {
   @service chatApi;
@@ -77,7 +77,7 @@ export default class ChatModalThreadSettings extends Component {
 
         {{#if this.currentUser.admin}}
           <div class="discourse-ai-cta">
-            <p class="discourse-ai-cta__title">{{icon "info-circle"}}
+            <p class="discourse-ai-cta__title">{{icon "circle-info"}}
               {{i18n "chat.thread_title_modal.discourse_ai.title"}}</p>
             <p class="discourse-ai-cta__description">{{htmlSafe
                 (i18n

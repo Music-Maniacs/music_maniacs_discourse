@@ -3,8 +3,10 @@ require "weakref"
 
 module Scheduler
   module Deferrable
-    DEFAULT_TIMEOUT ||= 90
-    STATS_CACHE_SIZE ||= 100
+    DEFAULT_TIMEOUT = 90
+    STATS_CACHE_SIZE = 100
+
+    attr_reader :async
 
     def initialize
       @async = !Rails.env.test?

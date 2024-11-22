@@ -17,8 +17,7 @@ import number from "discourse/helpers/number";
 import { ajax } from "discourse/lib/ajax";
 import { emojiUnescape } from "discourse/lib/text";
 import dIcon from "discourse-common/helpers/d-icon";
-import i18n from "discourse-common/helpers/i18n";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 import DMenu from "float-kit/components/d-menu";
 
 const TRUNCATED_LINKS_LIMIT = 5;
@@ -28,7 +27,7 @@ const MIN_LIKES_COUNT = 5;
 const MIN_PARTICIPANTS_COUNT = 5;
 const MIN_USERS_COUNT_FOR_AVATARS = 2;
 
-export const MIN_POSTS_COUNT = 10;
+export const MIN_POSTS_COUNT = 3;
 
 export default class TopicMapSummary extends Component {
   @service site;
@@ -74,17 +73,17 @@ export default class TopicMapSummary extends Component {
       return;
     }
 
-    return I18n.t("summary.short_title");
+    return i18n("summary.short_title");
   }
 
   get topRepliesIcon() {
-    return this.topRepliesSummaryEnabled ? "arrows-alt-v" : "layer-group";
+    return this.topRepliesSummaryEnabled ? "up-down" : "layer-group";
   }
 
   get topRepliesLabel() {
     return this.topRepliesSummaryEnabled
-      ? I18n.t("summary.show_all_label")
-      : I18n.t("summary.short_label");
+      ? i18n("summary.show_all_label")
+      : i18n("summary.short_label");
   }
 
   get loneStat() {
@@ -96,6 +95,10 @@ export default class TopicMapSummary extends Component {
 
   get manyStats() {
     return [this.hasLikes, this.hasUsers, this.hasLinks].every(Boolean);
+  }
+
+  get minViewsCount() {
+    return Math.max(this.args.topic.views, 1);
   }
 
   get shouldShowViewsChart() {
@@ -182,7 +185,7 @@ export default class TopicMapSummary extends Component {
       })
       .catch((error) => {
         this.dialog.alert(
-          I18n.t("generic_error_with_reason", {
+          i18n("generic_error_with_reason", {
             error: `http: ${error.status} - ${error.body}`,
           })
         );
@@ -219,7 +222,7 @@ export default class TopicMapSummary extends Component {
       })
       .catch((error) => {
         this.dialog.alert(
-          I18n.t("generic_error_with_reason", {
+          i18n("generic_error_with_reason", {
             error: `http: ${error.status} - ${error.body}`,
           })
         );
@@ -249,9 +252,9 @@ export default class TopicMapSummary extends Component {
         @onShow={{this.fetchViews}}
       >
         <:trigger>
-          {{number @topic.views noTitle="true"}}
+          {{number this.minViewsCount noTitle="true"}}
           <span class="topic-map__stat-label">
-            {{i18n "views_lowercase" count=@topic.views}}
+            {{i18n "views_lowercase" count=this.minViewsCount}}
           </span>
         </:trigger>
         <:content>
@@ -337,42 +340,29 @@ export default class TopicMapSummary extends Component {
           </:trigger>
           <:content>
             <h3>{{i18n "topic_map.links_title"}}</h3>
-            <table class="topic-links">
-              <tbody>
-                {{#each this.linksToShow as |link|}}
-                  <tr>
-                    <td>
-                      <span
-                        class="badge badge-notification clicks"
-                        title={{i18n "topic_map.clicks" count=link.clicks}}
-                      >
-                        {{link.clicks}}
-                      </span>
-                    </td>
-                    <td>
-                      <TopicMapLink
-                        @attachment={{link.attachment}}
-                        @title={{link.title}}
-                        @rootDomain={{link.root_domain}}
-                        @url={{link.url}}
-                        @userId={{link.user_id}}
-                      />
-                    </td>
-                  </tr>
-                {{/each}}
-              </tbody>
-            </table>
-            {{#if this.hasMoreLinks}}
-              <div class="link-summary">
-                <span>
-                  <DButton
-                    @action={{this.showAllLinks}}
-                    @title="topic_map.links_shown"
-                    @icon="chevron-down"
-                    class="btn-flat"
+            <ul class="topic-links">
+              {{#each this.linksToShow as |link|}}
+                <li>
+                  <TopicMapLink
+                    @attachment={{link.attachment}}
+                    @title={{link.title}}
+                    @rootDomain={{link.root_domain}}
+                    @url={{link.url}}
+                    @userId={{link.user_id}}
+                    @clickCount={{link.clicks}}
                   />
-                </span>
-              </div>
+                </li>
+              {{/each}}
+
+            </ul>
+            {{#if this.hasMoreLinks}}
+              <DButton
+                @action={{this.showAllLinks}}
+                @title="topic_map.links_shown"
+                @icon="chevron-down"
+                class="link-summary btn-flat"
+              />
+
             {{/if}}
           </:content>
         </DMenu>

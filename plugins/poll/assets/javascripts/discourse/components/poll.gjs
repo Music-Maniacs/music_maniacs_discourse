@@ -9,8 +9,7 @@ import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
 import round from "discourse/lib/round";
 import icon from "discourse-common/helpers/d-icon";
-import i18n from "discourse-common/helpers/i18n";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 import PollBreakdownModal from "../components/modal/poll-breakdown";
 import {
   MULTIPLE_POLL_TYPE,
@@ -42,10 +41,10 @@ export default class PollComponent extends Component {
   @service dialog;
   @service modal;
 
-  @tracked vote = this.args.attrs.vote || [];
-  @tracked poll = this.args.attrs.poll;
+  @tracked vote = this.args.post.polls_votes?.[this.args.poll.name] || [];
   @tracked preloadedVoters = this.defaultPreloadedVoters();
-  @tracked hasSavedVote = this.args.attrs.hasSavedVote;
+  @tracked voterListExpanded = false;
+  @tracked hasSavedVote = this.vote.length > 0;
 
   @tracked
   showResults =
@@ -122,13 +121,17 @@ export default class PollComponent extends Component {
     this.vote = [...this.vote];
   };
 
+  get poll() {
+    return this.args.poll;
+  }
+
   defaultPreloadedVoters() {
     const preloadedVoters = {};
 
-    if (this.poll.public && this.args.preloadedVoters) {
-      Object.keys(this.args.preloadedVoters).forEach((key) => {
+    if (this.poll.public && this.poll.preloaded_voters) {
+      Object.keys(this.poll.preloaded_voters).forEach((key) => {
         preloadedVoters[key] = {
-          voters: this.args.preloadedVoters[key],
+          voters: this.poll.preloaded_voters[key],
           loading: false,
         };
       });
@@ -147,15 +150,17 @@ export default class PollComponent extends Component {
   }
 
   get id() {
-    return this.args.attrs.id;
+    return `${this.args.poll.name}-${this.args.post.id}`;
   }
 
   get post() {
-    return this.args.attrs.post;
+    return this.args.post;
   }
 
   get groupableUserFields() {
-    return this.args.attrs.groupableUserFields;
+    return this.siteSettings.poll_groupable_user_fields
+      .split("|")
+      .filter(Boolean);
   }
 
   get isStaff() {
@@ -163,7 +168,7 @@ export default class PollComponent extends Component {
   }
 
   get titleHTML() {
-    return htmlSafe(this.args.attrs.titleHTML);
+    return htmlSafe(this.args.titleHTML);
   }
 
   get topicArchived() {
@@ -191,7 +196,7 @@ export default class PollComponent extends Component {
   }
 
   get status() {
-    return this.poll.get("status");
+    return this.poll.status;
   }
 
   @action
@@ -205,7 +210,7 @@ export default class PollComponent extends Component {
     }
 
     try {
-      const poll = await ajax("/polls/vote", {
+      const { poll } = await ajax("/polls/vote", {
         type: "PUT",
         data: {
           post_id: this.post.id,
@@ -215,7 +220,8 @@ export default class PollComponent extends Component {
       });
 
       this.hasSavedVote = true;
-      this.poll.setProperties(poll);
+      Object.assign(this.poll, poll);
+
       this.appEvents.trigger("poll:voted", poll, this.post, this.vote);
 
       if (this.poll.results !== ON_CLOSE) {
@@ -236,13 +242,13 @@ export default class PollComponent extends Component {
         }
         popupAjaxError(error);
       } else {
-        this.dialog.alert(I18n.t("poll.error_while_casting_votes"));
+        this.dialog.alert(i18n("poll.error_while_casting_votes"));
       }
     }
   }
 
   get options() {
-    let enrichedOptions = this.poll.get("options");
+    let enrichedOptions = this.poll.options;
 
     if (this.isRankedChoice) {
       enrichedOptions.forEach((candidate) => {
@@ -261,11 +267,11 @@ export default class PollComponent extends Component {
   }
 
   get voters() {
-    return this.poll.get("voters");
+    return this.poll.voters;
   }
 
   get rankedChoiceOutcome() {
-    return this.poll.get("ranked_choice_outcome") || [];
+    return this.poll.ranked_choice_outcome || null;
   }
 
   get min() {
@@ -288,25 +294,6 @@ export default class PollComponent extends Component {
 
   get closed() {
     return this.status === CLOSED_STATUS || this.isAutomaticallyClosed;
-  }
-
-  get rankedChoiceDropdownContent() {
-    let rankedChoiceDropdownContent = [];
-
-    rankedChoiceDropdownContent.push({
-      id: 0,
-      name: I18n.t("poll.options.ranked_choice.abstain"),
-    });
-
-    this.poll.options.forEach((option, i) => {
-      option.rank = 0;
-      rankedChoiceDropdownContent.push({
-        id: i + 1,
-        name: (i + 1).toString(),
-      });
-    });
-
-    return rankedChoiceDropdownContent;
   }
 
   get isAutomaticallyClosed() {
@@ -390,7 +377,7 @@ export default class PollComponent extends Component {
   }
 
   get pollGroups() {
-    return I18n.t("poll.results.groups.title", { groups: this.poll.groups });
+    return i18n("poll.results.groups.title", { groups: this.poll.groups });
   }
 
   get showCastVotesButton() {
@@ -457,7 +444,7 @@ export default class PollComponent extends Component {
 
     const average = this.voters === 0 ? 0 : round(totalScore / this.voters, -2);
 
-    return htmlSafe(I18n.t("poll.average_rating", { average }));
+    return htmlSafe(i18n("poll.average_rating", { average }));
   }
 
   get availableDisplayMode() {
@@ -473,23 +460,25 @@ export default class PollComponent extends Component {
 
   @action
   updatedVoters() {
-    this.preloadedVoters = this.defaultPreloadedVoters();
+    if (!this.voterListExpanded) {
+      this.preloadedVoters = this.defaultPreloadedVoters();
+    }
   }
 
   @action
   fetchVoters(optionId) {
-    let votersCount;
+    let voters;
     let preloadedVoters = this.preloadedVoters;
 
-    Object.keys(preloadedVoters).forEach((key) => {
-      if (key === optionId) {
-        preloadedVoters[key].loading = true;
-      }
-    });
+    if (optionId) {
+      preloadedVoters[optionId].loading = true;
+      voters = preloadedVoters[optionId]?.voters;
+    } else {
+      voters = preloadedVoters;
+    }
 
-    this.preloadedVoters = Object.assign(preloadedVoters);
-
-    votersCount = this.options.find((option) => option.id === optionId).votes;
+    this.preloadedVoters = Object.assign({}, preloadedVoters);
+    const votersCount = voters?.length;
 
     return ajax("/polls/voters.json", {
       data: {
@@ -501,14 +490,20 @@ export default class PollComponent extends Component {
       },
     })
       .then((result) => {
-        const voters = optionId
-          ? this.preloadedVoters[optionId].voters
-          : this.preloadedVoters;
+        this.voterListExpanded = true;
         const newVoters = optionId ? result.voters[optionId] : result.voters;
+        let votersSet = new Set([]);
+
         if (this.isRankedChoice) {
-          this.preloadedVoters[optionId].voters = [...new Set([...newVoters])];
+          votersSet = new Set(voters.map((voter) => voter.user.username));
+          newVoters.forEach((voter) => {
+            if (!votersSet.has(voter.user.username)) {
+              votersSet.add(voter.user.username);
+              voters.push(voter);
+            }
+          });
         } else {
-          const votersSet = new Set(voters.map((voter) => voter.username));
+          votersSet = new Set(voters.map((voter) => voter.username));
           newVoters.forEach((voter) => {
             if (!votersSet.has(voter.username)) {
               votersSet.add(voter.username);
@@ -517,12 +512,11 @@ export default class PollComponent extends Component {
           });
           // remove users who changed their vote
           if (this.poll.type === REGULAR) {
-            Object.keys(this.preloadedVoters).forEach((otherOptionId) => {
+            Object.keys(preloadedVoters).forEach((otherOptionId) => {
               if (optionId !== otherOptionId) {
-                this.preloadedVoters[otherOptionId].voters =
-                  this.preloadedVoters[otherOptionId].voters.filter(
-                    (voter) => !votersSet.has(voter.username)
-                  );
+                preloadedVoters[otherOptionId].voters = preloadedVoters[
+                  otherOptionId
+                ].voters.filter((voter) => !votersSet.has(voter.username));
               }
             });
           }
@@ -532,13 +526,14 @@ export default class PollComponent extends Component {
         if (error) {
           popupAjaxError(error);
         } else {
-          this.dialog.alert(I18n.t("poll.error_while_fetching_voters"));
+          this.dialog.alert(i18n("poll.error_while_fetching_voters"));
         }
       })
       .finally(() => {
-        preloadedVoters = this.preloadedVoters;
-        preloadedVoters[optionId].loading = false;
-        this.preloadedVoters = Object.assign(preloadedVoters);
+        if (optionId) {
+          preloadedVoters[optionId].loading = false;
+        }
+        this.preloadedVoters = Object.assign({}, preloadedVoters);
       });
   }
 
@@ -577,7 +572,7 @@ export default class PollComponent extends Component {
     }
 
     this.dialog.yesNoConfirm({
-      message: I18n.t(this.closed ? "poll.open.confirm" : "poll.close.confirm"),
+      message: i18n(this.closed ? "poll.open.confirm" : "poll.close.confirm"),
       didConfirm: () => {
         const status = this.closed ? OPEN_STATUS : CLOSED_STATUS;
         ajax("/polls/toggle_status", {
@@ -589,7 +584,7 @@ export default class PollComponent extends Component {
           },
         })
           .then(() => {
-            this.poll.set("status", status);
+            this.poll.status = status;
 
             if (
               this.poll.results === ON_CLOSE ||
@@ -611,7 +606,7 @@ export default class PollComponent extends Component {
             if (error) {
               popupAjaxError(error);
             } else {
-              this.dialog.alert(I18n.t("poll.error_while_toggling_status"));
+              this.dialog.alert(i18n("poll.error_while_toggling_status"));
             }
           });
       },
@@ -621,7 +616,10 @@ export default class PollComponent extends Component {
   @action
   showBreakdown() {
     this.modal.show(PollBreakdownModal, {
-      model: this.args.attrs,
+      model: {
+        poll: this.poll,
+        post: this.post,
+      },
     });
   }
 
@@ -664,7 +662,7 @@ export default class PollComponent extends Component {
         if (error) {
           popupAjaxError(error);
         } else {
-          this.dialog.alert(I18n.t("poll.error_while_exporting_results"));
+          this.dialog.alert(i18n("poll.error_while_exporting_results"));
         }
       });
   }
@@ -675,122 +673,129 @@ export default class PollComponent extends Component {
   }
 
   <template>
-    <div
-      {{didUpdate this.updatedVoters @preloadedVoters}}
-      class="poll-container"
-    >
-      {{this.titleHTML}}
-      {{#if this.notInVotingGroup}}
-        <div class="alert alert-danger">{{this.pollGroups}}</div>
-      {{/if}}
-      {{#if this.showResults}}
-        <div class={{this.resultsWidgetTypeClass}}>
-          {{#if this.isNumber}}
-            <span>{{this.averageRating}}</span>
-          {{else}}
-            {{#if this.resultsPie}}
-              <PollResultsPie @id={{this.id}} @options={{this.options}} />
+    <div class="poll">
+      <div
+        {{didUpdate this.updatedVoters this.poll.preloaded_voters}}
+        class="poll-container"
+      >
+        {{this.titleHTML}}
+        {{#if this.notInVotingGroup}}
+          <div class="alert alert-danger">{{this.pollGroups}}</div>
+        {{/if}}
+        {{#if this.showResults}}
+          <div class={{this.resultsWidgetTypeClass}}>
+            {{#if this.isNumber}}
+              <span>{{this.averageRating}}</span>
             {{else}}
-              <PollResultsTabs
-                @options={{this.options}}
-                @pollName={{this.poll.name}}
-                @pollType={{this.poll.type}}
-                @isRankedChoice={{this.isRankedChoice}}
-                @isPublic={{this.poll.public}}
-                @postId={{this.post.id}}
-                @vote={{this.vote}}
-                @voters={{this.preloadedVoters}}
-                @votersCount={{this.poll.voters}}
-                @fetchVoters={{this.fetchVoters}}
-                @rankedChoiceOutcome={{this.rankedChoiceOutcome}}
-                @showTally={{this.showTally}}
-              />
+              {{#if this.resultsPie}}
+                <PollResultsPie @id={{this.id}} @options={{this.options}} />
+              {{else}}
+                <PollResultsTabs
+                  @options={{this.options}}
+                  @pollName={{this.poll.name}}
+                  @pollType={{this.poll.type}}
+                  @isRankedChoice={{this.isRankedChoice}}
+                  @isPublic={{this.poll.public}}
+                  @postId={{this.post.id}}
+                  @vote={{this.vote}}
+                  @voters={{this.preloadedVoters}}
+                  @votersCount={{this.poll.voters}}
+                  @fetchVoters={{this.fetchVoters}}
+                  @rankedChoiceOutcome={{this.rankedChoiceOutcome}}
+                  @showTally={{this.showTally}}
+                />
+              {{/if}}
             {{/if}}
-          {{/if}}
-        </div>
-      {{else}}
-        <PollOptions
-          @isCheckbox={{this.isCheckbox}}
-          @isRankedChoice={{this.isRankedChoice}}
-          @rankedChoiceDropdownContent={{this.rankedChoiceDropdownContent}}
-          @options={{this.options}}
-          @votes={{this.vote}}
-          @sendOptionSelect={{this.toggleOption}}
-        />
-      {{/if}}
-    </div>
-    <PollInfo
-      @options={{this.options}}
-      @min={{this.min}}
-      @max={{this.max}}
-      @isMultiple={{this.isMultiple}}
-      @close={{this.close}}
-      @closed={{this.closed}}
-      @results={{this.poll.results}}
-      @showResults={{this.showResults}}
-      @postUserId={{this.poll.post.user_id}}
-      @isPublic={{this.poll.public}}
-      @hasVoted={{this.hasVoted}}
-      @voters={{this.voters}}
-    />
-    <div class="poll-buttons">
-      {{#if this.showCastVotesButton}}
-        <button
-          class={{this.castVotesButtonClass}}
-          title="poll.cast-votes.title"
-          disabled={{this.castVotesDisabled}}
-          {{on "click" this.castVotes}}
-        >
-          {{icon this.castVotesButtonIcon}}
-          <span class="d-button-label">{{i18n "poll.cast-votes.label"}}</span>
-        </button>
-      {{/if}}
-
-      {{#if this.showHideResultsButton}}
-        <button
-          class="btn btn-default toggle-results"
-          title="poll.hide-results.title"
-          {{on "click" this.toggleResults}}
-        >
-          {{icon "chevron-left"}}
-          <span class="d-button-label">{{i18n "poll.hide-results.label"}}</span>
-        </button>
-      {{/if}}
-
-      {{#if this.showShowResultsButton}}
-        <button
-          class="btn btn-default toggle-results"
-          title="poll.show-results.title"
-          {{on "click" this.toggleResults}}
-        >
-          {{icon "chart-bar"}}
-          <span class="d-button-label">{{i18n "poll.show-results.label"}}</span>
-        </button>
-      {{/if}}
-
-      {{#if this.showRemoveVoteButton}}
-        <button
-          class="btn btn-default remove-vote"
-          title="poll.remove-vote.title"
-          {{on "click" this.removeVote}}
-        >
-          {{icon "undo"}}
-          <span class="d-button-label">{{i18n "poll.remove-vote.label"}}</span>
-        </button>
-      {{/if}}
-
-      <PollButtonsDropdown
+          </div>
+        {{else}}
+          <PollOptions
+            @isCheckbox={{this.isCheckbox}}
+            @isRankedChoice={{this.isRankedChoice}}
+            @options={{this.options}}
+            @votes={{this.vote}}
+            @sendOptionSelect={{this.toggleOption}}
+          />
+        {{/if}}
+      </div>
+      <PollInfo
+        @options={{this.options}}
+        @min={{this.min}}
+        @max={{this.max}}
+        @isMultiple={{this.isMultiple}}
+        @close={{this.close}}
         @closed={{this.closed}}
+        @results={{this.poll.results}}
+        @showResults={{this.showResults}}
+        @postUserId={{this.poll.post.user_id}}
+        @isPublic={{this.poll.public}}
+        @hasVoted={{this.hasVoted}}
         @voters={{this.voters}}
-        @isStaff={{this.isStaff}}
-        @isMe={{this.isMe}}
-        @isRankedChoice={{this.isRankedChoice}}
-        @topicArchived={{this.topicArchived}}
-        @groupableUserFields={{this.groupableUserFields}}
-        @isAutomaticallyClosed={{this.isAutomaticallyClosed}}
-        @dropDownClick={{this.dropDownClick}}
-        @availableDisplayMode={{this.availableDisplayMode}}
       />
+      <div class="poll-buttons">
+        {{#if this.showCastVotesButton}}
+          <button
+            class={{this.castVotesButtonClass}}
+            title={{i18n "poll.cast-votes.title"}}
+            disabled={{this.castVotesDisabled}}
+            {{on "click" this.castVotes}}
+          >
+            {{icon this.castVotesButtonIcon}}
+            <span class="d-button-label">{{i18n "poll.cast-votes.label"}}</span>
+          </button>
+        {{/if}}
+
+        {{#if this.showHideResultsButton}}
+          <button
+            class="btn btn-default toggle-results"
+            title={{i18n "poll.hide-results.title"}}
+            {{on "click" this.toggleResults}}
+          >
+            {{icon "chevron-left"}}
+            <span class="d-button-label">{{i18n
+                "poll.hide-results.label"
+              }}</span>
+          </button>
+        {{/if}}
+
+        {{#if this.showShowResultsButton}}
+          <button
+            class="btn btn-default toggle-results"
+            title={{i18n "poll.show-results.title"}}
+            {{on "click" this.toggleResults}}
+          >
+            {{icon "chart-bar"}}
+            <span class="d-button-label">{{i18n
+                "poll.show-results.label"
+              }}</span>
+          </button>
+        {{/if}}
+
+        {{#if this.showRemoveVoteButton}}
+          <button
+            class="btn btn-default remove-vote"
+            title={{i18n "poll.remove-vote.title"}}
+            {{on "click" this.removeVote}}
+          >
+            {{icon "arrow-rotate-left"}}
+            <span class="d-button-label">{{i18n
+                "poll.remove-vote.label"
+              }}</span>
+          </button>
+        {{/if}}
+
+        <PollButtonsDropdown
+          @closed={{this.closed}}
+          @voters={{this.voters}}
+          @isStaff={{this.isStaff}}
+          @isMe={{this.isMe}}
+          @isRankedChoice={{this.isRankedChoice}}
+          @topicArchived={{this.topicArchived}}
+          @groupableUserFields={{this.groupableUserFields}}
+          @isAutomaticallyClosed={{this.isAutomaticallyClosed}}
+          @dropDownClick={{this.dropDownClick}}
+          @availableDisplayMode={{this.availableDisplayMode}}
+        />
+      </div>
     </div>
   </template>
 }

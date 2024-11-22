@@ -66,12 +66,12 @@ module PrettyText
     end
 
     root_path = "#{Rails.root}/app/assets/javascripts"
-    node_modules = "#{Rails.root}/node_modules"
+    d_node_modules = "#{Rails.root}/app/assets/javascripts/discourse/node_modules"
     md_node_modules = "#{Rails.root}/app/assets/javascripts/discourse-markdown-it/node_modules"
-    ctx.load("#{node_modules}/loader.js/dist/loader/loader.js")
+    ctx.load("#{d_node_modules}/loader.js/dist/loader/loader.js")
     ctx.load("#{md_node_modules}/markdown-it/dist/markdown-it.js")
     ctx.load("#{root_path}/handlebars-shim.js")
-    ctx.load("#{node_modules}/xss/dist/xss.js")
+    ctx.load("#{md_node_modules}/xss/dist/xss.js")
     ctx.load("#{Rails.root}/lib/pretty_text/vendor-shims.js")
 
     ctx_load_directory(
@@ -689,9 +689,9 @@ module PrettyText
 
   private
 
-  USER_TYPE ||= "user"
-  GROUP_TYPE ||= "group"
-  GROUP_MENTIONABLE_TYPE ||= "group-mentionable"
+  USER_TYPE = "user"
+  GROUP_TYPE = "group"
+  GROUP_MENTIONABLE_TYPE = "group-mentionable"
 
   def self.add_mentions(doc, user_id: nil)
     elements = doc.css("span.mention")

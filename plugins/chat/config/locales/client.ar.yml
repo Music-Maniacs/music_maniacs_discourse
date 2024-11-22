@@ -39,6 +39,14 @@ ar:
       chat_messages_count: "رسائل الدردشة"
       chat_channels_count: "قنوات الدردشة"
       chat_users_count: "مستخدمو الدردشة"
+      activities:
+        chat_messages:
+          zero: "%{formatted_number} رسالة دردشة"
+          one: "%{formatted_number} رسالة دردشة"
+          two: "رسالة دردشة واحدة"
+          few: "رسالتا دردشة"
+          many: "رسالة دردشة"
+          other: "رسالة دردشة"
     chat:
       text_copied: تم نسخ النص إلى الحافظة
       link_copied: تم نسخ الرابط إلى الحافظة
@@ -46,7 +54,6 @@ ar:
       deleted_chat_username: تم الحذف
       dates:
         yesterday: "أمس"
-        time_tiny: "h:mm"
       all_loaded: "يتم الآن عرض جميع الرسائل"
       already_enabled: "الدردشة مفعَّلة في هذا الموضوع. يُرجى تحديث الصفحة."
       disabled_for_topic: "الدردشة متوقفة في هذا الموضوع."
@@ -142,7 +149,6 @@ ar:
       header_indicator_preference:
         title: "إظهار مؤشر النشاط في الرأس"
         all_new: "كل الرسائل الجديدة"
-        dm_and_mentions: "الرسائل المباشرة والإشارات"
         only_mentions: "الإشارات فقط"
         never: "أبدًا"
       separate_sidebar_mode:
@@ -274,6 +280,7 @@ ar:
       placeholder_channel: "الدردشة في %{channelName}"
       placeholder_thread: "الدردشة في سلسلة"
       placeholder_users: "الدردشة مع %{commaSeparatedNames}"
+      placeholder_group: "الدردشة في المجموعة"
       placeholder_new_message_disallowed:
         archived: "القناة مؤرشفة، ولا يمكنك إرسال رسائل جديدة الآن."
         closed: "القناة مغلقة، ولا يمكنك إرسال رسائل جديدة الآن."
@@ -520,10 +527,8 @@ ar:
         auto_join_users_info: "تحقَّق كل ساعة من المستخدمين الذين كانوا نشطين في الأشهر الثلاثة الماضية. قم بإضافتهم إلى هذه القناة إذا كان لديهم وصول إلى الفئة %{category}."
         auto_join_users_info_no_category: "تحقَّق كل ساعة من المستخدمين الذين كانوا نشطين في الأشهر الثلاثة الماضية. قم بإضافتهم إلى هذه القناة إذا كان لديهم وصول إلى الفئة المحدَّدة."
         auto_join_users_warning: "سينضم كل المستخدمين الذين ليسوا أعضاءً في هذه القناة ولديهم وصول إلى فئة %{category}. هل أنت متأكد؟"
-        desktop_notification_level: "إشعارات سطح المكتب"
         follow: "الانضمام"
         followed: "انضم"
-        mobile_notification_level: "الإشعارات الفورية للجوَّال"
         mute: "كتم القناة"
         threading_enabled: "مفعَّلة"
         threading_disabled: "متوقفة"
@@ -564,6 +569,7 @@ ar:
       incoming_webhooks:
         back: "العودة"
         channel_placeholder: "اختيار قناة"
+        channel: "القناة"
         confirm_destroy: "هل تريد بالتأكيد حذف خطاف الويب الوارد هذا؟ لا يمكن التراجع عن هذا الإجراء."
         current_emoji: "الرمز التعبيري الحالي"
         description: "الوصف"
@@ -692,10 +698,10 @@ ar:
         notifications:
           regular:
             title: "طبيعية"
-            description: "سنُرسل إليك إشعارًا إذا أشار أحد إلى @اسمك في سلسلة الدردشة هذه."
           tracking:
             title: "التتبُّع"
-            description: "سيتم عرض عدد الردود الجديدة لهذا الموضوع في قائمة سلسلة الدردشة والقناة. سيتم إرسال إشعار إليك إذا أشار شخص ما إلى @اسمك في سلسلة الدردشة هذه."
+          watching:
+            title: "المراقبة"
         participants_other_count:
           zero: "+%{count}"
           one: "+%{count}"

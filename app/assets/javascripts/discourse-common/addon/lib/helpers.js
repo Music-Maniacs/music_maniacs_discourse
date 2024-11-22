@@ -13,6 +13,11 @@ export function makeArray(obj) {
 }
 
 export function htmlHelper(fn) {
+  deprecated(
+    `htmlHelper is deprecated. Use a plain function and \`htmlSafe()\` from "@ember/template" instead.`,
+    { id: "discourse.html-helper" }
+  );
+
   return Helper.helper(function (...args) {
     args =
       args.length > 1 ? args[0].concat({ hash: args[args.length - 1] }) : args;
@@ -94,9 +99,11 @@ export function registerUnbound(name, fn) {
     { id: "discourse.register-unbound" }
   );
 
-  _helpers[name] = Helper.extend({
-    compute: (params, args) => fn(...params, args),
-  });
+  _helpers[name] = class extends Helper {
+    compute(params, args) {
+      return fn(...params, args);
+    }
+  };
 
   registerRawHelper(name, fn);
 }

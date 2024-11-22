@@ -358,6 +358,8 @@ TEXT
   end
 
   describe "#add_report" do
+    after { Report.remove_report("readers") }
+
     it "adds a report" do
       plugin = Plugin::Instance.new nil, "/tmp/test.rb"
       plugin.add_report("readers") {}
@@ -441,26 +443,6 @@ TEXT
 
       payload = JSON.parse(UserSerializer.new(user, scope: Guardian.new(user)).to_json)
       expect(payload["user"]["custom_fields"]).to eq({})
-    end
-  end
-
-  describe "#register_color_scheme" do
-    it "can add a color scheme for the first time" do
-      plugin = Plugin::Instance.new nil, "/tmp/test.rb"
-      expect {
-        plugin.register_color_scheme("Purple", primary: "EEE0E5")
-        plugin.notify_after_initialize
-      }.to change { ColorScheme.count }.by(1)
-      expect(ColorScheme.where(name: "Purple")).to be_present
-    end
-
-    it "doesn't add the same color scheme twice" do
-      Fabricate(:color_scheme, name: "Halloween")
-      plugin = Plugin::Instance.new nil, "/tmp/test.rb"
-      expect {
-        plugin.register_color_scheme("Halloween", primary: "EEE0E5")
-        plugin.notify_after_initialize
-      }.to_not change { ColorScheme.count }
     end
   end
 
@@ -946,7 +928,7 @@ TEXT
 
     it "registers an about stat group correctly" do
       stats = { :last_day => 1, "7_days" => 10, "30_days" => 100, :count => 1000 }
-      plugin.register_stat("some_group", show_in_ui: true) { stats }
+      plugin.register_stat("some_group") { stats }
       expect(Stat.all_stats.with_indifferent_access).to match(
         hash_including(
           some_group_last_day: 1,
@@ -955,12 +937,6 @@ TEXT
           some_group_count: 1000,
         ),
       )
-    end
-
-    it "hides the stat group from the UI by default" do
-      stats = { :last_day => 1, "7_days" => 10, "30_days" => 100, :count => 1000 }
-      plugin.register_stat("some_group") { stats }
-      expect(About.displayed_plugin_stat_groups).to eq([])
     end
 
     it "does not allow duplicate named stat groups" do

@@ -2,13 +2,11 @@ import { click, visit } from "@ember/test-helpers";
 import { test } from "qunit";
 import {
   acceptance,
-  count,
-  exists,
   query,
   queryAll,
 } from "discourse/tests/helpers/qunit-helpers";
 import selectKit from "discourse/tests/helpers/select-kit-helper";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 
 acceptance("Category Edit - Security", function (needs) {
   needs.user();
@@ -20,7 +18,7 @@ acceptance("Category Edit - Security", function (needs) {
     const badgeName = firstRow.querySelector(".group-name-label").innerText;
     assert.strictEqual(badgeName, "everyone");
 
-    assert.strictEqual(count(".d-icon-check-square"), 3);
+    assert.dom(".d-icon-square-check").exists({ count: 3 });
   });
 
   test("removing a permission", async function (assert) {
@@ -29,7 +27,7 @@ acceptance("Category Edit - Security", function (needs) {
     await visit("/c/bug/edit/security");
 
     await availableGroups.expand();
-    assert.notOk(
+    assert.false(
       availableGroups.rowByValue("everyone").exists(),
       "everyone is already used and is not in the available groups"
     );
@@ -41,11 +39,12 @@ acceptance("Category Edit - Security", function (needs) {
       availableGroups.rowByValue("everyone").exists(),
       "everyone has been removed and appears in the available groups"
     );
-    assert.strictEqual(
-      query(".row-empty").innerText,
-      I18n.t("category.permissions.no_groups_selected"),
-      "shows message when no groups are selected"
-    );
+    assert
+      .dom(".row-empty")
+      .hasText(
+        i18n("category.permissions.no_groups_selected"),
+        "shows message when no groups are selected"
+      );
   });
 
   test("adding a permission", async function (assert) {
@@ -59,11 +58,11 @@ acceptance("Category Edit - Security", function (needs) {
     const addedRow = [...queryAll(".row-body")].at(-1);
 
     assert.strictEqual(
-      addedRow.querySelector(".group-name-label").innerText,
+      addedRow.querySelector(".group-name-link").innerText,
       "staff"
     );
     assert.strictEqual(
-      addedRow.querySelectorAll(".d-icon-check-square").length,
+      addedRow.querySelectorAll(".d-icon-square-check").length,
       3,
       "new row permissions match default 'everyone' permissions"
     );
@@ -75,16 +74,14 @@ acceptance("Category Edit - Security", function (needs) {
     await visit("/c/bug/edit/security");
     await click(".row-body .remove-permission");
 
-    assert.ok(!exists(".row-body"), "removes the permission from the list");
+    assert
+      .dom(".row-body")
+      .doesNotExist("removes the permission from the list");
 
     await availableGroups.expand();
     await availableGroups.selectRowByValue("everyone");
 
-    assert.strictEqual(
-      count(".row-body"),
-      1,
-      "adds back the permission tp the list"
-    );
+    assert.dom(".row-body").exists("adds back the permission tp the list");
 
     const firstRow = query(".row-body");
 
@@ -93,7 +90,7 @@ acceptance("Category Edit - Security", function (needs) {
       "everyone"
     );
     assert.strictEqual(
-      firstRow.querySelectorAll(".d-icon-check-square").length,
+      firstRow.querySelectorAll(".d-icon-square-check").length,
       1,
       "adds only 'See' permission for a new row"
     );

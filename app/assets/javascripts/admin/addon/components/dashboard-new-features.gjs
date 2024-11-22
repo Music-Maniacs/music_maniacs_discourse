@@ -4,8 +4,8 @@ import didInsert from "@ember/render-modifiers/modifiers/did-insert";
 import { service } from "@ember/service";
 import { htmlSafe } from "@ember/template";
 import { ajax } from "discourse/lib/ajax";
-import i18n from "discourse-common/helpers/i18n";
 import { bind } from "discourse-common/utils/decorators";
+import { i18n } from "discourse-i18n";
 import AdminConfigAreaCard from "admin/components/admin-config-area-card";
 import DashboardNewFeatureItem from "admin/components/dashboard-new-feature-item";
 
@@ -45,13 +45,18 @@ export default class DashboardNewFeatures extends Component {
   }
 
   <template>
-    <div class="admin-config-area" {{didInsert this.loadNewFeatures}}>
+    <div
+      class="admin-config-area__primary-content"
+      {{didInsert this.loadNewFeatures}}
+    >
       {{#if this.groupedNewFeatures}}
         {{#each this.groupedNewFeatures as |groupedFeatures|}}
           <AdminConfigAreaCard @translatedHeading={{groupedFeatures.date}}>
-            {{#each groupedFeatures.features as |feature|}}
-              <DashboardNewFeatureItem @item={{feature}} />
-            {{/each}}
+            <:content>
+              {{#each groupedFeatures.features as |feature|}}
+                <DashboardNewFeatureItem @item={{feature}} />
+              {{/each}}
+            </:content>
           </AdminConfigAreaCard>
         {{/each}}
       {{else if this.isLoaded}}

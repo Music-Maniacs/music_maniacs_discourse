@@ -2,12 +2,10 @@ import { click, visit } from "@ember/test-helpers";
 import { test } from "qunit";
 import {
   acceptance,
-  count,
-  exists,
   publishToMessageBus,
   query,
 } from "discourse/tests/helpers/qunit-helpers";
-import I18n from "discourse-i18n";
+import { i18n } from 'discourse-i18n';
 
 acceptance("Poll results", function (needs) {
   needs.user();
@@ -551,7 +549,7 @@ acceptance("Poll results", function (needs) {
               readers_count: 1,
               score: 0,
               yours: true,
-              topic_id: 134,
+              topic_id: 135,
               topic_slug: "load-more-poll-voters-ranked-choice",
               display_username: null,
               primary_group_name: null,
@@ -610,7 +608,7 @@ acceptance("Poll results", function (needs) {
                       votes: 0,
                     },
                   ],
-                  voters: 1,
+                  voters: 2,
                   preloaded_voters: {
                     def034c6770c6fd3754c054ef9ec4721: [
                       {
@@ -654,7 +652,7 @@ acceptance("Poll results", function (needs) {
                     votes: 2,
                   },
                   {
-                    digest: "def034c6770c6fd3754c054ef9ec4721",
+                    digest: "d8c22ff912e03740d9bc19e133e581e0",
                     votes: 0,
                   },
                 ],
@@ -864,7 +862,7 @@ acceptance("Poll results", function (needs) {
           },
         ],
         tags: [],
-        id: 134,
+        id: 135,
         title: "Load more poll voters",
         fancy_title: "Load more poll voters",
         posts_count: 1,
@@ -890,7 +888,7 @@ acceptance("Poll results", function (needs) {
         image_url: null,
         slow_mode_seconds: 0,
         draft: null,
-        draft_key: "topic_134",
+        draft_key: "topic_135",
         draft_sequence: 7,
         posted: true,
         unpinned: null,
@@ -898,7 +896,7 @@ acceptance("Poll results", function (needs) {
         current_post_number: 1,
         highest_post_number: 1,
         last_read_post_number: 1,
-        last_read_post_id: 156,
+        last_read_post_id: 158,
         deleted_by: null,
         has_deleted: false,
         actions_summary: [
@@ -981,14 +979,6 @@ acceptance("Poll results", function (needs) {
           voters: {
             db753fe0bc4e72869ac1ad8765341764: [
               {
-                id: 1,
-                username: "bianca",
-                name: null,
-                avatar_template:
-                  "/letter_avatar_proxy/v4/letter/b/3be4f8/{size}.png",
-                title: null,
-              },
-              {
                 id: 7,
                 username: "foo",
                 name: null,
@@ -1005,16 +995,6 @@ acceptance("Poll results", function (needs) {
         return helper.response({
           voters: {
             def034c6770c6fd3754c054ef9ec4721: [
-              {
-                rank: 1,
-                user: {
-                  id: 1,
-                  username: "bianca",
-                  name: null,
-                  avatar_template:
-                    "/letter_avatar_proxy/v4/letter/b/3be4f8/{size}.png",
-                },
-              },
               {
                 rank: 1,
                 user: {
@@ -1062,16 +1042,12 @@ acceptance("Poll results", function (needs) {
 
   test("can load more voters", async function (assert) {
     await visit("/t/load-more-poll-voters/134");
-    assert.strictEqual(
-      count(".poll-container .results li:nth-child(1) .poll-voters li"),
-      1,
-      "Initially, one voter shown on first option"
-    );
-    assert.strictEqual(
-      count(".poll-container .results li:nth-child(2) .poll-voters li"),
-      0,
-      "Initially, no voter shown on second option"
-    );
+    assert
+      .dom(".poll-container .results li:nth-child(1) .poll-voters li")
+      .exists({ count: 1 }, "initially, one voter shown on first option");
+    assert
+      .dom(".poll-container .results li:nth-child(2) .poll-voters li")
+      .doesNotExist("initially, no voter shown on second option");
 
     await publishToMessageBus("/polls/134", {
       post_id: "156",
@@ -1112,30 +1088,30 @@ acceptance("Poll results", function (needs) {
       ],
     });
 
-    assert.strictEqual(
-      count(".poll-container .results li:nth-child(1) .poll-voters li"),
-      1,
-      "after incoming message, one voter shown on first option"
-    );
+    assert
+      .dom(".poll-container .results li:nth-child(1) .poll-voters li")
+      .exists(
+        { count: 1 },
+        "after incoming message, one voter shown on first option"
+      );
 
-    assert.strictEqual(
-      count(".poll-container .results li:nth-child(2) .poll-voters li"),
-      0,
-      "after incoming message, no voter shown on second option"
-    );
+    assert
+      .dom(".poll-container .results li:nth-child(2) .poll-voters li")
+      .doesNotExist("after incoming message, no voter shown on second option");
 
     await click(".poll-voters-toggle-expand");
 
-    assert.strictEqual(
-      count(".poll-container .results li:nth-child(1) .poll-voters li"),
-      2,
-      "after clicking fetch voters button, two voters shown on first option"
-    );
-    assert.strictEqual(
-      count(".poll-container .results li:nth-child(2) .poll-voters li"),
-      0,
-      "after clicking fetch voters button, no voters shown on second option"
-    );
+    assert
+      .dom(".poll-container .results li:nth-child(1) .poll-voters li")
+      .exists(
+        { count: 2 },
+        "after clicking fetch voters button, two voters shown on first option"
+      );
+    assert
+      .dom(".poll-container .results li:nth-child(2) .poll-voters li")
+      .doesNotExist(
+        "after clicking fetch voters button, no voters shown on second option"
+      );
   });
 
   test("can load more voters - ranked choice", async function (assert) {
@@ -1145,7 +1121,7 @@ acceptance("Poll results", function (needs) {
       query(
         ".poll-container .discourse-poll-ranked_choice-results .tab-container .tab.nav-item.active button"
       ).innerText,
-      I18n.t("poll.results.tabs.outcome"),
+      i18n("poll.results.tabs.outcome"),
       "Outcome tab is active"
     );
 
@@ -1157,27 +1133,99 @@ acceptance("Poll results", function (needs) {
       query(
         ".poll-container .discourse-poll-ranked_choice-results .tab-container .tab.nav-item.active button"
       ).innerText,
-      I18n.t("poll.results.tabs.votes"),
+      i18n("poll.results.tabs.votes"),
       "Votes tab is active"
     );
 
-    assert.strictEqual(
-      count(
+    assert
+      .dom(
         ".poll-container .discourse-poll-ranked_choice-results .poll-voters li"
-      ),
-      1,
-      "Initially, one voter shown on first option"
-    );
+      )
+      .exists({ count: 1 }, "Initially, one voter shown on first option");
 
     await click(".poll-voters-toggle-expand");
 
-    assert.strictEqual(
-      count(
+    assert
+      .dom(
         ".poll-container .discourse-poll-ranked_choice-results .results li:nth-child(1) .poll-voters li"
-      ),
-      2,
-      "after clicking fetch voters button, two voters shown on first option"
-    );
+      )
+      .exists(
+        { count: 2 },
+        "after clicking fetch voters button, two voters shown on first option"
+      );
+
+    await publishToMessageBus("/polls/135", {
+      post_id: "158",
+      polls: [
+        {
+          name: "poll",
+          type: "ranked_choice",
+          status: "open",
+          public: true,
+          results: "always",
+          options: [
+            {
+              id: "def034c6770c6fd3754c054ef9ec4721",
+              html: "This",
+              votes: 3,
+            },
+            {
+              id: "d8c22ff912e03740d9bc19e133e581e0",
+              html: "That",
+              votes: 0,
+            },
+          ],
+          voters: 3,
+          preloaded_voters: {
+            def034c6770c6fd3754c054ef9ec4721: [
+              {
+                rank: 1,
+                user: {
+                  id: 1,
+                  username: "bianca",
+                  name: null,
+                  avatar_template:
+                    "/letter_avatar_proxy/v4/letter/b/3be4f8/{size}.png",
+                },
+              },
+              {
+                rank: 1,
+                user: {
+                  id: 7,
+                  username: "foo",
+                  name: null,
+                  avatar_template:
+                    "/letter_avatar_proxy/v4/letter/f/b19c9b/{size}.png",
+                  title: null,
+                },
+              },
+              {
+                rank: 1,
+                user: {
+                  id: 11,
+                  username: "bar",
+                  name: null,
+                  avatar_template:
+                    "/letter_avatar_proxy/v4/letter/f/f33bef/{size}.png",
+                  title: null,
+                },
+              },
+            ],
+          },
+          chart_type: "bar",
+          title: null,
+        },
+      ],
+    });
+
+    assert
+      .dom(
+        ".poll-container .discourse-poll-ranked_choice-results .results li:nth-child(1) .poll-voters li"
+      )
+      .exists(
+        { count: 2 },
+        "after incoming message containing 3 voters, only 2 voters shown on first option as bus updates are not supported once voters are expanded"
+      );
   });
 
   test("can unvote", async function (assert) {
@@ -1185,13 +1233,13 @@ acceptance("Poll results", function (needs) {
 
     await click(".toggle-results");
 
-    assert.strictEqual(count(".poll-container .d-icon-circle"), 1);
-    assert.strictEqual(count(".poll-container .d-icon-far-circle"), 1);
+    assert.dom(".poll-container .d-icon-circle").exists({ count: 1 });
+    assert.dom(".poll-container .d-icon-far-circle").exists({ count: 1 });
 
     await click(".remove-vote");
 
-    assert.strictEqual(count(".poll-container .d-icon-circle"), 0);
-    assert.strictEqual(count(".poll-container .d-icon-far-circle"), 2);
+    assert.dom(".poll-container .d-icon-circle").doesNotExist();
+    assert.dom(".poll-container .d-icon-far-circle").exists({ count: 2 });
   });
 });
 
@@ -1695,6 +1743,6 @@ acceptance("Poll results - no voters", function (needs) {
   test("does not show results button", async function (assert) {
     await visit("/t/load-more-poll-voters/134");
 
-    assert.ok(!exists(".toggle-results"));
+    assert.dom(".toggle-results").doesNotExist();
   });
 });

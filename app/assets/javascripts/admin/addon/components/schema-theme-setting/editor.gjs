@@ -7,7 +7,7 @@ import { gt } from "truth-helpers";
 import DButton from "discourse/components/d-button";
 import { popupAjaxError } from "discourse/lib/ajax-error";
 import { cloneJSON } from "discourse-common/lib/object";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 import Tree from "admin/components/schema-theme-setting/editor/tree";
 import FieldInput from "admin/components/schema-theme-setting/field";
 
@@ -68,7 +68,7 @@ export default class SchemaThemeSettingNewEditor extends Component {
 
     const lastHistory = this.history[this.history.length - 1];
 
-    return I18n.t("admin.customize.theme.schema.back_button", {
+    return i18n("admin.customize.theme.schema.back_button", {
       name: this.generateSchemaTitle(
         this.#resolveDataFromPaths(lastHistory.dataPaths)[lastHistory.index],
         this.#resolveSchemaFromPaths(lastHistory.schemaPaths),
@@ -308,7 +308,7 @@ export default class SchemaThemeSettingNewEditor extends Component {
           {{#if (gt this.fields.length 0)}}
             <DButton
               @action={{this.removeItem}}
-              @icon="trash-alt"
+              @icon="trash-can"
               class="btn-danger schema-theme-setting-editor__remove-btn"
             />
           {{/if}}

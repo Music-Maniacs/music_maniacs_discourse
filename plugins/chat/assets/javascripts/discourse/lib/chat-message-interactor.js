@@ -10,7 +10,7 @@ import { clipboardCopy } from "discourse/lib/utilities";
 import Bookmark from "discourse/models/bookmark";
 import getURL from "discourse-common/lib/get-url";
 import { bind } from "discourse-common/utils/decorators";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 import { MESSAGE_CONTEXT_THREAD } from "discourse/plugins/chat/discourse/components/chat-message";
 import ChatMessageFlag from "discourse/plugins/chat/discourse/lib/chat-message-flag";
 import ChatMessage from "discourse/plugins/chat/discourse/models/chat-message";
@@ -162,14 +162,14 @@ export default class ChatMessageInteractor {
 
     buttons.push({
       id: "copyLink",
-      name: I18n.t("chat.copy_link"),
+      name: i18n("chat.copy_link"),
       icon: "link",
     });
 
     if (this.site.mobileView) {
       buttons.push({
         id: "copyText",
-        name: I18n.t("chat.copy_text"),
+        name: i18n("chat.copy_text"),
         icon: "clipboard",
       });
     }
@@ -177,23 +177,23 @@ export default class ChatMessageInteractor {
     if (this.canEdit) {
       buttons.push({
         id: "edit",
-        name: I18n.t("chat.edit"),
-        icon: "pencil-alt",
+        name: i18n("chat.edit"),
+        icon: "pencil",
       });
     }
 
     if (!this.pane.selectingMessages) {
       buttons.push({
         id: "select",
-        name: I18n.t("chat.select"),
-        icon: "tasks",
+        name: i18n("chat.select"),
+        icon: "list-check",
       });
     }
 
     if (this.canFlagMessage) {
       buttons.push({
         id: "flag",
-        name: I18n.t("chat.flag"),
+        name: i18n("chat.flag"),
         icon: "flag",
       });
     }
@@ -201,24 +201,24 @@ export default class ChatMessageInteractor {
     if (this.canDeleteMessage) {
       buttons.push({
         id: "delete",
-        name: I18n.t("chat.delete"),
-        icon: "trash-alt",
+        name: i18n("chat.delete"),
+        icon: "trash-can",
       });
     }
 
     if (this.canRestoreMessage) {
       buttons.push({
         id: "restore",
-        name: I18n.t("chat.restore"),
-        icon: "undo",
+        name: i18n("chat.restore"),
+        icon: "arrow-rotate-left",
       });
     }
 
     if (this.canRebakeMessage) {
       buttons.push({
         id: "rebake",
-        name: I18n.t("chat.rebake_message"),
-        icon: "sync-alt",
+        name: i18n("chat.rebake_message"),
+        icon: "rotate",
       });
     }
 
@@ -249,7 +249,7 @@ export default class ChatMessageInteractor {
     clipboardCopy(this.message.message);
     this.toasts.success({
       duration: 3000,
-      data: { message: I18n.t("chat.text_copied") },
+      data: { message: i18n("chat.text_copied") },
     });
   }
 
@@ -269,7 +269,7 @@ export default class ChatMessageInteractor {
     clipboardCopy(url);
     this.toasts.success({
       duration: 1500,
-      data: { message: I18n.t("chat.link_copied") },
+      data: { message: i18n("chat.link_copied") },
     });
   }
 

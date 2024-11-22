@@ -13,7 +13,7 @@ class ProblemCheck
     end
 
     def run_all
-      each(&:run)
+      select(&:enabled?).each(&:run)
     end
 
     private
@@ -23,6 +23,7 @@ class ProblemCheck
 
   include ActiveSupport::Configurable
 
+  config_accessor :enabled, default: true, instance_writer: false
   config_accessor :priority, default: "low", instance_writer: false
 
   # Determines if the check should be performed at a regular interval, and if
@@ -89,6 +90,10 @@ class ProblemCheck
     ProblemCheck::WatchedWords,
   ].freeze
 
+  # To enforce the unique constraint in Postgres <15 we need a dummy
+  # value, since the index considers NULLs to be distinct.
+  NO_TARGET = "__NULL__"
+
   def self.[](key)
     key = key.to_sym
 
@@ -111,6 +116,11 @@ class ProblemCheck
     name.demodulize.underscore.to_sym
   end
   delegate :identifier, to: :class
+
+  def self.enabled?
+    enabled
+  end
+  delegate :enabled?, to: :class
 
   def self.scheduled?
     perform_every.present?
@@ -170,12 +180,12 @@ class ProblemCheck
 
   private
 
-  def tracker(target = nil)
+  def tracker(target = NO_TARGET)
     ProblemCheckTracker[identifier, target]
   end
 
   def targets
-    [nil]
+    [NO_TARGET]
   end
 
   def problem(override_key: nil, override_data: {})

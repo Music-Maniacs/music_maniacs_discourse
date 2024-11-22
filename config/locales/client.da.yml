@@ -120,7 +120,6 @@ da:
       topic_html: 'Emne: <span class="topic-title">%{topicTitle}</span>'
       post: "indlæg #%{postNumber} af @%{username}"
       close: "luk"
-      twitter: "Del på Twitter"
       facebook: "Del på Facebook"
       email: "Send via e-mail"
       url: "Kopiér og del URL"
@@ -255,6 +254,7 @@ da:
       pill: "Foreslået"
       pm_title: "Foreslåede beskeder"
     about:
+      edit: "Rediger denne side"
       simple_title: "Om"
       title: "Om %{title}"
       stats: "Webstedsstatistikker"
@@ -270,7 +270,6 @@ da:
       post_count: "Indlæg"
       active_user_count: "Aktive brugere"
       contact: "Kontakt os"
-      contact_info: "I tilfælde af en kritisk begivenhed eller vigtige spørgsmål angående denne side, kontakt os venligst på %{contact_info}."
       activities:
         topics:
           one: "%{formatted_number} emne"
@@ -1174,7 +1173,7 @@ da:
       ignored_users: "Ignorerede"
       ignored_users_instructions: "Undertryk alle indlæg, meddelelser og PM'er fra disse brugere."
       tracked_topics_link: "Vis"
-      automatically_unpin_topics: "Stop automatisk med at følge emner, når jeg når til bunden."
+      automatically_unpin_topics: "Stop automatisk med at følge emner, når jeg når til bunden"
       apps: "Apps"
       revoke_access: "Tilbagekald adgang"
       undo_revoke_access: "Fortryd Tilbagekald adgang"
@@ -1355,7 +1354,6 @@ da:
         add_email: "Tilføj alternativ e-mail"
         auth_override_instructions: "E-mail kan opdateres fra godkendelsesudbyderen."
         no_secondary: "Ingen sekundære emails"
-        instructions: "Vis aldrig offentligt"
         admin_note: "Bemærk: En administratorbruger, der skifter en anden ikke-admin-brugers e-mail, indikerer, at brugeren har mistet adgang til deres oprindelige e-mail-konto, så en nulstil-adgangskode-e-mail vil blive sendt til brugerens nye adresse. Brugerens e-mail ændres ikke, før de har afsluttet processen med nulstilling af adgangskode."
         ok: "Vi vil sende dig en bekræftelses email"
         required: "Indtast venligst en e-mail-adresse"
@@ -1381,13 +1379,13 @@ da:
         action: "Klik her for at aktivere din konto"
         already_done: "Beklager, dette bekræftelses-link er ikke længere gyldigt. Måske er din konto allerede aktiv?"
         please_continue: "Din nye konto er bekræftet; du bliver nu omdirigeret til forsiden."
-        continue_button: "Fortsæt til %{site_name}"
+        continue_button: "Afslut!"
         welcome_to: "Velkommen til %{site_name}!"
         approval_required: "En moderator skal manuelt godkende din nye konto før du kan tilgå forummet. Du får en e-mail, når din konto er godkendt!"
       name:
         title: "Navn"
-        instructions: "Dit fulde navn (valgfrit)."
-        instructions_required: "Dit fulde navn."
+        instructions: "Dit fulde navn (valgfrit)"
+        instructions_required: "Dit fulde navn"
         required: "Indtast venligst et navn"
         too_short: "Dit navn er for kort"
         ok: "Dit navn ser fint ud"
@@ -1436,7 +1434,6 @@ da:
       location: "Sted"
       website: "Websted"
       email_settings: "E-mail"
-      hide_profile_and_presence: "Skjul min offentlige profil og tilstedeværelsesfunktioner"
       enable_physical_keyboard: "Aktivér understøttelse af fysisk tastatur på iPad"
       text_size:
         title: "Skriftstørrelse"
@@ -1548,12 +1545,10 @@ da:
           success: "Invitiationslinket blev genereret!"
           error: "Der opstod en fejl under generering af Invitationslink"
         invite:
-          new_title: "Opret Invitation"
-          edit_title: "Rediger Invitation"
-          instructions: "Del dette link for øjeblikkeligt at give adgang til dette websted:"
-          copy_link: "kopier link"
           expires_in_time: "Udløber om %{time}"
           expired_at_time: "Udløb kl. %{time}"
+          copy_link: "Kopiér link"
+          link_copied: "Link kopieret!"
           show_advanced: "Vis Avancerede Indstillinger"
           hide_advanced: "Skjul Avancerede Indstillinger"
           restrict: "Begræns til"
@@ -1562,11 +1557,10 @@ da:
           email_or_domain_placeholder: "navn@eksempel.dk eller eksempel.dk"
           max_redemptions_allowed: "Maks. anvendelser"
           add_to_groups: "Tilføj til grupper"
-          expires_at: "Udløber efter"
-          custom_message: "Valgfri personlig meddelelse"
+          expires_after: "Udløber efter"
           send_invite_email: "Gem og send e-mail"
-          save_invite: "Gem Invitation"
-          invite_saved: "Invitation gemt."
+          update_invite: "Opdater"
+          cancel: "Annuller"
         bulk_invite:
           none: "Ingen invitationer at vise på denne side."
           text: "Masseinvitation"
@@ -1773,12 +1767,15 @@ da:
     search_hint: "brugernavn, email eller IP adresse"
     create_account:
       header_title: "Velkommen!"
-      subheader_title: "Lad os oprette din konto"
       disclaimer: "Ved at registrere dig accepterer du <a href='%{privacy_link}' target='blank'>Privatlivsbetingelser</a> og <a href='%{tos_link}' target='blank'>servicevilkårene</a> ."
       title: "Tilmeld dig"
       failed: "Noget gik galt. Måske er e-mail-adressen allerede registreret – prøv “Jeg har glemt min adgangskode”-linket"
       associate: "Har du allerede en konto? <a href='%{associate_link}'>Log ind</a> for at linke din %{provider} konto."
       already_have_account: "Har du allerede en konto?"
+      progress_bar:
+        signup: "Tilmeld dig"
+        approve: "Godkend"
+        login: "Log ind"
     forgot_password:
       title: "Nulstil kodeord"
       action: "Jeg har glemt min adgangskode"
@@ -1809,7 +1806,6 @@ da:
       confirm_button: Gennemfør login
     login:
       header_title: "Velkommen tilbage"
-      subheader_title: "Log ind med din konto"
       title: "Log ind"
       username: "Bruger"
       password: "Adgangskode"
@@ -2387,6 +2383,9 @@ da:
         selected:
           one: "Du har valgt <b>%{count}</b> indlæg."
           other: "Du har valgt <b>%{count}</b> indlæg."
+        selected_count:
+          one: "%{count} valgt"
+          other: "%{count} valgt"
         change_tags: "Erstat Mærker"
         append_tags: "Tilføj Mærker"
         choose_new_tags: "Vælg nye mærker for dette emne"
@@ -2425,11 +2424,15 @@ da:
         bookmarks: "Der er ikke flere bogmærkede emner."
         filter: "Der er ikke flere emner."
     topic_bulk_actions:
+      dismiss:
+        name: "Ignorer Alle"
       close_topics:
         name: "Luk"
         optional: (valgfri)
       archive_topics:
         name: "Arkiv"
+      archive_messages:
+        name: "Flyt til arkiv"
       move_messages_to_inbox:
         name: "Flyt til indbakke"
       append_tags:
@@ -2455,6 +2458,7 @@ da:
         help: "Flyt beskeder tilbage til Indbakke"
       defer:
         help: "Markér emne som ulæst"
+        title: "Markér som ulæst"
       list: "Emner"
       new: "nyt emne"
       unread: "ulæste"
@@ -2899,17 +2903,22 @@ da:
       few_likes_left: "Tak fordi du spreder kærligheden! Du har kun få 'Synes godt om' tilbage i dag."
       controls:
         reply: "begynd at skrive et svar til dette indlæg"
+        like_action: "Like"
         like: "'Synes godt om' dette indlæg"
         has_liked: "Du synes godt om dette indlæg"
         read_indicator: "medlemmer der har læst dette indlæg"
+        undo_like_action: "Undo like"
         undo_like: "fortryd 'Synes godt om'"
         edit: "redigér dette indlæg"
         edit_action: "Rediger"
         edit_anonymous: "Beklager, du skal være logget ind for at redigere dette indlæg."
+        flag_action: "Rapportér"
         flag: "gør moderator opmærksom på dette indlæg"
         delete: "slet dette indlæg"
         undelete: "annullér sletning"
+        share_action: "Del"
         share: "del et link til dette indlæg"
+        copy_action: "Kopiér link"
         link_copied: "Link kopieret!"
         more: "Mere"
         delete_replies:
@@ -2922,6 +2931,7 @@ da:
             other: "Ja, og alle %{count} svar"
           just_the_post: "Nej, kun dette indlæg"
         admin: "indlæg administrator handlinger"
+        admin_action: "Admin"
         permanently_delete: "Slet permanent"
         wiki: "Opret Wiki"
         unwiki: "Fjern Wiki"
@@ -3770,6 +3780,8 @@ da:
               title_drafts: "Mine uopslåede kladder"
             review:
               content: "Anmeldelse"
+            invite:
+              content: "Invitér"
       panels:
         forum:
           label: Forum
@@ -3811,6 +3823,7 @@ da:
     powered_by_discourse: "Drevet af Discourse"
   admin_js:
     type_to_filter: "skriv for at filtrere…"
+    settings: "Indstillinger"
     admin:
       title: "Discourse Admin"
       moderator: "Moderator"
@@ -3842,6 +3855,7 @@ da:
         installed_version: "Installeret"
         latest_version: "Seneste version"
         problems_found: "Nogle råd baseret på dine nuværende sideindstillinger"
+        dismiss_notice: "Ignorer Alle"
         new_features:
           title: "Hvad er nyt"
           learn_more: "Lær mere..."
@@ -4163,11 +4177,15 @@ da:
           screened_ips: "Blokerede IPer"
           screened_urls: "Blokerede URLer"
           search_logs: "Søgnings logs"
-          security: "Sikkerhed"
-          spam: "Spam"
+      section_landing_pages:
+        account:
+          title: "Konto"
+          backups:
+            title: "Backups"
       config_areas:
         about:
           contact_url_placeholder: "https://johnny-smith.com/contact"
+          company_name: "Navn"
           optional: "(valgfri)"
           update: "Opdater"
           saved: "gemt!"
@@ -4177,6 +4195,7 @@ da:
           edit: "Rediger"
           delete: "Slet"
           delete_confirm: 'Er du sikker på, at du vil slette "%{name}"?'
+          flags_tab: "Flag"
           form:
             save: "Gem"
             name: "Navn"
@@ -4184,9 +4203,14 @@ da:
             invalid_applies_to: "Obligatoriske"
             topic: "emner"
             post: "indlæg"
+          more_options:
+            move_up: "Flyt op"
+            move_down: "Flyt ned"
+        look_and_feel:
+          themes:
+            title: "Temaer"
       plugins:
         title: "Udvidelser"
-        installed: "Installerede Udvidelser"
         name: "Navn"
         none_installed: "Du har ikke nogen udvidelser installeret"
         version: "Version"
@@ -4218,7 +4242,6 @@ da:
         menu:
           backups: "Backups"
           logs: "Logs"
-        none: "Ingen backups tilgængelige"
         read_only:
           enable:
             title: "Aktiver \"read-only\" tilstand"
@@ -4254,12 +4277,11 @@ da:
           download:
             label: "Download"
             title: "Send e-mail med downloadlink"
-            alert: "Et link til download af denne backup er blevet e-mailet til dig."
+            alert: "Et link til download af denne backup er blevet e-mailet til dig"
           destroy:
             title: "Sletter backuppen"
             confirm: "Er du sikker på du vil fjerne denne backup?"
           restore:
-            is_disabled: "Gendan er deaktiveret i forum indstillingerne."
             label: "Genetabler"
             title: "Gendan backuppen"
             confirm: "Er du sikker på du vil genskabe denne backup?"
@@ -4268,7 +4290,6 @@ da:
             title: "Rul databasen tilbage til et tidspunkt hvor tingene virkede"
             confirm: "Er du sikker på at du vil genskabe databasen til den forrige virkende version?"
         location:
-          local: "Lokal lagring"
           s3: "S3"
         backup_storage_error: "Kunne ikke få adgang til backup lagring: %{error_message}"
       export_csv:
@@ -4368,6 +4389,9 @@ da:
           convert_theme_tooltip: "Konverter dette tema til komponent"
           inactive_themes: "Inaktive temaer:"
           inactive_components: "Ubrugte komponenter:"
+          selected:
+            one: "%{count} valgt"
+            other: "%{count} valgt"
           cancel: "Annuller"
           broken_theme_tooltip: "Dette tema har fejl i dets CSS, HTML eller YAML"
           disabled_component_tooltip: "Denne komponent er deaktiveret"
@@ -5038,7 +5062,6 @@ da:
         time_read: "Læsetid"
         post_edits_count: "Indlægs Redigeringer"
         anonymize: "Anonymiser Bruger"
-        anonymize_confirm: "Er du HELT SIKKER på at du vil anonymisere denne konto? Dette vil ændre brugernavnet og email adressen, samt nulstille profil informationen."
         anonymize_yes: "Ja, anonymiser denne konto"
         anonymize_failed: "Der var problemer med at anonymisere denne konto."
         delete: "Slet bruger"
@@ -5236,6 +5259,8 @@ da:
         history: "Vis ændringshistorik"
         reset: "nulstil"
         none: "ingen"
+        save: "gem"
+        cancel: "annuller"
       site_settings:
         emoji_list:
           invalid_input: "Humørikon liste bør kun indeholde gyldige humørikon navne, for eksempel: knus"
@@ -5368,10 +5393,6 @@ da:
             with_post: <span class="username">%{username}</span> for indlæg i %{link}
             with_post_time: <span class="username">%{username}</span> for indlæg i %{link} klokken <span class="time">%{time}</span>
             with_time: <span class="username">%{username}</span> klokken <span class="time">%{time}</span>
-        badge_intro:
-          title: "Vælg et eksisterende emblem, eller opret et nyt for at komme i gang"
-          what_are_badges_title: "Hvad er emblemer?"
-          badge_query_examples_title: "Eksempler på emblem-forespørgsel"
         mass_award:
           title: Masseudnævnelse
           description: Tildel det samme emblem til mange brugere på én gang.
@@ -5384,8 +5405,6 @@ da:
           grant_existing_holders: Tildel yderligere emblemer til eksisterende emblemindehavere
       emoji:
         title: "Humørikon"
-        add: "Tilføj ny emoji"
-        choose_files: "Vælg Filer"
         uploading: "Overfører…"
         name: "Navn"
         group: "Gruppe"
@@ -5425,15 +5444,17 @@ da:
         category_id: "Kategori ID"
         category_title: "Kategori"
         tag_name: "Mærke navn"
+        tag_title: "Mærke"
         external_url: "Ekstern eller Relativ URL"
+        user_title: "Bruger"
         username: "Brugernavn"
         destination: "Destination"
         copy_to_clipboard: "Kopier Permalink til udklipsholder"
         delete_confirm: Er du sikker på at du vil slette dette permalink?
         form:
           label: "Ny:"
-          add: "Tilføj"
-          filter: "Søg (URL eller ekstern URL)"
+          url: "URL"
+          save: "Gem"
       reseed:
         action:
           label: "Erstat tekst ..."

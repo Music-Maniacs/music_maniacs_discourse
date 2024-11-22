@@ -39,6 +39,9 @@ ja:
       chat_messages_count: "チャットメッセージ"
       chat_channels_count: "チャットチャンネル"
       chat_users_count: "チャットユーザー"
+      activities:
+        chat_messages:
+          other: "%{formatted_number} チャットメッセージ"
     chat:
       text_copied: テキストをクリップボードにコピーしました
       link_copied: リンクをクリップボードにコピーしました
@@ -46,7 +49,6 @@ ja:
       deleted_chat_username: 削除
       dates:
         yesterday: "昨日"
-        time_tiny: "h:mm"
       all_loaded: "すべてのメッセージを表示中"
       already_enabled: "このトピックのチャットはすでに有効になっています。再読み込みしてください。"
       disabled_for_topic: "このトピックのチャットは無効になっています。"
@@ -127,7 +129,6 @@ ja:
       header_indicator_preference:
         title: "ヘッダーにアクティビティインジケーターを表示"
         all_new: "すべての新着メッセージ"
-        dm_and_mentions: "ダイレクトメッセージとメンション"
         only_mentions: "メンションのみ"
         never: "なし"
       separate_sidebar_mode:
@@ -427,10 +428,8 @@ ja:
         auto_join_users_info: "どのユーザーが過去 3 か月間アクティブであったかを時間単位で確認します。ユーザーが %{category} カテゴリにアクセスできる場合は、このチャンネルに追加します。"
         auto_join_users_info_no_category: "どのユーザーが過去 3 か月間アクティブであったかを時間単位で確認します。選択されたカテゴリにユーザーがアクセスできる場合は、このチャンネルに追加します。"
         auto_join_users_warning: "このチャンネルのメンバーでなく、%{category} カテゴリにアクセスできるすべてのユーザーが参加します。よろしいですか？"
-        desktop_notification_level: "デスクトップ通知"
         follow: "参加"
         followed: "参加中"
-        mobile_notification_level: "モバイルプッシュ通知"
         mute: "チャンネルをミュート"
         threading_enabled: "有効"
         threading_disabled: "無効"
@@ -564,10 +563,10 @@ ja:
         notifications:
           regular:
             title: "標準"
-            description: "このスレッドで誰かが @name であなたをメンションすると、通知されます。"
           tracking:
             title: "追跡中"
-            description: "スレッドリストとチャンネルに、このスレッドの新しい返信数が表示されます。スレッドで誰かが @name であなたをメンションすると、通知されます。"
+          watching:
+            title: "ウォッチ中"
         participants_other_count:
           other: "+%{count} 件"
       thread_title_toast:
@@ -592,6 +591,8 @@ ja:
       chat_invitation: "があなたをチャットチャンネルに招待しました"
       chat_invitation_html: "<span>%{username}</span> <span>があなたをチャットチャンネルに招待しました</span>"
       chat_quoted: "<span>%{username}</span> %{description}"
+      chat_watched_thread_label:
+        other: "%{username} および他 %{count} 人"
       popup:
         chat_mention:
           direct: 'があなたを "%{channel}" でメンションしました'

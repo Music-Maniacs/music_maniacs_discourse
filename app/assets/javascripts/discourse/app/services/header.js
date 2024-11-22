@@ -7,7 +7,7 @@ import { disableImplicitInjections } from "discourse/lib/implicit-injections";
 import deprecated from "discourse-common/lib/deprecated";
 import { SCROLLED_UP } from "./scroll-direction";
 
-const VALID_HEADER_BUTTONS_TO_HIDE = ["search", "login", "signup"];
+const VALID_HEADER_BUTTONS_TO_HIDE = ["search", "login", "signup", "menu"];
 
 @disableImplicitInjections
 export default class Header extends Service {
@@ -28,7 +28,6 @@ export default class Header extends Service {
 
   @tracked hamburgerVisible = false;
   @tracked userVisible = false;
-  @tracked anyWidgetHeaderOverrides = false;
 
   #hiders = new TrackedMap();
 
@@ -70,32 +69,6 @@ export default class Header extends Service {
     }
 
     return true;
-  }
-
-  get useGlimmerHeader() {
-    if (this.siteSettings.glimmer_header_mode === "disabled") {
-      return false;
-    } else if (this.siteSettings.glimmer_header_mode === "enabled") {
-      if (this.anyWidgetHeaderOverrides) {
-        // eslint-disable-next-line no-console
-        console.error(
-          "Using modern 'glimmer' header, even though there are themes and/or plugins using deprecated APIs. Deprecated header customizations will be broken. (glimmer_header_mode: enabled) https://meta.discourse.org/t/316549"
-        );
-      }
-
-      return true;
-    } else {
-      // Auto
-      if (this.anyWidgetHeaderOverrides) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          "Using legacy 'widget' header because themes and/or plugins are using deprecated APIs. (glimmer_header_mode: auto) https://meta.discourse.org/t/316549"
-        );
-        return false;
-      } else {
-        return true;
-      }
-    }
   }
 
   registerHider(ref, buttons) {

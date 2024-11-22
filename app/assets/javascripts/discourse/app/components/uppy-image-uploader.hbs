@@ -9,19 +9,23 @@
     <label
       class="btn btn-default pad-left no-text {{if this.disabled 'disabled'}}"
       title={{this.disabledReason}}
+      for={{this.computedId}}
+      tabindex="0"
+      {{on "keydown" this.handleKeyboardActivation}}
     >
       {{d-icon "far-image"}}
       <PickFilesButton
+        @registerFileInput={{this.uppyUpload.setup}}
         @fileInputDisabled={{this.disabled}}
-        @fileInputClass="hidden-upload-field"
         @acceptedFormatsOverride="image/*"
+        @fileInputId={{this.computedId}}
       />
     </label>
 
     {{#if this.imageUrl}}
       <DButton
         @action={{action "trash"}}
-        @icon="far-trash-alt"
+        @icon="trash-can"
         class="btn-danger pad-left no-text"
       />
       <DButton
@@ -34,11 +38,11 @@
       />
     {{/if}}
 
-    <span class="btn {{unless this.uploading 'hidden'}}">{{i18n
+    <span class="btn {{unless this.uppyUpload.uploading 'hidden'}}">{{i18n
         "upload_selector.uploading"
       }}
-      {{this.uploadProgress}}%</span>
-    <span class="btn {{unless this.processing 'hidden'}}">{{i18n
+      {{this.uppyUpload.uploadProgress}}%</span>
+    <span class="btn {{unless this.uppyUpload.processing 'hidden'}}">{{i18n
         "upload_selector.processing"
       }}</span>
   </div>

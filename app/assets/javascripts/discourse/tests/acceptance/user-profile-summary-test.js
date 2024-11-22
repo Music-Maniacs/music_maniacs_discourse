@@ -1,13 +1,9 @@
-import { click, visit } from "@ember/test-helpers";
+import { click, currentURL, visit } from "@ember/test-helpers";
 import { test } from "qunit";
 import userFixtures from "discourse/tests/fixtures/user-fixtures";
-import {
-  acceptance,
-  exists,
-  query,
-} from "discourse/tests/helpers/qunit-helpers";
+import { acceptance, query } from "discourse/tests/helpers/qunit-helpers";
 import { cloneJSON } from "discourse-common/lib/object";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 
 let deleteAndBlock = null;
 
@@ -17,16 +13,30 @@ acceptance("User Profile - Summary", function (needs) {
   test("Viewing Summary", async function (assert) {
     await visit("/u/eviltrout/summary");
 
-    assert.ok(exists(".replies-section li a"), "replies");
-    assert.ok(exists(".topics-section li a"), "topics");
-    assert.ok(exists(".links-section li a"), "links");
-    assert.ok(exists(".replied-section .user-info"), "liked by");
-    assert.ok(exists(".liked-by-section .user-info"), "liked by");
-    assert.ok(exists(".liked-section .user-info"), "liked");
-    assert.ok(exists(".badges-section .badge-card"), "badges");
-    assert.ok(
-      exists(".top-categories-section .category-link"),
-      "top categories"
+    assert.dom(".replies-section li a").exists("replies");
+    assert.dom(".topics-section li a").exists("topics");
+    assert.dom(".links-section li a").exists("links");
+    assert.dom(".replied-section .user-info").exists("liked by");
+    assert.dom(".liked-by-section .user-info").exists("liked by");
+    assert.dom(".liked-section .user-info").exists("liked");
+    assert.dom(".badges-section .badge-card").exists("badges");
+    assert
+      .dom(".top-categories-section .category-link")
+      .exists("top categories");
+  });
+
+  test("Top Categories Search", async function (assert) {
+    await visit("/u/eviltrout/summary");
+
+    await click(".top-categories-section .reply-count a");
+    assert.strictEqual(currentURL(), "/search?q=%40eviltrout%20%23bug");
+
+    await visit("/u/eviltrout/summary");
+
+    await click(".top-categories-section .topic-count a");
+    assert.strictEqual(
+      currentURL(),
+      "/search?q=%40eviltrout%20%23bug%20in%3Afirst"
     );
   });
 });
@@ -46,7 +56,7 @@ acceptance("User Profile - Summary - User Status", function (needs) {
 
   test("Shows User Status", async function (assert) {
     await visit("/u/eviltrout/summary");
-    assert.ok(exists(".user-status-message .emoji[alt='tooth']"));
+    assert.dom(".user-status-message .emoji[alt='tooth']").exists();
   });
 });
 
@@ -97,16 +107,20 @@ acceptance("User Profile - Summary - Stats", function (needs) {
     await visit("/u/eviltrout/summary");
 
     assert.equal(query(".stats-time-read span").textContent.trim(), "1d");
-    assert.equal(
-      query(".stats-time-read span").title,
-      I18n.t("user.summary.time_read_title", { duration: "1 day" })
-    );
+    assert
+      .dom(".stats-time-read span")
+      .hasAttribute(
+        "title",
+        i18n("user.summary.time_read_title", { duration: "1 day" })
+      );
 
     assert.equal(query(".stats-recent-read span").textContent.trim(), "17m");
-    assert.equal(
-      query(".stats-recent-read span").title,
-      I18n.t("user.summary.recent_time_read_title", { duration: "17 mins" })
-    );
+    assert
+      .dom(".stats-recent-read span")
+      .hasAttribute(
+        "title",
+        i18n("user.summary.recent_time_read_title", { duration: "17 mins" })
+      );
   });
 });
 
@@ -156,7 +170,7 @@ acceptance("User Profile - Summary - Admin", function (needs) {
 
     assert.equal(
       query("#dialog-title").textContent,
-      I18n.t("admin.user.delete_confirm_title"),
+      i18n("admin.user.delete_confirm_title"),
       "dialog has a title"
     );
 

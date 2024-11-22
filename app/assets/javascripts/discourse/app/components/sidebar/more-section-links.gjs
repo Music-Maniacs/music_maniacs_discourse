@@ -7,8 +7,8 @@ import willDestroy from "@ember/render-modifiers/modifiers/will-destroy";
 import { service } from "@ember/service";
 import { isEmpty } from "@ember/utils";
 import icon from "discourse-common/helpers/d-icon";
-import i18n from "discourse-common/helpers/i18n";
 import { bind } from "discourse-common/utils/decorators";
+import { i18n } from "discourse-i18n";
 import MoreSectionLink from "./more-section-link";
 import SectionLinkButton from "./section-link-button";
 
@@ -129,7 +129,7 @@ export default class SidebarMoreSectionLinks extends Component {
         class="sidebar-section-link sidebar-row sidebar-more-section-links-details-summary --link-button"
       >
         <span class="sidebar-section-link-prefix icon">
-          {{icon "ellipsis-v"}}
+          {{icon "ellipsis-vertical"}}
         </span>
         <span class="sidebar-section-link-content-text">
           {{i18n "sidebar.more"}}

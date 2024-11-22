@@ -6,8 +6,8 @@ import SearchMenu, {
 import searchFixtures from "discourse/tests/fixtures/search-fixtures";
 import { setupRenderingTest } from "discourse/tests/helpers/component-test";
 import pretender, { response } from "discourse/tests/helpers/create-pretender";
-import { exists, query } from "discourse/tests/helpers/qunit-helpers";
-import I18n from "discourse-i18n";
+import { query } from "discourse/tests/helpers/qunit-helpers";
+import { i18n } from "discourse-i18n";
 
 // Note this isn't a full-fledge test of the search menu. Those tests are in
 // acceptance/search-test.js. This is simply about the rendering of the
@@ -32,46 +32,42 @@ module("Integration | Component | search-menu", function (hooks) {
 
     await render(<template><SearchMenu /></template>);
 
-    assert.ok(
-      exists(".show-advanced-search"),
-      "it shows full page search button"
-    );
+    assert
+      .dom(".show-advanced-search")
+      .exists("it shows full page search button");
 
-    assert.notOk(exists(".menu-panel"), "Menu panel is not rendered yet");
+    assert.dom(".menu-panel").doesNotExist("Menu panel is not rendered yet");
 
     await click("#search-term");
 
-    assert.ok(
-      exists(".menu-panel .search-menu-initial-options"),
-      "Menu panel is rendered with initial options"
-    );
+    assert
+      .dom(".menu-panel .search-menu-initial-options")
+      .exists("Menu panel is rendered with initial options");
 
     await fillIn("#search-term", "test");
 
     assert.strictEqual(
       query(".label-suffix").textContent.trim(),
-      I18n.t("search.in_topics_posts"),
+      i18n("search.in_topics_posts"),
       "search label reflects context of search"
     );
 
     await triggerKeyEvent("#search-term", "keyup", "Enter");
 
-    assert.ok(
-      exists(".search-result-topic"),
-      "search result is a list of topics"
-    );
+    assert
+      .dom(".search-result-topic")
+      .exists("search result is a list of topics");
 
     await triggerKeyEvent("#search-term", "keydown", "Escape");
 
-    assert.notOk(exists(".menu-panel"), "Menu panel is gone");
+    assert.dom(".menu-panel").doesNotExist("Menu panel is gone");
 
     await click("#search-term");
     await click("#search-term");
 
-    assert.ok(
-      exists(".search-result-topic"),
-      "Clicking the term brought back search results"
-    );
+    assert
+      .dom(".search-result-topic")
+      .exists("Clicking the term brought back search results");
   });
 
   test("clicking outside results hides and blurs input", async function (assert) {
@@ -91,9 +87,8 @@ module("Integration | Component | search-menu", function (hooks) {
       document.body,
       "Clicking outside blurs focus and closes panel"
     );
-    assert.notOk(
-      exists(".menu-panel .search-menu-initial-options"),
-      "Menu panel is hidden"
-    );
+    assert
+      .dom(".menu-panel .search-menu-initial-options")
+      .doesNotExist("Menu panel is hidden");
   });
 });

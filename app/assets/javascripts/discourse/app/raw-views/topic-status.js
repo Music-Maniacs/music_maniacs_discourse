@@ -1,14 +1,14 @@
 import EmberObject from "@ember/object";
 import discourseComputed from "discourse-common/utils/decorators";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 
-export default EmberObject.extend({
-  showDefault: null,
+export default class TopicStatus extends EmberObject {
+  showDefault = null;
 
   @discourseComputed("defaultIcon")
   renderDiv(defaultIcon) {
     return (defaultIcon || this.statuses.length > 0) && !this.noDiv;
-  },
+  }
 
   @discourseComputed
   statuses() {
@@ -73,7 +73,7 @@ export default EmberObject.extend({
         translationParams.unlistedReason = topic.visibilityReasonTranslated;
       }
 
-      result.title = I18n.t(
+      result.title = i18n(
         `topic_statuses.${result.key}.help`,
         translationParams
       );
@@ -95,5 +95,5 @@ export default EmberObject.extend({
       this.set("showDefault", defaultIcon);
     }
     return results;
-  },
-});
+  }
+}

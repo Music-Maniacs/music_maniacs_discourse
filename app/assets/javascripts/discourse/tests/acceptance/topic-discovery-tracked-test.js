@@ -5,12 +5,11 @@ import Site from "discourse/models/site";
 import topicFixtures from "discourse/tests/fixtures/discovery-fixtures";
 import {
   acceptance,
-  exists,
   publishToMessageBus,
   query,
 } from "discourse/tests/helpers/qunit-helpers";
 import { cloneJSON } from "discourse-common/lib/object";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 
 acceptance("Topic Discovery Tracked", function (needs) {
   needs.user({
@@ -64,44 +63,51 @@ acceptance("Topic Discovery Tracked", function (needs) {
 
     await visit("/");
 
-    assert.ok(
-      exists("#navigation-bar li.categories"),
-      "the categories nav item is displayed when tracked filter is not present"
-    );
+    assert
+      .dom("#navigation-bar li.categories")
+      .exists(
+        "the categories nav item is displayed when tracked filter is not present"
+      );
 
     await visit("/categories");
 
-    assert.ok(
-      exists("#navigation-bar li.categories"),
-      "the categories nav item is displayed on categories route when tracked filter is not present"
-    );
+    assert
+      .dom("#navigation-bar li.categories")
+      .exists(
+        "the categories nav item is displayed on categories route when tracked filter is not present"
+      );
 
     await visit("/?f=tracked");
 
-    assert.ok(
-      !exists("#navigation-bar li.categories"),
-      "the categories nav item is not displayed when tracked filter is present"
-    );
+    assert
+      .dom("#navigation-bar li.categories")
+      .doesNotExist(
+        "the categories nav item is not displayed when tracked filter is present"
+      );
 
-    assert.ok(
-      query("#navigation-bar li.unread a").href.endsWith("/unread?f=tracked"),
-      "unread link has tracked filter"
-    );
+    assert
+      .dom("#navigation-bar li.unread a")
+      .hasAttribute(
+        "href",
+        "/unread?f=tracked",
+        "unread link has tracked filter"
+      );
 
-    assert.ok(
-      query("#navigation-bar li.new a").href.endsWith("/new?f=tracked"),
-      "new link has tracked filter"
-    );
+    assert
+      .dom("#navigation-bar li.new a")
+      .hasAttribute("href", "/new?f=tracked", "new link has tracked filter");
 
-    assert.ok(
-      query("#navigation-bar li.hot a").href.endsWith("/hot?f=tracked"),
-      "hot link has tracked filter"
-    );
+    assert
+      .dom("#navigation-bar li.hot a")
+      .hasAttribute("href", "/hot?f=tracked", "hot link has tracked filter");
 
-    assert.ok(
-      query("#navigation-bar li.latest a").href.endsWith("/latest?f=tracked"),
-      "latest link has tracked filter"
-    );
+    assert
+      .dom("#navigation-bar li.latest a")
+      .hasAttribute(
+        "href",
+        "/latest?f=tracked",
+        "latest link has tracked filter"
+      );
   });
 
   test("visit discovery pages with tracked filter", async function (assert) {
@@ -179,13 +185,13 @@ acceptance("Topic Discovery Tracked", function (needs) {
 
     assert.strictEqual(
       query("#navigation-bar li.unread").textContent.trim(),
-      I18n.t("filters.unread.title_with_count", { count: 4 }),
+      i18n("filters.unread.title_with_count", { count: 4 }),
       "displays the right content on unread link"
     );
 
     assert.strictEqual(
       query("#navigation-bar li.new").textContent.trim(),
-      I18n.t("filters.new.title_with_count", { count: 2 }),
+      i18n("filters.new.title_with_count", { count: 2 }),
       "displays the right content on new link"
     );
 
@@ -193,13 +199,13 @@ acceptance("Topic Discovery Tracked", function (needs) {
 
     assert.strictEqual(
       query("#navigation-bar li.unread").textContent.trim(),
-      I18n.t("filters.unread.title_with_count", { count: 3 }),
+      i18n("filters.unread.title_with_count", { count: 3 }),
       "displays the right content on unread link"
     );
 
     assert.strictEqual(
       query("#navigation-bar li.new").textContent.trim(),
-      I18n.t("filters.new.title_with_count", { count: 1 }),
+      i18n("filters.new.title_with_count", { count: 1 }),
       "displays the right content on new link"
     );
 
@@ -225,13 +231,13 @@ acceptance("Topic Discovery Tracked", function (needs) {
 
     assert.strictEqual(
       query("#navigation-bar li.unread").textContent.trim(),
-      I18n.t("filters.unread.title_with_count", { count: 2 }),
+      i18n("filters.unread.title_with_count", { count: 2 }),
       "displays the right content on unread link"
     );
 
     assert.strictEqual(
       query("#navigation-bar li.new").textContent.trim(),
-      I18n.t("filters.new.title"),
+      i18n("filters.new.title"),
       "displays the right content on new link"
     );
   });
@@ -255,13 +261,13 @@ acceptance("Topic Discovery Tracked", function (needs) {
 
     assert.strictEqual(
       query("#navigation-bar li.unread").textContent.trim(),
-      I18n.t("filters.unread.title"),
+      i18n("filters.unread.title"),
       "displays the right content on unread link"
     );
 
     assert.strictEqual(
       query("#navigation-bar li.new").textContent.trim(),
-      I18n.t("filters.new.title_with_count", { count: 1 }),
+      i18n("filters.new.title_with_count", { count: 1 }),
       "displays the right content on new link"
     );
 
@@ -269,13 +275,13 @@ acceptance("Topic Discovery Tracked", function (needs) {
 
     assert.strictEqual(
       query("#navigation-bar li.unread").textContent.trim(),
-      I18n.t("filters.unread.title"),
+      i18n("filters.unread.title"),
       "displays the right content on unread link"
     );
 
     assert.strictEqual(
       query("#navigation-bar li.new").textContent.trim(),
-      I18n.t("filters.new.title"),
+      i18n("filters.new.title"),
       "displays the right content on new link"
     );
   });
@@ -333,13 +339,13 @@ acceptance("Topic Discovery Tracked", function (needs) {
 
     assert.strictEqual(
       query("#navigation-bar li.unread").textContent.trim(),
-      I18n.t("filters.unread.title_with_count", { count: 1 }),
+      i18n("filters.unread.title_with_count", { count: 1 }),
       "displays the right content on unread link"
     );
 
     assert.strictEqual(
       query("#navigation-bar li.new").textContent.trim(),
-      I18n.t("filters.new.title"),
+      i18n("filters.new.title"),
       "displays the right content on new link"
     );
 
@@ -347,13 +353,13 @@ acceptance("Topic Discovery Tracked", function (needs) {
 
     assert.strictEqual(
       query("#navigation-bar li.unread").textContent.trim(),
-      I18n.t("filters.unread.title"),
+      i18n("filters.unread.title"),
       "displays the right content on unread link"
     );
 
     assert.strictEqual(
       query("#navigation-bar li.new").textContent.trim(),
-      I18n.t("filters.new.title"),
+      i18n("filters.new.title"),
       "displays the right content on new link"
     );
   });

@@ -128,6 +128,34 @@ RSpec.describe UsersController do
           expect(session[:current_user_id]).to be_blank
         end
       end
+
+      context "when bootstrap mode is enabled" do
+        before { SiteSetting.bootstrap_mode_enabled = true }
+
+        it "adds the user to the user directory" do
+          token = Fabricate(:email_token, user: inactive_user)
+
+          expect do put "/u/activate-account/#{token.token}" end.to change {
+            DirectoryItem.where(user_id: inactive_user.id).count
+          }.by(DirectoryItem.period_types.count)
+
+          expect(response.status).to eq(200)
+        end
+      end
+
+      context "when bootstrap mode is disabled" do
+        before { SiteSetting.bootstrap_mode_enabled = false }
+
+        it "adds the user to the user directory" do
+          token = Fabricate(:email_token, user: inactive_user)
+
+          expect do put "/u/activate-account/#{token.token}" end.not_to change {
+            DirectoryItem.where(user_id: inactive_user.id).count
+          }
+
+          expect(response.status).to eq(200)
+        end
+      end
     end
 
     context "when cookies contains a destination URL" do
@@ -352,8 +380,6 @@ RSpec.describe UsersController do
       context "with rate limiting" do
         before { RateLimiter.enable }
 
-        use_redis_snapshotting
-
         it "rate limits reset passwords" do
           freeze_time
 
@@ -574,6 +600,30 @@ RSpec.describe UsersController do
         expect(response.parsed_body["errors"]).to be_blank
         expect(session[:current_user_id]).to be_blank
       end
+
+      context "when in staff writes only mode" do
+        before { Discourse.enable_readonly_mode(Discourse::STAFF_WRITES_ONLY_MODE_KEY) }
+
+        it "allows staff to reset their password" do
+          admin = Fabricate(:admin)
+          email_token =
+            Fabricate(:email_token, user: admin, scope: EmailToken.scopes[:password_reset])
+
+          put "/u/password-reset/#{email_token.token}.json",
+              params: {
+                password: "hg9ow8yhg98oadminlonger",
+              }
+
+          expect(response.parsed_body["errors"]).to be_blank
+          expect(session[:current_user_id]).to eq(admin.id)
+        end
+
+        it "doesn't allow non-staff to reset their password" do
+          put "/u/password-reset/#{email_token.token}.json", params: { password: "ksjafh928r" }
+          expect(response.parsed_body["errors"]).to_not be_blank
+          expect(session[:current_user_id]).to be_blank
+        end
+      end
     end
   end
 
@@ -673,6 +723,28 @@ RSpec.describe UsersController do
                password: "testing12352343",
              }
         expect(response.status).to eq(400)
+      end
+    end
+
+    context "when using an encoded email that decodes to an invalid email" do
+      it "blocks the registration" do
+        post_user(email: "=?x?q?hacker=40hackerdomain.com=3e=00?=osama@discourseemail.com")
+        expect(response.status).to eq(200)
+        expect(response.parsed_body["success"]).to eq(false)
+        expect(response.parsed_body["message"]).to eq("Primary email is invalid.")
+        expect(response.parsed_body["user_id"]).to be_blank
+      end
+    end
+
+    context "when using an encoded email that decodes to a valid email" do
+      it "accepts the registration" do
+        post_user(
+          email:
+            "=?utf-8?q?=6f=73=61=6d=61=2d=69=6e=2d=71=2d=65=6e=63=6f=64=69=6e=67?=@discourse.org",
+        )
+        expect(response.status).to eq(200)
+        expect(response.parsed_body["success"]).to eq(true)
+        expect(User.find_by(id: response.parsed_body["user_id"])).to be_present
       end
     end
 
@@ -3832,7 +3904,7 @@ RSpec.describe UsersController do
 
         context "when expiring_at param is set" do
           it "changes notification level to ignore" do
-            freeze_time(Time.now) do
+            freeze_time do
               expiring_at = 3.days.from_now
               put "/u/#{another_user.username}/notification_level.json",
                   params: {
@@ -4210,8 +4282,8 @@ RSpec.describe UsersController do
       end
     end
 
-    context "when `hide_profile_and_presence` user option is checked" do
-      before_all { user1.user_option.update_columns(hide_profile_and_presence: true) }
+    context "when `hide_profile` user option is checked" do
+      before_all { user1.user_option.update_columns(hide_profile: true) }
 
       it "returns 404" do
         get "/u/#{user1.username_lower}/summary.json"
@@ -4360,8 +4432,6 @@ RSpec.describe UsersController do
     end
 
     context "with a session variable" do
-      use_redis_snapshotting
-
       it "raises an error with an invalid session value" do
         post_user
 
@@ -4572,7 +4642,7 @@ RSpec.describe UsersController do
       end
 
       it "returns a hidden profile" do
-        user.user_option.update_column(:hide_profile_and_presence, true)
+        user.user_option.update_column(:hide_profile, true)
 
         get "/u/#{user.username}.json"
         expect(response.status).to eq(200)
@@ -4770,7 +4840,7 @@ RSpec.describe UsersController do
 
     it "should not be able to view a private user profile" do
       user1.user_profile.update!(bio_raw: "Hello world!")
-      user1.user_option.update!(hide_profile_and_presence: true)
+      user1.user_option.update!(hide_profile: true)
 
       get "/u/#{user1.username}"
 
@@ -4843,7 +4913,7 @@ RSpec.describe UsersController do
       end
 
       context "when hidden users" do
-        before { user.user_option.update!(hide_profile_and_presence: true) }
+        before { user.user_option.update!(hide_profile: true) }
 
         it "returns the correct partial response when the user has messages enabled" do
           user.user_option.update!(allow_private_messages: true)
@@ -4882,8 +4952,8 @@ RSpec.describe UsersController do
       expect(response).to have_http_status(:forbidden)
     end
 
-    context "when `hide_profile_and_presence` user option is checked" do
-      before { user2.user_option.update_columns(hide_profile_and_presence: true) }
+    context "when `hide_profile` user option is checked" do
+      before { user2.user_option.update_columns(hide_profile: true) }
 
       it "does not include hidden profiles" do
         get "/user-cards.json?user_ids=#{user.id},#{user2.id}"
@@ -5574,8 +5644,6 @@ RSpec.describe UsersController do
 
   describe "#enable_second_factor_totp" do
     before { sign_in(user1) }
-
-    use_redis_snapshotting
 
     def create_totp
       stub_secure_session_confirmed

@@ -1,6 +1,7 @@
 import { action } from "@ember/object";
-import { bind, observes } from "discourse-common/utils/decorators";
-import I18n from "discourse-i18n";
+import { observes } from "@ember-decorators/object";
+import { bind } from "discourse-common/utils/decorators";
+import { i18n } from "discourse-i18n";
 import { chooseDarker, darkLightDiff } from "../../../lib/preview";
 import HomepagePreview from "./-homepage-preview";
 import PreviewBaseComponent from "./-preview-base";
@@ -11,42 +12,42 @@ Nullam eget sem non elit tincidunt rhoncus. Fusce
 velit nisl, porttitor sed nisl ac, consectetur interdum
 metus. Fusce in consequat augue, vel facilisis felis.`;
 
-export default PreviewBaseComponent.extend({
-  width: 628,
-  height: 322,
-  logo: null,
-  avatar: null,
-  previewTopic: true,
-  draggingActive: false,
-  startX: 0,
-  scrollLeft: 0,
-  HomepagePreview,
+export default class Index extends PreviewBaseComponent {
+  width = 628;
+  height = 322;
+  logo = null;
+  avatar = null;
+  previewTopic = true;
+  draggingActive = false;
+  startX = 0;
+  scrollLeft = 0;
+  HomepagePreview = HomepagePreview;
 
   init() {
-    this._super(...arguments);
+    super.init(...arguments);
     this.step
       .findField("homepage_style")
       ?.addListener(this.onHomepageStyleChange);
-  },
+  }
 
   willDestroy() {
-    this._super(...arguments);
+    super.willDestroy(...arguments);
     this.step
       .findField("homepage_style")
       ?.removeListener(this.onHomepageStyleChange);
-  },
+  }
 
   didInsertElement() {
-    this._super(...arguments);
+    super.didInsertElement(...arguments);
     this.element.addEventListener("mouseleave", this.handleMouseLeave);
     this.element.addEventListener("mousemove", this.handleMouseMove);
-  },
+  }
 
   willDestroyElement() {
-    this._super(...arguments);
+    super.willDestroyElement(...arguments);
     this.element.removeEventListener("mouseleave", this.handleMouseLeave);
     this.element.removeEventListener("mousemove", this.handleMouseMove);
-  },
+  }
 
   mouseDown(e) {
     const slider = this.element.querySelector(".previews");
@@ -55,16 +56,16 @@ export default PreviewBaseComponent.extend({
       startX: e.pageX - slider.offsetLeft,
       scrollLeft: slider.scrollLeft,
     });
-  },
+  }
 
   @bind
   handleMouseLeave() {
     this.set("draggingActive", false);
-  },
+  }
 
   mouseUp() {
     this.set("draggingActive", false);
-  },
+  }
 
   @bind
   handleMouseMove(e) {
@@ -85,18 +86,18 @@ export default PreviewBaseComponent.extend({
     if (slider.scrollLeft > slider.offsetWidth - 50) {
       this.set("previewTopic", false);
     }
-  },
+  }
 
   didUpdateAttrs() {
-    this._super(...arguments);
+    super.didUpdateAttrs(...arguments);
 
     this.triggerRepaint();
-  },
+  }
 
   @bind
   onHomepageStyleChange() {
     this.set("previewTopic", false);
-  },
+  }
 
   @observes("previewTopic")
   scrollPreviewArea() {
@@ -106,14 +107,14 @@ export default PreviewBaseComponent.extend({
       left: this.previewTopic ? 0 : el.scrollWidth - el.offsetWidth,
       behavior: "smooth",
     });
-  },
+  }
 
   images() {
     return {
       logo: this.wizard.logoUrl,
       avatar: "/images/wizard/trout.png",
     };
-  },
+  }
 
   paint({ ctx, colors, font, headingFont, width, height }) {
     const headerHeight = height * 0.3;
@@ -138,7 +139,7 @@ export default PreviewBaseComponent.extend({
     ctx.beginPath();
     ctx.fillStyle = colors.primary;
     ctx.font = `bold ${titleFontSize}em '${headingFont}'`;
-    ctx.fillText(I18n.t("wizard.previews.topic_title"), margin, height * 0.3);
+    ctx.fillText(i18n("wizard.previews.topic_title"), margin, height * 0.3);
 
     const bodyFontSize = height / 330.0;
     ctx.font = `${bodyFontSize}em '${font}'`;
@@ -151,7 +152,7 @@ export default PreviewBaseComponent.extend({
     }
 
     // Share Button
-    const shareButtonWidth = I18n.t("wizard.previews.share_button").length * 11;
+    const shareButtonWidth = i18n("wizard.previews.share_button").length * 11;
 
     ctx.beginPath();
     ctx.rect(margin, line + lineHeight, shareButtonWidth, height * 0.1);
@@ -162,13 +163,13 @@ export default PreviewBaseComponent.extend({
     ctx.fillStyle = chooseDarker(colors.primary, colors.secondary);
     ctx.font = `${bodyFontSize}em '${font}'`;
     ctx.fillText(
-      I18n.t("wizard.previews.share_button"),
+      i18n("wizard.previews.share_button"),
       margin + 10,
       line + lineHeight * 1.9
     );
 
     // Reply Button
-    const replyButtonWidth = I18n.t("wizard.previews.reply_button").length * 11;
+    const replyButtonWidth = i18n("wizard.previews.reply_button").length * 11;
 
     ctx.beginPath();
     ctx.rect(
@@ -182,7 +183,7 @@ export default PreviewBaseComponent.extend({
     ctx.fillStyle = colors.secondary;
     ctx.font = `${bodyFontSize}em '${font}'`;
     ctx.fillText(
-      I18n.t("wizard.previews.reply_button"),
+      i18n("wizard.previews.reply_button"),
       shareButtonWidth + margin + 20,
       line + lineHeight * 1.9
     );
@@ -207,17 +208,17 @@ export default PreviewBaseComponent.extend({
     ctx.font = `Bold ${bodyFontSize}em ${font}`;
     ctx.fillStyle = colors.primary;
     ctx.fillText("1 / 20", timelineX + margin, height * 0.3 + margin * 1.5);
-  },
+  }
 
   @action
   setPreviewHomepage(event) {
     event?.preventDefault();
     this.set("previewTopic", false);
-  },
+  }
 
   @action
   setPreviewTopic(event) {
     event?.preventDefault();
     this.set("previewTopic", true);
-  },
-});
+  }
+}

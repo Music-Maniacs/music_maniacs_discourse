@@ -6,7 +6,7 @@ import concatClass from "discourse/helpers/concat-class";
 import TopicStatusIcons from "discourse/helpers/topic-status-icons";
 import { escapeExpression } from "discourse/lib/utilities";
 import icon from "discourse-common/helpers/d-icon";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 
 export default class Status extends Component {
   @service currentUser;
@@ -17,12 +17,12 @@ export default class Status extends Component {
 
   get topicStatuses() {
     let topicStatuses = [];
-    TopicStatusIcons.render(this.args.topic, (name, key) => {
+    TopicStatusIcons.render(this.args.topicInfo, (name, key) => {
       const iconArgs = { class: key === "unpinned" ? "unpinned" : null };
       const statusIcon = { name, iconArgs };
 
       const attributes = {
-        title: escapeExpression(I18n.t(`topic_statuses.${key}.help`)),
+        title: escapeExpression(i18n(`topic_statuses.${key}.help`)),
       };
       let klass = ["topic-status"];
       if (key === "unpinned" || key === "pinned") {
@@ -42,7 +42,7 @@ export default class Status extends Component {
     }
     const parent = e.target.closest(".topic-statuses");
     if (parent?.querySelector(".pin-toggle-button")?.contains(e.target)) {
-      this.args.topic.togglePinnedForUser();
+      this.args.topicInfo.togglePinnedForUser();
     }
   }
 

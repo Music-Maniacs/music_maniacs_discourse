@@ -19,6 +19,7 @@ describe DiscourseAutomation::Triggers::TOPIC_TAGS_CHANGED do
     SiteSetting.tagging_enabled = true
     SiteSetting.create_tag_allowed_groups = Group::AUTO_GROUPS[:everyone]
     SiteSetting.tag_topic_allowed_groups = Group::AUTO_GROUPS[:everyone]
+    SiteSetting.pm_tags_allowed_for_groups = Group::AUTO_GROUPS[:everyone]
   end
 
   context "when watching a cool tag" do
@@ -32,6 +33,19 @@ describe DiscourseAutomation::Triggers::TOPIC_TAGS_CHANGED do
       automation.reload
     end
 
+    it "fills placeholders correctly" do
+      topic_0 = Fabricate(:topic, user: user, tags: [], category: category)
+
+      list =
+        capture_contexts do
+          DiscourseTagging.tag_topic_by_names(topic_0, Guardian.new(user), [cool_tag.name])
+        end
+
+      expect(list[0]["placeholders"]).to eq(
+        { "topic_title" => topic_0.title, "topic_url" => topic_0.relative_url },
+      )
+    end
+
     it "should fire the trigger if the tag is added" do
       topic_0 = Fabricate(:topic, user: user, tags: [], category: category)
 
@@ -42,6 +56,7 @@ describe DiscourseAutomation::Triggers::TOPIC_TAGS_CHANGED do
 
       expect(list.length).to eq(1)
       expect(list[0]["kind"]).to eq(DiscourseAutomation::Triggers::TOPIC_TAGS_CHANGED)
+      expect(list[0]["user"]).to eq(user)
     end
 
     it "should fire the trigger if the tag is removed" do
@@ -52,6 +67,7 @@ describe DiscourseAutomation::Triggers::TOPIC_TAGS_CHANGED do
 
       expect(list.length).to eq(1)
       expect(list[0]["kind"]).to eq(DiscourseAutomation::Triggers::TOPIC_TAGS_CHANGED)
+      expect(list[0]["user"]).to eq(user)
     end
 
     it "should not fire if the tag is not present" do
@@ -149,7 +165,7 @@ describe DiscourseAutomation::Triggers::TOPIC_TAGS_CHANGED do
 
       expect(list.length).to eq(1)
       expect(list[0]["kind"]).to eq(DiscourseAutomation::Triggers::TOPIC_TAGS_CHANGED)
-      expect(list[0]["added_tags"]).to eq([bad_tag.name, another_tag.name])
+      expect(list[0]["added_tags"]).to match_array([bad_tag.name, another_tag.name])
       expect(list[0]["removed_tags"]).to eq([cool_tag.name])
     end
 
@@ -169,6 +185,39 @@ describe DiscourseAutomation::Triggers::TOPIC_TAGS_CHANGED do
       expect(list[0]["kind"]).to eq(DiscourseAutomation::Triggers::TOPIC_TAGS_CHANGED)
       expect(list[0]["added_tags"]).to eq([another_tag.name])
       expect(list[0]["removed_tags"]).to eq([])
+    end
+
+    it "should not fire the trigger on PMs by default" do
+      pm = Fabricate(:private_message_topic)
+      list =
+        capture_contexts do
+          DiscourseTagging.tag_topic_by_names(
+            pm,
+            Guardian.new(user),
+            [cool_tag.name, another_tag.name],
+          )
+        end
+      expect(list.length).to eq(0)
+    end
+
+    it "should fire the trigger on PMs if trigger_with_pms is set" do
+      automation.upsert_field!(
+        "trigger_with_pms",
+        "boolean",
+        { "value" => true },
+        target: "trigger",
+      )
+
+      pm = Fabricate(:private_message_topic)
+      list =
+        capture_contexts do
+          DiscourseTagging.tag_topic_by_names(
+            pm,
+            Guardian.new(user),
+            [cool_tag.name, another_tag.name],
+          )
+        end
+      expect(list.length).to eq(1)
     end
   end
 end

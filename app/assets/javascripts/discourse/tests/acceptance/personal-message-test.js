@@ -10,9 +10,8 @@ import DiscourseURL from "discourse/lib/url";
 import {
   acceptance,
   publishToMessageBus,
-  query,
 } from "discourse/tests/helpers/qunit-helpers";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 import selectKit from "../helpers/select-kit-helper";
 
 acceptance("Personal Message", function (needs) {
@@ -21,10 +20,9 @@ acceptance("Personal Message", function (needs) {
   test("suggested messages", async function (assert) {
     await visit("/t/pm-for-testing/12");
 
-    assert.strictEqual(
-      query("#suggested-topics-title").innerText.trim(),
-      I18n.t("suggested_topics.pm_title")
-    );
+    assert
+      .dom("#suggested-topics-title")
+      .hasText(i18n("suggested_topics.pm_title"));
   });
 
   test("redirects to inbox after topic is archived and clears topicList cache", async function (assert) {

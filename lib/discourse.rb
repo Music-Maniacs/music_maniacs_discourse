@@ -7,15 +7,15 @@ require "version"
 require "git_utils"
 
 module Discourse
-  DB_POST_MIGRATE_PATH ||= "db/post_migrate"
-  REQUESTED_HOSTNAME ||= "REQUESTED_HOSTNAME"
+  DB_POST_MIGRATE_PATH = "db/post_migrate"
+  REQUESTED_HOSTNAME = "REQUESTED_HOSTNAME"
   MAX_METADATA_FILE_SIZE = 64.kilobytes
 
   class Utils
-    URI_REGEXP ||= URI.regexp(%w[http https])
+    URI_REGEXP = URI.regexp(%w[http https])
 
     # TODO: Remove this once we drop support for Ruby 2.
-    EMPTY_KEYWORDS ||= {}
+    EMPTY_KEYWORDS = {}
 
     # Usage:
     #   Discourse::Utils.execute_command("pwd", chdir: 'mydirectory')
@@ -330,7 +330,7 @@ module Discourse
   end
 
   # list of pixel ratios Discourse tries to optimize for
-  PIXEL_RATIOS ||= [1, 1.5, 2, 3]
+  PIXEL_RATIOS = [1, 1.5, 2, 3]
 
   def self.avatar_sizes
     # TODO: should cache these when we get a notification system for site settings
@@ -477,7 +477,7 @@ module Discourse
       end
   end
 
-  BUILTIN_AUTH ||= [
+  BUILTIN_AUTH = [
     Auth::AuthProvider.new(
       authenticator: Auth::FacebookAuthenticator.new,
       frame_width: 580,
@@ -658,33 +658,37 @@ module Discourse
 
   LAST_POSTGRES_READONLY_KEY = "postgres:last_readonly"
 
-  READONLY_MODE_KEY_TTL ||= 60
-  READONLY_MODE_KEY ||= "readonly_mode"
-  PG_READONLY_MODE_KEY ||= "readonly_mode:postgres"
-  PG_READONLY_MODE_KEY_TTL ||= 300
-  USER_READONLY_MODE_KEY ||= "readonly_mode:user"
-  PG_FORCE_READONLY_MODE_KEY ||= "readonly_mode:postgres_force"
+  READONLY_MODE_KEY_TTL = 60
+  READONLY_MODE_KEY = "readonly_mode"
+  PG_READONLY_MODE_KEY = "readonly_mode:postgres"
+  PG_READONLY_MODE_KEY_TTL = 300
+  USER_READONLY_MODE_KEY = "readonly_mode:user"
+  PG_FORCE_READONLY_MODE_KEY = "readonly_mode:postgres_force"
 
   # Pseudo readonly mode, where staff can still write
-  STAFF_WRITES_ONLY_MODE_KEY ||= "readonly_mode:staff_writes_only"
+  STAFF_WRITES_ONLY_MODE_KEY = "readonly_mode:staff_writes_only"
 
-  READONLY_KEYS ||= [
+  READONLY_KEYS = [
     READONLY_MODE_KEY,
     PG_READONLY_MODE_KEY,
     USER_READONLY_MODE_KEY,
     PG_FORCE_READONLY_MODE_KEY,
   ]
 
-  def self.enable_readonly_mode(key = READONLY_MODE_KEY)
+  def self.enable_readonly_mode(key = READONLY_MODE_KEY, expires: nil)
     if key == PG_READONLY_MODE_KEY || key == PG_FORCE_READONLY_MODE_KEY
       Sidekiq.pause!("pg_failover") if !Sidekiq.paused?
     end
 
-    if [USER_READONLY_MODE_KEY, PG_FORCE_READONLY_MODE_KEY, STAFF_WRITES_ONLY_MODE_KEY].include?(
-         key,
-       )
-      Discourse.redis.set(key, 1)
-    else
+    if expires.nil?
+      expires = [
+        USER_READONLY_MODE_KEY,
+        PG_FORCE_READONLY_MODE_KEY,
+        STAFF_WRITES_ONLY_MODE_KEY,
+      ].exclude?(key)
+    end
+
+    if expires
       ttl =
         case key
         when PG_READONLY_MODE_KEY
@@ -695,6 +699,8 @@ module Discourse
 
       Discourse.redis.setex(key, ttl, 1)
       keep_readonly_mode(key, ttl: ttl) if !Rails.env.test?
+    else
+      Discourse.redis.set(key, 1)
     end
 
     MessageBus.publish(readonly_channel, true)
@@ -858,7 +864,7 @@ module Discourse
     user ||= (system_user || User.admins.real.order(:id).first)
   end
 
-  SYSTEM_USER_ID ||= -1
+  SYSTEM_USER_ID = -1
 
   def self.system_user
     @system_users ||= {}
@@ -1036,7 +1042,7 @@ module Discourse
     warning
   end
 
-  SIDEKIQ_NAMESPACE ||= "sidekiq"
+  SIDEKIQ_NAMESPACE = "sidekiq"
 
   def self.sidekiq_redis_config
     conf = GlobalSetting.redis_config.dup
@@ -1176,7 +1182,7 @@ module Discourse
     ENV["RAILS_ENV"] == "test" && ENV["TEST_ENV_NUMBER"]
   end
 
-  CDN_REQUEST_METHODS ||= %w[GET HEAD OPTIONS]
+  CDN_REQUEST_METHODS = %w[GET HEAD OPTIONS]
 
   def self.is_cdn_request?(env, request_method)
     return if CDN_REQUEST_METHODS.exclude?(request_method)
@@ -1216,5 +1222,9 @@ module Discourse
         request.env["HTTP_ACCEPT_LANGUAGE"],
       ) if SiteSetting.set_locale_from_accept_language_header
     locale
+  end
+
+  def self.enable_sidekiq_logging?
+    ENV["DISCOURSE_LOG_SIDEKIQ"] == "1"
   end
 end

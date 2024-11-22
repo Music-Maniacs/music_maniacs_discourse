@@ -203,6 +203,7 @@ sw:
     suggested_topics:
       pm_title: "Ujumbe Uliopendekezwa"
     about:
+      edit: "Hariri ukurasa huu"
       simple_title: "Kuhusu "
       title: "Kuhusu %{title}"
       stats: "Takwimu za tovuti."
@@ -212,7 +213,6 @@ sw:
       like_count: "Upendo"
       topic_count: "Mada"
       post_count: "Machapisho"
-      contact_info: "Iwapo kuna suala la muhimu au haraka linalohusiana na mtandao huu, tafadhali wasiliana nasi kupitia %{contact_info}."
       activities:
         topics:
           one: "%{formatted_number} topiki"
@@ -707,7 +707,7 @@ sw:
       users: "Watumiaji"
       muted_users: "Kunyamazisha"
       tracked_topics_link: "Onesha"
-      automatically_unpin_topics: "Otomatikali ondoa mada zilizobandikwa nikifika mwisho wa ukurasa."
+      automatically_unpin_topics: "Otomatikali ondoa mada zilizobandikwa nikifika mwisho wa ukurasa"
       apps: "Programu-tumizi"
       revoke_access: "Tengua ufikivu"
       undo_revoke_access: "Ondoa Utenguaji Fikivu"
@@ -822,13 +822,12 @@ sw:
         action: "Bonyeza hapa kuanzisha akkaunti yako"
         already_done: "Samahani, kiungo cha uthibitisho cha akaunti ni batili. Labda akaunti yako tayari ipo hewani?"
         please_continue: "Akaunti yako imethibitishwa; utapelekwa kwenye ukurasa wa nyumbani."
-        continue_button: "Endelea kwenye %{site_name}"
         welcome_to: "Karibu kwenye %{site_name}!"
         approval_required: "Msimamizi lazima aipe kibali akaunti yako mpya kabla haujaanza kutumia jukwaa. Utatumiwa barua pepe akaunti yako ikipata kibali!"
       name:
         title: "Jina"
-        instructions: "Jina lako lote (sio lazima)."
-        instructions_required: "Jina lako lote."
+        instructions: "Jina lako lote (sio lazima)"
+        instructions_required: "Jina lako lote"
         too_short: "Jina lako ni fupi"
         ok: "Jina lako liko vizuri"
       username:
@@ -935,6 +934,8 @@ sw:
         valid_for: "Kiungo cha Mwaliko kitatumiwa na barua pepe hii tu:%{email}"
         invite_link:
           success: "Kiungo cha Mualiko kimetengenezwa kwa mafanikio!"
+        invite:
+          cancel: "Ghairi"
         bulk_invite:
           error: "Samahani, faili hili inabidi liwe na umbizo faili la CSV"
       password:
@@ -1089,6 +1090,10 @@ sw:
       header_title: "Karibu!"
       title: "Jiunge"
       failed: "Tatizo limetokea, labda barua pepe imesajiliwa tayari, jaribu kiungo cha kusahau nywila."
+      progress_bar:
+        signup: "Jiunge"
+        approve: "Imethibitishwa"
+        login: "Ingia"
     forgot_password:
       title: "Weka upa nywila"
       action: "Nimesahau nywila yangu"
@@ -1112,6 +1117,7 @@ sw:
       complete_email_not_found: "Hakuna akaunti inayolingana na <b>%{email}</b>"
       confirm_title: Endelea kwenye %{site_name}
     login:
+      title: "Ingia"
       username: "Mtumiaji"
       password: "Nywila"
       show_password: "Onyesha"
@@ -1488,6 +1494,8 @@ sw:
         top: "Hakuna mada za juu zingine."
         bookmarks: "Hakuna mada zingine zilizoalamishwa."
     topic_bulk_actions:
+      dismiss:
+        name: "Ondosha..."
       close_topics:
         name: "Funga"
         optional: (sio muhimu)
@@ -1797,21 +1805,26 @@ sw:
       few_likes_left: "Asante kwa kutoa upendo! Umebakiwa na upendo mchache kwa ajili ya leo."
       controls:
         reply: "anza kuandika jibu kwenye mada hii"
+        like_action: "Penda"
         like: "penda hili chapisho"
         has_liked: "umependa chapisho hili"
+        undo_like_action: "Ondoa upendo"
         undo_like: "ondoa upendo"
         edit: "hariri chapisho hili"
         edit_action: "Hariri"
         edit_anonymous: "Samahani, lazima uwe umeingia kuhariri chapisho hili."
+        flag_action: "Bendera"
         flag: "ripoti kwa siri chapisho hili liangaliwe au tuma ujumbe binafsi wa taarifa kuhusiana na hii"
         delete: "futa chapisho hili"
         undelete: "rudisha chapisho hili"
+        share_action: "Shirikisha"
         share: "gawiza kiungo kwenye mada hii"
         more: "Zaidi"
         delete_replies:
           confirm: "Je unataka pia kufuta majibu ya chapisho hili?"
           just_the_post: "Hapana, chapisho hili tu"
         admin: "chapisha vitendo vya kiongozi"
+        admin_action: "Kiongozi"
         wiki: "Tengeneza Wiki"
         unwiki: "Ondoa Wiki"
         convert_to_moderator: "Ongeza Rangi ya Wasaidizi"
@@ -2317,6 +2330,8 @@ sw:
               content: "Watumiaji"
             my_posts:
               content: "Machapisho Yangu"
+            invite:
+              content: "Mualiko"
       filter: "Chuja..."
     form_templates:
       upload_field:
@@ -2336,6 +2351,7 @@ sw:
         show: "Onyesha"
         about: "Kuhusu"
   admin_js:
+    settings: "Mipangilio"
     admin:
       title: "Kiongozi wa Discourse"
       moderator: "Msimamizi"
@@ -2357,6 +2373,7 @@ sw:
         stale_data: "Utafutaji wa toleo la sasa haujafanyika hivi karibuni. Hakikisha sidekiq inafanya kazi."
         installed_version: "Imesanikishwa"
         latest_version: "Hivi Karibuni"
+        dismiss_notice: "Ondosha..."
         new_features:
           learn_more: "Jifunze zaidi..."
         last_checked: "Mara ya Mwisho imeangaliwa"
@@ -2548,11 +2565,15 @@ sw:
           screened_ips: "Anwani za mtandao zinazoruhusiwa au kukatazwa"
           screened_urls: "Anwani za tovuti zinazoruhusiwa au kukatazwa"
           search_logs: "Batli ya Utafiti"
-          security: "Ulinzi"
-          spam: "Barua Taka"
+      section_landing_pages:
+        account:
+          title: "Akaunti"
+          backups:
+            title: "Machelezo"
       config_areas:
         about:
           contact_url_placeholder: "https://johnny-smith.com/contact"
+          company_name: "Jina"
           optional: "(sio muhimu)"
           saved: "imehifadhiwa!"
         flags:
@@ -2560,6 +2581,7 @@ sw:
           enabled: "Imeruhusiwa?"
           edit: "Hariri"
           delete: "Futa"
+          flags_tab: "Bendera"
           form:
             save: "Hifadhi"
             name: "Jina"
@@ -2567,9 +2589,11 @@ sw:
             invalid_applies_to: "Muhimu na Inahitajika"
             topic: "mada"
             post: "machapisho"
+        look_and_feel:
+          themes:
+            title: "Mandhari"
       plugins:
         title: "Programu-jalizi"
-        installed: "Progamu-jalizi zilizowekwa"
         name: "Jina"
         none_installed: "Hauna programu-jalizi zilizowekwa."
         version: "Toleo"
@@ -2597,7 +2621,7 @@ sw:
         menu:
           backups: "Machelezo"
           logs: "Batli"
-        none: "Hakuna chelezo iliyopo."
+        none: "Hakuna chelezo iliyopo"
         read_only:
           enable:
             title: "Ruhusu hali-tumizi ya usomaji tu."
@@ -2628,12 +2652,11 @@ sw:
           download:
             label: "Pakua"
             title: "Tuma barua pepe yenye kiungo cha upakuaji"
-            alert: "Kiungo cha kupakua chelezo hii imetumwa kwenye barua pepe yako."
+            alert: "Kiungo cha kupakua chelezo hii imetumwa kwenye barua pepe yako"
           destroy:
             title: "Ondoa chelezo"
             confirm: "Una uhakika unataka kufuta chelezo hii?"
           restore:
-            is_disabled: "Rejesha imezuiliwa kwenye mipangilio ya tovuti."
             label: "Rejesha"
             title: "Rejesha chelezo"
             confirm: "Una uhakika unataka kurejesha chelezo hii?"
@@ -3129,7 +3152,6 @@ sw:
         approve_bulk_success: "Umefanikiwa! Watumiaji wamethibitishwa na wamejulishwa."
         time_read: "Mda wa Kusoma"
         anonymize: "Mfanye Mtumiaji Asijulikane"
-        anonymize_confirm: "Una UHAKIKA unataka kufanya hii akaunti iwe ya mtu asiyejulikana? Kitendo hicho kitabadilisha jina la mtumiaji na barua pepe, na kuanzisha upya taarifa zote binafsi."
         anonymize_yes: "Ndio, fanya hii akaunti iwe ya mtu asiyejulikana"
         anonymize_failed: "Tatizo limetokea wakati wa kufanya akaunti iwe ya mtu asiyejulikana."
         delete: "Futa Mtumiaji"
@@ -3275,6 +3297,8 @@ sw:
         show_overriden: "Onyesha vilivyobatilishwa pekee"
         reset: "weka au anza upya"
         none: "bila"
+        save: "hifadhi"
+        cancel: "ghairi"
       site_settings:
         title: "Mpangilio"
         no_results: "Hakuna Majibu Yaliyopatikana"
@@ -3381,7 +3405,6 @@ sw:
             with_time: <span class="username">%{username}</span> kwenye %{time}<span class="time">
       emoji:
         title: "Emoji"
-        add: "Ongeza Emoji Mpya"
         name: "Jina"
         group: "Kikundi"
         image: "Picha"
@@ -3413,12 +3436,13 @@ sw:
         post_title: "Ujumbe"
         category_id: "Utambulisho wa kikundi"
         category_title: "Kikundi"
+        user_title: "Mtumiaji"
         username: "Jina la mtumiaji"
         delete_confirm: Una uhakika unataka kufuta hii link kiungo?
         form:
           label: "Mpya:"
-          add: "Ongeza"
-          filter: "Tafuta (URL au Kiungo cha nje)"
+          url: "Anwani ya mtandao"
+          save: "Hifadhi"
       reseed:
         modal:
           categories: "Kategoria"

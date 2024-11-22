@@ -163,6 +163,8 @@ Discourse::Application.routes.draw do
         post "reset-bounce-score"
         put "disable_second_factor"
         delete "sso_record"
+        get "similar-users.json" => "users#similar_users"
+        put "delete_associated_accounts"
       end
       get "users/:id.json" => "users#show", :defaults => { format: "json" }
       get "users/:id/:username" => "users#show",
@@ -246,6 +248,8 @@ Discourse::Application.routes.draw do
                   only: %i[index create update destroy],
                   constraints: AdminConstraint.new
         resources :emojis, only: %i[index create destroy], constraints: AdminConstraint.new
+        get "emojis/new" => "emojis#index"
+        get "emojis/settings" => "emojis#index"
         resources :form_templates, constraints: AdminConstraint.new, path: "/form-templates" do
           collection { get "preview" => "form_templates#preview" }
         end
@@ -298,13 +302,17 @@ Discourse::Application.routes.draw do
 
         resource :email_style, only: %i[show update]
         get "email_style/:field" => "email_styles#show", :constraints => { field: /html|css/ }
+
+        resources :permalinks, only: %i[index new create show destroy]
       end
 
       resources :embeddable_hosts, only: %i[create update destroy], constraints: AdminConstraint.new
       resources :color_schemes,
                 only: %i[index create update destroy],
                 constraints: AdminConstraint.new
-      resources :permalinks, only: %i[index create destroy], constraints: AdminConstraint.new
+      resources :permalinks,
+                only: %i[index create show update destroy],
+                constraints: AdminConstraint.new
 
       scope "/customize" do
         resources :watched_words, only: %i[index create destroy] do
@@ -326,6 +334,7 @@ Discourse::Application.routes.draw do
       get "dashboard/reports" => "dashboard#reports"
       get "dashboard/whats-new" => "dashboard#new_features"
       get "/whats-new" => "dashboard#new_features"
+      post "/toggle-feature" => "dashboard#toggle_feature"
 
       resources :dashboard, only: [:index] do
         collection { get "problems" }
@@ -367,6 +376,7 @@ Discourse::Application.routes.draw do
                :format => :json
 
           get "logs" => "backups#logs"
+          get "settings" => "backups#index"
           get "status" => "backups#status"
           delete "cancel" => "backups#cancel"
           post "rollback" => "backups#rollback"
@@ -400,7 +410,17 @@ Discourse::Application.routes.draw do
         resources :about, constraints: AdminConstraint.new, only: %i[index] do
           collection { put "/" => "about#update" }
         end
+
+        resources :look_and_feel,
+                  path: "look-and-feel",
+                  constraints: AdminConstraint.new,
+                  only: %i[index] do
+          collection { get "/themes" => "look_and_feel#themes" }
+        end
       end
+
+      get "section/:section_id" => "section#show", :constraints => AdminConstraint.new
+      resources :admin_notices, only: %i[destroy], constraints: AdminConstraint.new
     end # admin namespace
 
     get "email/unsubscribe/:key" => "email#unsubscribe", :as => "email_unsubscribe"
@@ -1339,6 +1359,7 @@ Discourse::Application.routes.draw do
 
     get "new-topic" => "new_topic#index"
     get "new-message" => "new_topic#index"
+    get "new-invite" => "new_invite#index"
 
     # Topic routes
     get "t/id_for/:slug" => "topics#id_for_slug"
@@ -1603,6 +1624,8 @@ Discourse::Application.routes.draw do
          constraints: HomePageConstraint.new("custom"),
          as: "custom_index"
 
+    get "/custom" => "custom_homepage#index"
+
     get "/user-api-key/new" => "user_api_keys#new"
     post "/user-api-key" => "user_api_keys#create"
     post "/user-api-key/revoke" => "user_api_keys#revoke"
@@ -1610,10 +1633,14 @@ Discourse::Application.routes.draw do
     get "/user-api-key/otp" => "user_api_keys#otp"
     post "/user-api-key/otp" => "user_api_keys#create_otp"
 
+    get "/user-api-key-client" => "user_api_key_clients#show"
+    post "/user-api-key-client" => "user_api_key_clients#create"
+
     get "/safe-mode" => "safe_mode#index"
     post "/safe-mode" => "safe_mode#enter", :as => "safe_mode_enter"
 
     get "/theme-qunit" => "qunit#theme"
+    get "/theme-tests", to: redirect("/theme-qunit")
 
     # This is a special route that is used when theme QUnit tests are run through testem which appends a testem_id to the
     # path. Unfortunately, testem's proxy support does not allow us to easily remove this from the path, so we have to

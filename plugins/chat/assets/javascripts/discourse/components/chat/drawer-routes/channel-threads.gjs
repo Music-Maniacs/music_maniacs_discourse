@@ -5,19 +5,20 @@ import { service } from "@ember/service";
 import { htmlSafe } from "@ember/template";
 import replaceEmoji from "discourse/helpers/replace-emoji";
 import { popupAjaxError } from "discourse/lib/ajax-error";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 import Navbar from "discourse/plugins/chat/discourse/components/chat/navbar";
 import ChatThreadList from "discourse/plugins/chat/discourse/components/chat-thread-list";
 
 export default class ChatDrawerRoutesChannelThreads extends Component {
   @service chat;
   @service chatChannelsManager;
+  @service chatStateManager;
 
-  backLinkTitle = I18n.t("chat.return_to_list");
+  backLinkTitle = i18n("chat.return_to_list");
 
   get title() {
     return htmlSafe(
-      I18n.t("chat.threads.list") +
+      i18n("chat.threads.list") +
         " - " +
         replaceEmoji(this.chat.activeChannel.title)
     );
@@ -57,14 +58,16 @@ export default class ChatDrawerRoutesChannelThreads extends Component {
         </Navbar>
       {{/if}}
 
-      <div class="chat-drawer-content" {{didInsert this.fetchChannel}}>
-        {{#if this.chat.activeChannel}}
-          <ChatThreadList
-            @channel={{this.chat.activeChannel}}
-            @includeHeader={{false}}
-          />
-        {{/if}}
-      </div>
+      {{#if this.chatStateManager.isDrawerExpanded}}
+        <div class="chat-drawer-content" {{didInsert this.fetchChannel}}>
+          {{#if this.chat.activeChannel}}
+            <ChatThreadList
+              @channel={{this.chat.activeChannel}}
+              @includeHeader={{false}}
+            />
+          {{/if}}
+        </div>
+      {{/if}}
     </div>
   </template>
 }

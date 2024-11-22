@@ -14,6 +14,7 @@ describe "Admin About Config Area Page", type: :system do
       SiteSetting.site_description = "this is a description for my forums"
       SiteSetting.about_banner_image = image_upload
       SiteSetting.extended_site_description = "this is an extended description for my forums"
+      SiteSetting.short_site_description = "short description for browser tab"
 
       SiteSetting.community_owner = "kitty"
       SiteSetting.contact_email = "kitty@litterbox.com"
@@ -37,6 +38,9 @@ describe "Admin About Config Area Page", type: :system do
       )
       expect(config_area.general_settings_section.community_description_editor.value).to eq(
         "this is an extended description for my forums",
+      )
+      expect(config_area.general_settings_section.community_title_input.value).to eq(
+        "short description for browser tab",
       )
       expect(config_area.general_settings_section.banner_image_uploader).to have_uploaded_image
 
@@ -78,6 +82,9 @@ describe "Admin About Config Area Page", type: :system do
       config_area.general_settings_section.community_description_editor.fill_in(
         "here's an extended description for the **community**",
       )
+      config_area.general_settings_section.community_title_input.fill_in(
+        "here's a title for my site",
+      )
       config_area.general_settings_section.banner_image_uploader.select_image(image_file.path)
       expect(config_area.general_settings_section.banner_image_uploader).to have_uploaded_image
 
@@ -93,6 +100,7 @@ describe "Admin About Config Area Page", type: :system do
       expect(SiteSetting.extended_site_description_cooked).to eq(
         "<p>here’s an extended description for the <strong>community</strong></p>",
       )
+      expect(SiteSetting.short_site_description).to eq("here's a title for my site")
       expect(SiteSetting.about_banner_image.sha1).to eq(Upload.generate_digest(image_file))
     end
 
@@ -103,6 +111,29 @@ describe "Admin About Config Area Page", type: :system do
         config_area.visit
 
         config_area.general_settings_section.banner_image_uploader.remove_image
+
+        config_area.general_settings_section.submit
+        expect(config_area.general_settings_section).to have_saved_successfully
+        expect(SiteSetting.about_banner_image).to eq(nil)
+      end
+
+      it "can upload an image using keyboard nav" do
+        config_area.visit
+
+        image_file = file_from_fixtures("logo.png", "images")
+        config_area.general_settings_section.banner_image_uploader.select_image_with_keyboard(
+          image_file.path,
+        )
+
+        expect(config_area.general_settings_section.banner_image_uploader).to have_uploaded_image
+      end
+
+      it "can remove the uploaded image using keyboard nav" do
+        SiteSetting.about_banner_image = image_upload
+
+        config_area.visit
+
+        config_area.general_settings_section.banner_image_uploader.remove_image_with_keyboard
 
         config_area.general_settings_section.submit
         expect(config_area.general_settings_section).to have_saved_successfully

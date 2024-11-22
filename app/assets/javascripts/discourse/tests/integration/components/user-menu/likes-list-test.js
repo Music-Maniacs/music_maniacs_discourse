@@ -4,7 +4,7 @@ import { module, test } from "qunit";
 import { setupRenderingTest } from "discourse/tests/helpers/component-test";
 import pretender, { response } from "discourse/tests/helpers/create-pretender";
 import { query } from "discourse/tests/helpers/qunit-helpers";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 
 module(
   "Integration | Component | user-menu | likes-notifications-list",
@@ -16,17 +16,21 @@ module(
       pretender.get("/notifications", () => {
         return response({ notifications: [] });
       });
+
       await render(template);
+
       assert.strictEqual(
         query(".empty-state-title").textContent.trim(),
-        I18n.t("user.no_likes_title"),
+        i18n("user.no_likes_title"),
         "empty state title for the likes tab is shown"
       );
-      const emptyStateBodyLink = query(".empty-state-body a");
-      assert.ok(
-        emptyStateBodyLink.href.endsWith("/my/preferences/notifications"),
-        "link to /my/preferences/notification inside empty state body is rendered"
-      );
+      assert
+        .dom(".empty-state-body a")
+        .hasAttribute(
+          "href",
+          "/my/preferences/notifications",
+          "link to /my/preferences/notification inside empty state body is rendered"
+        );
     });
   }
 );

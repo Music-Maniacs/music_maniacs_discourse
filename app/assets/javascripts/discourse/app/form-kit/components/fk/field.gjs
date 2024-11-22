@@ -49,14 +49,12 @@ export default class FKField extends Component {
     this.field = this.args.registerField(this.name, {
       triggerRevalidationFor: this.args.triggerRevalidationFor,
       title: this.args.title,
-      subtitle: this.args.subtitle,
       description: this.args.description,
       showTitle: this.args.showTitle,
       collectionIndex: this.args.collectionIndex,
       set: this.args.set,
       addError: this.args.addError,
       validate: this.args.validate,
-      disabled: this.args.disabled,
       validation: this.args.validation,
       onSet: this.args.onSet,
     });
@@ -96,6 +94,7 @@ export default class FKField extends Component {
           Custom=(component
             FKControlWrapper
             errors=@errors
+            disabled=@disabled
             component=FKControlCustom
             value=this.value
             field=this.field
@@ -104,6 +103,7 @@ export default class FKField extends Component {
           Code=(component
             FKControlWrapper
             errors=@errors
+            disabled=@disabled
             component=FKControlCode
             value=this.value
             field=this.field
@@ -112,6 +112,7 @@ export default class FKField extends Component {
           Question=(component
             FKControlWrapper
             errors=@errors
+            disabled=@disabled
             component=FKControlQuestion
             value=this.value
             field=this.field
@@ -120,6 +121,7 @@ export default class FKField extends Component {
           Textarea=(component
             FKControlWrapper
             errors=@errors
+            disabled=@disabled
             component=FKControlTextarea
             value=this.value
             field=this.field
@@ -128,6 +130,7 @@ export default class FKField extends Component {
           Checkbox=(component
             FKControlWrapper
             errors=@errors
+            disabled=@disabled
             component=FKControlCheckbox
             value=this.value
             field=this.field
@@ -136,6 +139,7 @@ export default class FKField extends Component {
           Image=(component
             FKControlWrapper
             errors=@errors
+            disabled=@disabled
             component=FKControlImage
             value=this.value
             field=this.field
@@ -144,6 +148,7 @@ export default class FKField extends Component {
           Password=(component
             FKControlWrapper
             errors=@errors
+            disabled=@disabled
             component=FKControlPassword
             value=this.value
             field=this.field
@@ -152,6 +157,7 @@ export default class FKField extends Component {
           Composer=(component
             FKControlWrapper
             errors=@errors
+            disabled=@disabled
             component=FKControlComposer
             value=this.value
             field=this.field
@@ -160,6 +166,7 @@ export default class FKField extends Component {
           Icon=(component
             FKControlWrapper
             errors=@errors
+            disabled=@disabled
             component=FKControlIcon
             value=this.value
             field=this.field
@@ -168,6 +175,7 @@ export default class FKField extends Component {
           Toggle=(component
             FKControlWrapper
             errors=@errors
+            disabled=@disabled
             component=FKControlToggle
             value=this.value
             field=this.field
@@ -176,6 +184,7 @@ export default class FKField extends Component {
           Menu=(component
             FKControlWrapper
             errors=@errors
+            disabled=@disabled
             component=FKControlMenu
             value=this.value
             field=this.field
@@ -184,6 +193,7 @@ export default class FKField extends Component {
           Select=(component
             FKControlWrapper
             errors=@errors
+            disabled=@disabled
             component=FKControlSelect
             value=this.value
             field=this.field
@@ -192,6 +202,7 @@ export default class FKField extends Component {
           Input=(component
             FKControlWrapper
             errors=@errors
+            disabled=@disabled
             component=FKControlInput
             value=this.value
             field=this.field
@@ -200,6 +211,7 @@ export default class FKField extends Component {
           RadioGroup=(component
             FKControlWrapper
             errors=@errors
+            disabled=@disabled
             component=FKControlRadioGroup
             value=this.value
             field=this.field

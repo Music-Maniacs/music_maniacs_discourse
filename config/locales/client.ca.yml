@@ -36,6 +36,7 @@ ca:
       long_with_year_no_time: "D MMM YYYY"
       full_with_year_no_time: "D MMMM YYYY"
       long_date_without_year: "MMM D, LT"
+      long_date_with_year_without_time: "MMM D, AAAA"
       long_date_without_year_with_linebreak: "D MMM <br/>HH:mm"
       wrap_ago: "fa %{date} "
       wrap_on: "el %{date}"
@@ -122,7 +123,6 @@ ca:
       topic_html: 'Tema: <span class="topic-title">%{topicTitle}</span>'
       post: "publicació #%{postNumber} de @%{username}"
       close: "tanca"
-      twitter: "Comparteix en Twitter"
       facebook: "Comparteix en Facebook"
       email: "Envia per correu electrònic"
       url: "Copiar i compartir URL"
@@ -255,6 +255,7 @@ ca:
     suggested_topics:
       pm_title: "Missatges recomanats"
     about:
+      edit: "Edita aquesta pàgina"
       simple_title: "Quant a"
       title: "Quant a %{title}"
       stats: "Estadístiques del lloc web"
@@ -264,7 +265,6 @@ ca:
       like_count: "'M'agrada'"
       topic_count: "Temes"
       post_count: "Publicacions"
-      contact_info: "En cas d'una qüestió urgent o greu que afecti aquest lloc web, contacteu amb nosaltres en: %{contact_info}."
       activities:
         topics:
           one: "%{formatted_number} tema"
@@ -985,7 +985,7 @@ ca:
       muted_users: "Silenciat"
       ignored_users: "Ignorat"
       tracked_topics_link: "Mostra"
-      automatically_unpin_topics: "Desafixa automàticament els temes quan jo arribi al final."
+      automatically_unpin_topics: "Desafixa automàticament els temes quan jo arribi al final"
       apps: "Aplicacions"
       revoke_access: "Revoca l'accés"
       undo_revoke_access: "Desfés revocar l'accés"
@@ -1123,7 +1123,7 @@ ca:
         destroy: "Elimina el correu electrònic"
         add_email: "Afegeix un correu electrònic alternatiu"
         no_secondary: "Sense adreces de correu secundàries"
-        instructions: "No es mostra mai en públic."
+        instructions: "No es mostra mai en públic"
         ok: "Us enviarem un correu electrònic de confirmació"
         required: "Introduïu una adreça de correu electrònic"
         invalid: "Introduïu una adreça vàlida de correu electrònic"
@@ -1145,13 +1145,13 @@ ca:
         action: "Feu clic aquí per a activar el vostre compte"
         already_done: "Aquest enllaç ja no és vàlid per a confirmar el compte. Potser el vostre compte ja és actiu?"
         please_continue: "El vostre nou compte està confirmat; us redirigirem a la pàgina principal."
-        continue_button: "Continua a %{site_name}"
+        continue_button: "Acaba!"
         welcome_to: "Benvingut a %{site_name}!"
         approval_required: "Cal que un moderador aprovi manualment el vostre nou compte abans no pugueu accedir al fòrum. Rebreu un correu quan el compte hagi estat aprovat!"
       name:
         title: "Nom"
-        instructions: "El vostre nom complet (opcional)."
-        instructions_required: "El vostre nom complet."
+        instructions: "El vostre nom complet (opcional)"
+        instructions_required: "El vostre nom complet"
         too_short: "El vostre nom és massa curt"
         ok: "El vostre nom sona bé"
       username:
@@ -1191,7 +1191,6 @@ ca:
       location: "Ubicació"
       website: "Lloc web"
       email_settings: "Correu electrònic"
-      hide_profile_and_presence: "Amaga les característiques del meu perfil i la meva presència públics "
       enable_physical_keyboard: "Habilita el suport de teclat físic en iPad"
       text_size:
         title: "Mida del text"
@@ -1284,6 +1283,8 @@ ca:
         valid_for: "L'enllaç d'invitació només és vàlid per a aquesta adreça de correu: %{email}"
         invite_link:
           success: "Enllaç d'invitació generat emb èxit!"
+        invite:
+          cancel: "Cancel·la"
         bulk_invite:
           error: "El fitxer hauria de tenir format CSV."
       password:
@@ -1441,6 +1442,10 @@ ca:
       disclaimer: "Registrant-vos, accepteu la <a href='%{privacy_link}' target='blank'>política de privacitat</a> i les <a href='%{tos_link}' target='blank'>condicions del servei</a>."
       title: "Registre"
       failed: "Alguna cosa ha anat malament. Potser aquest correu electrònic ja ha estat registrat; proveu-ho amb l'enllaç de contrasenya oblidada"
+      progress_bar:
+        signup: "Registre"
+        approve: "Aprova"
+        login: "Inicia la sessió"
     forgot_password:
       title: "Restabliment de contrasenya"
       action: "He oblidat la contrasenya"
@@ -1468,6 +1473,7 @@ ca:
       logging_in_as: Iniciant sessió com a %{email}
       confirm_button: Acaba l'inici de sessió
     login:
+      title: "Inicia la sessió"
       username: "Usuari"
       password: "Contrasenya"
       show_password: "Mostra"
@@ -1916,6 +1922,8 @@ ca:
         top: "No hi ha més temes destacats."
         bookmarks: "No hi ha més temes marcats com a preferits."
     topic_bulk_actions:
+      dismiss:
+        name: "Descarta-ho"
       close_topics:
         name: "Tanca"
         optional: (opcional)
@@ -2288,16 +2296,20 @@ ca:
       few_likes_left: "Gràcies per compartir l'amor! Us queden uns quants 'm'agrada' per donar avui."
       controls:
         reply: "comença a redactar una resposta a aquesta publicació"
+        like_action: "M'agrada"
         like: "m'agrada aquesta publicació"
         has_liked: "us ha agradat aquesta publicació"
         read_indicator: "membres que han llegit aquesta publicació"
+        undo_like_action: "Desfés 'M'agrada'"
         undo_like: "desfés 'M'agrada'"
         edit: "edita aquesta publicació"
         edit_action: "Edita"
         edit_anonymous: "Ho sentim, però heu d'iniciar la sessió per a editar aquesta publicació."
+        flag_action: "Bandera"
         flag: "posa bandera en privat a aquesta publicació per a destacar-la o envia una notificació privada sobre això"
         delete: "suprimeix aquesta publicació"
         undelete: "restaura aquesta publicació"
+        share_action: "Comparteix"
         share: "comparteix un enllaç sobre aquesta publicació"
         more: "Més"
         delete_replies:
@@ -2310,6 +2322,7 @@ ca:
             other: "Sí, i totes les %{count} respostes"
           just_the_post: "No, només aquesta publicació"
         admin: "accions d'administració de publicació"
+        admin_action: "Administració"
         wiki: "Passa a wiki"
         unwiki: "Elimina la wiki"
         convert_to_moderator: "Afegeix un color de l'equip responsable"
@@ -2937,6 +2950,8 @@ ca:
               content: "Les meves publicacions"
             review:
               content: "Revisa"
+            invite:
+              content: "Convida"
       filter: "Filtre..."
     until: "Fins a:"
     form_templates:
@@ -2960,6 +2975,7 @@ ca:
         show: "Mostra"
         about: "Quant a"
   admin_js:
+    settings: "Configuració"
     admin:
       title: "Administració de Discourse"
       moderator: "Moderador"
@@ -2987,6 +3003,7 @@ ca:
         installed_version: "Instal·lat"
         latest_version: "Més recents"
         problems_found: "Uns quants consells basats en la configuració actual del lloc web."
+        dismiss_notice: "Descarta-ho"
         new_features:
           learn_more: "Per a saber-ne més..."
         last_checked: "Comprovat per darrera vegada"
@@ -3249,11 +3266,15 @@ ca:
           screened_ips: "IPs sota supervisió"
           screened_urls: "URLs sota supervisió"
           search_logs: "Cerca els registres (logs)"
-          security: "Seguretat"
-          spam: "Brossa"
+      section_landing_pages:
+        account:
+          title: "Compte"
+          backups:
+            title: "Còpies de seguretat"
       config_areas:
         about:
           contact_url_placeholder: "https://johnny-smith.com/contact"
+          company_name: "Nom"
           optional: "(opcional)"
           saved: "desat!"
         flags:
@@ -3262,6 +3283,7 @@ ca:
           edit: "Edita"
           delete: "Suprimeix"
           delete_confirm: 'Esteu segur que voleu suprimir "%{name}"?'
+          flags_tab: "Banderes"
           form:
             save: "Desa"
             name: "Nom"
@@ -3269,9 +3291,11 @@ ca:
             invalid_applies_to: "Necessari"
             topic: "temes"
             post: "publicacions"
+        look_and_feel:
+          themes:
+            title: "Aparences"
       plugins:
         title: "Connectors"
-        installed: "Connectors instal·lats"
         name: "Nom"
         none_installed: "No teniu cap connector instal·lat."
         version: "Versió"
@@ -3300,7 +3324,7 @@ ca:
         menu:
           backups: "Còpies de seguretat"
           logs: "Registres"
-        none: "No hi ha cap còpia de seguretat disponible."
+        none: "No hi ha cap còpia de seguretat disponible"
         read_only:
           enable:
             title: "Activa el mode només de lectura"
@@ -3331,12 +3355,11 @@ ca:
           download:
             label: "Descarrega"
             title: "Envia correu amb enllaç de descàrrega"
-            alert: "Us hem enviat per correu un enllaç per a descarregar aquesta còpia de seguretat."
+            alert: "Us hem enviat per correu un enllaç per a descarregar aquesta còpia de seguretat"
           destroy:
             title: "Elimina la còpia de seguretat"
             confirm: "Esteu segur que voleu destruir aquesta còpia de seguretat?"
           restore:
-            is_disabled: "S'ha desactivat la restauració en la configuració del lloc web."
             label: "Restaura"
             title: "Restaura la còpia de seguretat"
             confirm: "Esteu segur que voleu restaurar aquesta còpia de seguretat?"
@@ -3345,7 +3368,6 @@ ca:
             title: "Reverteix la base de dades a l'estat de funcionament previ"
             confirm: "Esteu segur que voleu revertir la base de dades a l'estat de funcionament previ?"
         location:
-          local: "Emmagatzematge local"
           s3: "S3"
         backup_storage_error: "Error d'accés a l'emmagatzematge de còpia de seguretat: %{error_message}"
       export_csv:
@@ -3977,7 +3999,6 @@ ca:
         time_read: "Temps de lectura"
         post_edits_count: "Edicions de la publicació"
         anonymize: "Fes anònim l'usuari"
-        anonymize_confirm: "Esteu segur que voleu fer anònim aquest compte? Això canviarà el nom d'usuari i el correu electrònic, i restablirà tota la informació de perfil."
         anonymize_yes: "Sí, fes anònim aquest compte"
         anonymize_failed: "Hi ha hagut un problema en fer anònim aquest compte."
         delete: "Suprimeix l'usuari"
@@ -4131,6 +4152,8 @@ ca:
         show_overriden: "Mostra només els sobreescrits"
         reset: "restableix"
         none: "cap"
+        save: "desa"
+        cancel: "cancel·la"
       site_settings:
         title: "Configuració"
         no_results: "Sense resultats"
@@ -4250,13 +4273,8 @@ ca:
             with_post: <span class="username">%{username}</span> per a publicació en %{link}
             with_post_time: <span class="username">%{username}</span> per a publicació en %{link} en <span class="time">%{time}</span>
             with_time: <span class="username">%{username}</span> en <span class="time">%{time}</span>
-        badge_intro:
-          title: "Seleccioneu una insígnia existent o creeu-ne una de nova per a començar."
-          what_are_badges_title: "Què són les insígnies (badges)?"
-          badge_query_examples_title: "Exemples de consulta d'insígnies"
       emoji:
         title: "Emoji"
-        add: "Afegeix emoji nou"
         name: "Nom"
         group: "Grup"
         image: "Imatge"
@@ -4290,12 +4308,13 @@ ca:
         post_title: "Publicació"
         category_id: "ID de categoria"
         category_title: "Categoria"
+        user_title: "Usuari"
         username: "Nom d'usuari "
         delete_confirm: Esteu segur que voleu suprimir l'enllaç permanent?
         form:
           label: "Nou:"
-          add: "Afegeix"
-          filter: "Cerca (URL o URL extern)"
+          url: "URL"
+          save: "Desa"
       reseed:
         action:
           label: "Reemplaça el text..."

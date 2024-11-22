@@ -2,7 +2,7 @@
 
 class PostSerializer < BasicPostSerializer
   # To pass in additional information we might need
-  INSTANCE_VARS ||= %i[
+  INSTANCE_VARS = %i[
     parent_post
     add_raw
     add_title
@@ -591,7 +591,7 @@ class PostSerializer < BasicPostSerializer
       else
         query = User.includes(:user_option)
         query = query.includes(:user_status) if SiteSetting.enable_user_status
-        query = query.where(username: object.mentions)
+        query = query.where(username_lower: object.mentions)
       end
 
     users.map { |user| BasicUserSerializer.new(user, root: false, include_status: true).as_json }

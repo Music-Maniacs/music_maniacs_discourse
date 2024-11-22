@@ -11,20 +11,22 @@ import willDestroy from "@ember/render-modifiers/modifiers/will-destroy";
 import { cancel, schedule } from "@ember/runloop";
 import { service } from "@ember/service";
 import { modifier } from "ember-modifier";
-import { eq, not } from "truth-helpers";
+import { eq, lt, not } from "truth-helpers";
 import DButton from "discourse/components/d-button";
 import concatClass from "discourse/helpers/concat-class";
-import optionalService from "discourse/lib/optional-service";
+import { applyValueTransformer } from "discourse/lib/transformer";
 import { updateUserStatusOnMention } from "discourse/lib/update-user-status-on-mention";
 import isZoomed from "discourse/lib/zoom-check";
 import discourseDebounce from "discourse-common/lib/debounce";
+import getURL from "discourse-common/lib/get-url";
 import discourseLater from "discourse-common/lib/later";
 import { bind } from "discourse-common/utils/decorators";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 import ChatMessageAvatar from "discourse/plugins/chat/discourse/components/chat/message/avatar";
 import ChatMessageError from "discourse/plugins/chat/discourse/components/chat/message/error";
 import ChatMessageInfo from "discourse/plugins/chat/discourse/components/chat/message/info";
 import ChatMessageLeftGutter from "discourse/plugins/chat/discourse/components/chat/message/left-gutter";
+import ChatMessageBlocks from "discourse/plugins/chat/discourse/components/chat-message/blocks";
 import ChatMessageActionsMobileModal from "discourse/plugins/chat/discourse/components/chat-message-actions-mobile";
 import ChatMessageInReplyToIndicator from "discourse/plugins/chat/discourse/components/chat-message-in-reply-to-indicator";
 import ChatMessageReaction from "discourse/plugins/chat/discourse/components/chat-message-reaction";
@@ -63,7 +65,6 @@ export default class ChatMessage extends Component {
   @service router;
   @service toasts;
   @service modal;
-  @optionalService adminTools;
 
   @tracked isActive = false;
 
@@ -94,11 +95,6 @@ export default class ChatMessage extends Component {
       }
     };
   });
-
-  constructor() {
-    super(...arguments);
-    this.initMentionedUsers();
-  }
 
   get pane() {
     return this.threadContext ? this.chatThreadPane : this.chatChannelPane;
@@ -137,7 +133,7 @@ export default class ChatMessage extends Component {
 
     recursiveCount(this.args.message);
 
-    return I18n.t("chat.deleted", { count });
+    return i18n("chat.deleted", { count });
   }
 
   get shouldRender() {
@@ -214,6 +210,8 @@ export default class ChatMessage extends Component {
   @action
   didInsertMessage(element) {
     this.messageContainer = element;
+    this.initMentionedUsers();
+    this.decorateMentions(element);
     this.debounceDecorateCookedMessage();
     this.refreshStatusOnMentions();
   }
@@ -239,24 +237,52 @@ export default class ChatMessage extends Component {
     );
   }
 
+  initMentionedUsers() {
+    this.args.message.mentionedUsers.forEach((user) => {
+      if (!user.statusManager.isTrackingStatus()) {
+        user.statusManager.trackStatus();
+        user.on("status-changed", this, "refreshStatusOnMentions");
+      }
+    });
+  }
+
+  decorateMentions(cooked) {
+    if (this.args.message.channel.allowChannelWideMentions) {
+      const wideMentions = [...cooked.querySelectorAll("span.mention")];
+      MENTION_KEYWORDS.forEach((keyword) => {
+        const mentions = wideMentions.filter((node) => {
+          return node.textContent.trim() === `@${keyword}`;
+        });
+
+        const classes = applyValueTransformer("mentions-class", [], {
+          user: { username: keyword },
+        });
+
+        mentions.forEach((mention) => {
+          mention.classList.add(...classes);
+        });
+      });
+    }
+
+    this.args.message.mentionedUsers.forEach((user) => {
+      const href = getURL(`/u/${user.username.toLowerCase()}`);
+      const mentions = cooked.querySelectorAll(`a.mention[href="${href}"]`);
+      const classes = applyValueTransformer("mentions-class", [], {
+        user,
+      });
+
+      mentions.forEach((mention) => {
+        mention.classList.add(...classes);
+      });
+    });
+  }
+
   @action
   decorateCookedMessage(message) {
     schedule("afterRender", () => {
       _chatMessageDecorators.forEach((decorator) => {
         decorator.call(this, this.messageContainer, message.channel);
       });
-    });
-  }
-
-  @action
-  initMentionedUsers() {
-    this.args.message.mentionedUsers.forEach((user) => {
-      if (user.statusManager.isTrackingStatus()) {
-        return;
-      }
-
-      user.statusManager.trackStatus();
-      user.on("status-changed", this, "refreshStatusOnMentions");
     });
   }
 
@@ -522,6 +548,7 @@ export default class ChatMessage extends Component {
           (if this.pane.selectingMessages "-selectable")
           (if @message.highlighted "-highlighted")
           (if @message.streaming "-streaming")
+          (if (lt @message.user.id 0) "is-bot")
           (if (eq @message.user.id this.currentUser.id) "is-by-current-user")
           (if (eq @message.id this.currentUser.id) "is-by-current-user")
           (if
@@ -639,7 +666,7 @@ export default class ChatMessage extends Component {
                 {{#if this.shouldRenderStopMessageStreamingButton}}
                   <div class="stop-streaming-btn-container">
                     <DButton
-                      @class="stop-streaming-btn"
+                      class="stop-streaming-btn"
                       @icon="stop-circle"
                       @label="cancel"
                       @action={{fn this.stopMessageStreaming @message}}
@@ -647,6 +674,8 @@ export default class ChatMessage extends Component {
 
                   </div>
                 {{/if}}
+
+                <ChatMessageBlocks @message={{@message}} />
 
                 <ChatMessageError
                   @message={{@message}}

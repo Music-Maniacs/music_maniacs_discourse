@@ -5,7 +5,7 @@ import {
   query,
   queryAll,
 } from "discourse/tests/helpers/qunit-helpers";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 
 acceptance("Admin - Watched Words", function (needs) {
   needs.user();
@@ -103,7 +103,7 @@ acceptance("Admin - Watched Words", function (needs) {
       .hasText("Discourse");
     assert
       .dom(".watched-words-list .watched-word .case-sensitive")
-      .hasText(I18n.t("admin.watched_words.case_sensitive"));
+      .hasText(i18n("admin.watched_words.case_sensitive"));
 
     await click(".select-kit-header.multi-select-header");
     await fillIn(".select-kit-filter input", "discourse");
@@ -116,7 +116,7 @@ acceptance("Admin - Watched Words", function (needs) {
       .hasText("discourse");
     assert
       .dom(".watched-words-list .watched-word .case-sensitive")
-      .hasText(I18n.t("admin.watched_words.case_sensitive"));
+      .hasText(i18n("admin.watched_words.case_sensitive"));
   });
 
   test("remove words", async function (assert) {
@@ -146,6 +146,18 @@ acceptance("Admin - Watched Words", function (needs) {
 
     assert.dom(".d-modal__body li .match").hasText("Hello");
     assert.dom(".d-modal__body li .tag").hasText("greeting");
+  });
+
+  test("showing/hiding words - tag", async function (assert) {
+    await visit("/admin/customize/watched_words/action/tag");
+
+    await click(".show-words-checkbox");
+
+    assert.dom(".watched-word").hasText("​ hello → greeting");
+
+    await click(".show-words-checkbox");
+
+    assert.dom(".watched-word").doesNotExist();
   });
 });
 

@@ -6,9 +6,9 @@ import { service } from "@ember/service";
 import DButton from "discourse/components/d-button";
 import concatClass from "discourse/helpers/concat-class";
 import { isTesting } from "discourse-common/config/environment";
-import i18n from "discourse-common/helpers/i18n";
 import discourseLater from "discourse-common/lib/later";
 import { bind } from "discourse-common/utils/decorators";
+import { i18n } from "discourse-i18n";
 
 export default class SoftwareUpdatePrompt extends Component {
   @service messageBus;
@@ -96,7 +96,7 @@ export default class SoftwareUpdatePrompt extends Component {
           <div aria-live="polite" class="update-prompt-main-content">
             <DButton
               @action={{this.refreshPage}}
-              @icon="redo"
+              @icon="arrow-rotate-right"
               @label="software_update_prompt.message"
               class="btn-transparent update-prompt-message"
             />
@@ -104,7 +104,7 @@ export default class SoftwareUpdatePrompt extends Component {
             <span class="update-prompt-dismiss">
               <DButton
                 @action={{this.dismiss}}
-                @icon="times"
+                @icon="xmark"
                 aria-label={{i18n "software_update_prompt.dismiss"}}
                 class="btn-transparent"
               />

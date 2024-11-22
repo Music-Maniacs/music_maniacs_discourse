@@ -76,8 +76,9 @@ class CurrentUserSerializer < BasicUserSerializer
              :use_admin_sidebar,
              :can_view_raw_email,
              :use_glimmer_topic_list?,
+             :use_auto_glimmer_post_menu?,
              :login_method,
-             :render_experimental_about_page
+             :has_unseen_features
 
   delegate :user_stat, to: :object, private: true
   delegate :any_posts, :draft_count, :pending_posts_count, :read_faq?, to: :user_stat
@@ -142,8 +143,12 @@ class CurrentUserSerializer < BasicUserSerializer
     object.staff?
   end
 
-  def render_experimental_about_page
-    object.in_any_groups?(SiteSetting.experimental_redesigned_about_page_groups_map)
+  def has_unseen_features
+    DiscourseUpdates.has_unseen_features?(object.id)
+  end
+
+  def include_has_unseen_features?
+    object.staff?
   end
 
   def can_post_anonymously
@@ -320,6 +325,10 @@ class CurrentUserSerializer < BasicUserSerializer
 
   def use_glimmer_topic_list?
     scope.user.in_any_groups?(SiteSetting.experimental_glimmer_topic_list_groups_map)
+  end
+
+  def use_auto_glimmer_post_menu?
+    scope.user.in_any_groups?(SiteSetting.glimmer_post_menu_groups_map)
   end
 
   def do_not_disturb_channel_position

@@ -12,7 +12,7 @@ import {
   paste,
   query,
 } from "discourse/tests/helpers/qunit-helpers";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 
 let uploadNumber = 1;
 
@@ -196,7 +196,7 @@ acceptance("Uppy Composer Attachment - Upload Placeholder", function (needs) {
       await settled();
       assert.strictEqual(
         query(".dialog-body").textContent.trim(),
-        I18n.t("post.errors.too_many_dragged_and_dropped_files", {
+        i18n("post.errors.too_many_dragged_and_dropped_files", {
           count: 2,
         }),
         "it should warn about too many files added"
@@ -221,7 +221,7 @@ acceptance("Uppy Composer Attachment - Upload Placeholder", function (needs) {
       await settled();
       assert.strictEqual(
         query(".dialog-body").textContent.trim(),
-        I18n.t("post.errors.upload_not_authorized", {
+        i18n("post.errors.upload_not_authorized", {
           authorized_extensions: authorizedExtensions(
             false,
             this.siteSettings
@@ -498,14 +498,6 @@ acceptance("Uppy Composer Attachment - Upload Error", function (needs) {
   });
 
   test("should show an error message for the failed upload", async function (assert) {
-    // Don't log the upload error
-    const stub = sinon
-      .stub(console, "error")
-      .withArgs(
-        sinon.match(/\[Uppy\]/),
-        sinon.match(/Failed to upload avatar\.png/)
-      );
-
     await visit("/");
     await click("#create-topic");
     await fillIn(".d-editor-input", "The image:\n");
@@ -513,7 +505,6 @@ acceptance("Uppy Composer Attachment - Upload Error", function (needs) {
     const done = assert.async();
 
     appEvents.on("composer:upload-error", async () => {
-      sinon.assert.calledOnce(stub);
       await settled();
       assert.strictEqual(
         query(".dialog-body").textContent.trim(),

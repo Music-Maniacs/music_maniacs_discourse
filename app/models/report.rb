@@ -20,6 +20,7 @@ class Report
   include Reports::ConsolidatedApiRequests
   include Reports::ConsolidatedPageViews
   include Reports::ConsolidatedPageViewsBrowserDetection
+  include Reports::SiteTraffic
   include Reports::DailyEngagedUsers
   include Reports::DauByMau
   include Reports::Emails
@@ -223,6 +224,11 @@ class Report
     singleton_class.instance_eval { define_method("report_#{name}", &block) }
   end
 
+  # Only used for testing.
+  def Report.remove_report(name)
+    singleton_class.instance_eval { remove_method("report_#{name}") }
+  end
+
   def self._get(type, opts = nil)
     opts ||= {}
 
@@ -294,19 +300,19 @@ class Report
     report
   end
 
+  # NOTE: Once use_legacy_pageviews is always false or no longer needed
+  # we will no longer support the page_view_anon and page_view_logged_in reports,
+  # they can be removed.
   def self.req_report(report, filter = nil)
     data =
+      # For this report we intentionally do not want to count mobile pageviews.
       if filter == :page_view_total
-        # For this report we intentionally do not want to count mobile pageviews
-        # or "browser" pageviews. See `ConsolidatedPageViewsBrowserDetection` for
-        # browser pageviews.
-        ApplicationRequest.where(
-          req_type: [
-            ApplicationRequest.req_types[:page_view_crawler],
-            ApplicationRequest.req_types[:page_view_anon],
-            ApplicationRequest.req_types[:page_view_logged_in],
-          ].flatten,
-        )
+        SiteSetting.use_legacy_pageviews ? legacy_page_view_requests : page_view_requests
+        # This is a separate report because if people have switched over
+        # to _not_ use legacy pageviews, we want to show both a Pageviews
+        # and Legacy Pageviews report.
+      elsif filter == :page_view_legacy_total
+        legacy_page_view_requests
       else
         ApplicationRequest.where(req_type: ApplicationRequest.req_types[filter])
       end
@@ -327,6 +333,31 @@ class Report
       data.where("date >= ? AND date < ?", (report.start_date - 31.days), report.start_date).sum(
         :count,
       )
+  end
+
+  # We purposefully exclude "browser" pageviews. See
+  # `ConsolidatedPageViewsBrowserDetection` for browser pageviews.
+  def self.legacy_page_view_requests
+    ApplicationRequest.where(
+      req_type: [
+        ApplicationRequest.req_types[:page_view_crawler],
+        ApplicationRequest.req_types[:page_view_anon],
+        ApplicationRequest.req_types[:page_view_logged_in],
+      ].flatten,
+    )
+  end
+
+  # We purposefully exclude "crawler" pageviews here and by
+  # only doing browser pageviews we are excluding "other" pageviews
+  # too. This is to reflect what is shown in the "Site traffic" report
+  # by default.
+  def self.page_view_requests
+    ApplicationRequest.where(
+      req_type: [
+        ApplicationRequest.req_types[:page_view_anon_browser],
+        ApplicationRequest.req_types[:page_view_logged_in_browser],
+      ].flatten,
+    )
   end
 
   def self.report_about(report, subject_class, report_method = :count_per_day)

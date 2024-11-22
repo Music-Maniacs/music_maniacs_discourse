@@ -7,7 +7,7 @@ import * as AvatarUtils from "discourse-common/lib/avatar-utils";
 import deprecated from "discourse-common/lib/deprecated";
 import escape from "discourse-common/lib/escape";
 import getURL from "discourse-common/lib/get-url";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 
 let _defaultHomepage;
 
@@ -383,7 +383,7 @@ export function unicodeSlugify(string) {
       .replace(/--+/g, "-") // replace multiple dashes with a single dash
       .replace(/^-+/, "") // Remove leading dashes
       .replace(/-+$/, ""); // Remove trailing dashes
-  } catch (e) {
+  } catch {
     // in case the regex construct \p{Letter} is not supported by the browser
     // fall back to the basic slugify function
     return slugify(string);
@@ -425,7 +425,7 @@ export function areCookiesEnabled() {
     let ret = document.cookie.includes("cookietest=");
     document.cookie = "cookietest=1; expires=Thu, 01-Jan-1970 00:00:01 GMT";
     return ret;
-  } catch (e) {
+  } catch {
     return false;
   }
 }
@@ -494,10 +494,10 @@ export function translateModKey(string) {
   } else {
     string = string
       .toLowerCase()
-      .replace("shift", I18n.t("shortcut_modifier_key.shift"))
-      .replace("ctrl", I18n.t("shortcut_modifier_key.ctrl"))
-      .replace("meta", I18n.t("shortcut_modifier_key.ctrl"))
-      .replace("alt", I18n.t("shortcut_modifier_key.alt"));
+      .replace("shift", i18n("shortcut_modifier_key.shift"))
+      .replace("ctrl", i18n("shortcut_modifier_key.ctrl"))
+      .replace("meta", i18n("shortcut_modifier_key.ctrl"))
+      .replace("alt", i18n("shortcut_modifier_key.alt"));
   }
 
   return string;
@@ -768,4 +768,20 @@ export function cleanNullQueryParams(params) {
 
 export function getElement(node) {
   return node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+}
+
+export function isPrimaryTab() {
+  return new Promise((resolve) => {
+    if (capabilities.supportsServiceWorker) {
+      navigator.serviceWorker.addEventListener("message", (event) => {
+        resolve(event.data.primaryTab);
+      });
+
+      navigator.serviceWorker.ready.then((registration) => {
+        registration.active.postMessage({ action: "primaryTab" });
+      });
+    } else {
+      resolve(true);
+    }
+  });
 }

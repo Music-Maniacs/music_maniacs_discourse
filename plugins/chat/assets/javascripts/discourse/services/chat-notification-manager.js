@@ -1,7 +1,7 @@
 import Service, { service } from "@ember/service";
 import {
   alertChannel,
-  onNotification,
+  onNotification as onDesktopNotification,
 } from "discourse/lib/desktop-notifications";
 import { withPluginApi } from "discourse/lib/plugin-api";
 import { isTesting } from "discourse-common/config/environment";
@@ -10,13 +10,37 @@ import { bind } from "discourse-common/utils/decorators";
 export default class ChatNotificationManager extends Service {
   @service presence;
   @service chat;
+  @service chatChannelsManager;
   @service chatStateManager;
   @service currentUser;
   @service appEvents;
+  @service site;
 
   _subscribedToCore = true;
   _subscribedToChat = false;
   _countChatInDocTitle = true;
+
+  willDestroy() {
+    super.willDestroy(...arguments);
+
+    if (!this._shouldRun()) {
+      return;
+    }
+
+    this._chatPresenceChannel.off(
+      "change",
+      this._subscribeToCorrectNotifications
+    );
+    this._chatPresenceChannel.unsubscribe();
+    this._chatPresenceChannel.leave();
+
+    this._corePresenceChannel.off(
+      "change",
+      this._subscribeToCorrectNotifications
+    );
+    this._corePresenceChannel.unsubscribe();
+    this._corePresenceChannel.leave();
+  }
 
   start() {
     if (!this._shouldRun()) {
@@ -48,28 +72,6 @@ export default class ChatNotificationManager extends Service {
       "change",
       this._subscribeToCorrectNotifications
     );
-  }
-
-  willDestroy() {
-    super.willDestroy(...arguments);
-
-    if (!this._shouldRun()) {
-      return;
-    }
-
-    this._chatPresenceChannel.off(
-      "change",
-      this._subscribeToCorrectNotifications
-    );
-    this._chatPresenceChannel.unsubscribe();
-    this._chatPresenceChannel.leave();
-
-    this._corePresenceChannel.off(
-      "change",
-      this._subscribeToCorrectNotifications
-    );
-    this._corePresenceChannel.unsubscribe();
-    this._corePresenceChannel.leave();
   }
 
   shouldCountChatInDocTitle() {
@@ -144,17 +146,19 @@ export default class ChatNotificationManager extends Service {
   }
 
   @bind
-  onMessage(data) {
+  async onMessage(data) {
     if (data.channel_id === this.chat.activeChannel?.id) {
       return;
     }
 
-    return onNotification(
-      data,
-      this.siteSettings,
-      this.currentUser,
-      this.appEvents
-    );
+    if (this.site.desktopView) {
+      return onDesktopNotification(
+        data,
+        this.siteSettings,
+        this.currentUser,
+        this.appEvents
+      );
+    }
   }
 
   _shouldRun() {

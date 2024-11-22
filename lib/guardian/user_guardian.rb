@@ -131,7 +131,7 @@ module UserGuardian
     return true if !SiteSetting.allow_users_to_hide_profile?
 
     # If a user has hidden their profile, restrict it to them and staff
-    return is_me?(user) || is_staff? if user.user_option.try(:hide_profile_and_presence?)
+    return is_me?(user) || is_staff? if user.user_option.try(:hide_profile?)
 
     true
   end
@@ -171,8 +171,13 @@ module UserGuardian
       (
         SiteSetting.enable_category_group_moderation &&
           Reviewable
-            .where(reviewable_by_group_id: @user.group_users.pluck(:group_id))
-            .where("category_id IS NULL or category_id IN (?)", allowed_category_ids)
+            .joins(
+              "INNER JOIN category_moderation_groups ON category_moderation_groups.category_id = reviewables.category_id",
+            )
+            .where(
+              category_id: allowed_category_ids,
+              "category_moderation_groups.group_id": @user.group_users.pluck(:group_id),
+            )
             .exists?
       )
   end
@@ -197,6 +202,10 @@ module UserGuardian
 
   def can_delete_sso_record?(user)
     SiteSetting.enable_discourse_connect && user && is_admin?
+  end
+
+  def can_delete_user_associated_accounts?(user)
+    user && is_admin?
   end
 
   def can_change_tracking_preferences?(user)

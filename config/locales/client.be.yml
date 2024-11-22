@@ -148,6 +148,7 @@ be:
     suggested_topics:
       pm_title: "прапанаваныя паведамленні"
     about:
+      edit: "Рэдагаваць гэтую старонку"
       simple_title: "Аб сайце"
       title: "Аб %{title}"
       stats: "статыстыка"
@@ -157,7 +158,6 @@ be:
       like_count: "перавагі"
       topic_count: "Тэмы"
       post_count: "Паведамленні"
-      contact_info: "У выпадку сур'ёзных праблем з гэтым сайтам, калі ласка, звяжыцеся з намі праз %{contact_info}."
       activities:
         posts:
           one: "%{formatted_number} запіс"
@@ -598,12 +598,11 @@ be:
         action: "Націсніце тут, каб актываваць свой рахунак"
         already_done: "ня На жаль, гэтая спасылка для пацверджання акаўнта больш не дзейнічае. Магчыма, ваш уліковы запіс ўжо актываваная?"
         please_continue: "Ваш новы рахунак пацвярджаецца; Вы будзеце перанакіраваны на галоўную старонку."
-        continue_button: "Працягнуць да %{site_name}"
         welcome_to: "Сардэчна запрашаем да сайта %{site_name}!"
         approval_required: "Мадэратар павінен ўручную зацвердзіць новы ўліковы запіс, перш чым гэты форум. Вы атрымаеце па электроннай пошце, калі ваш рахунак будзе ўхвалены!"
       name:
         title: "Імя"
-        instructions_required: "Ваша поўнае імя."
+        instructions_required: "Ваша поўнае імя"
         too_short: "Ваша імя занадта кароткае"
         ok: "Ваша імя выглядае добра"
       username:
@@ -686,6 +685,8 @@ be:
         time_read: "час чытання"
         days_visited: "дзён наведанае"
         account_age_days: "Ўзрост акаўнта ў днях"
+        invite:
+          cancel: "адмяніць"
       password:
         title: "Пароль"
         common: "Гэты пароль занадта просты."
@@ -793,6 +794,10 @@ be:
       header_title: "жаданы!"
       title: "рэгістрацыя"
       failed: "Нешта пайшло не так; хутчэй за ўсё, гэтую электронную пошту ўжо зарэгістравана, паспрабуйце спасылкі Забыўся пароль"
+      progress_bar:
+        signup: "рэгістрацыя"
+        approve: "ўхваляць"
+        login: "Увайсці"
     forgot_password:
       title: "Скід пароля"
       action: "Я забыўся (а) пароль"
@@ -802,6 +807,7 @@ be:
     email_login:
       confirm_title: Працягнуць да %{site_name}
     login:
+      title: "Увайсці"
       username: "Карыстальнік"
       password: "Пароль"
       second_factor_backup_description: "Калі ласка, увядзіце адзін з рэзервовых кодаў:"
@@ -1129,9 +1135,13 @@ be:
       errors:
         upload_not_authorized: "Sorry, the file you are trying to upload is not authorized (authorized extensions: %{authorized_extensions})."
       controls:
+        like_action: "Падабайка"
         like: "упадабаць гэты пост"
         edit_action: "Рэдагаваць"
+        flag_action: "Пазначыць"
+        share_action: "Падзяліцца"
         more: "Болей"
+        admin_action: "адміністратар"
         delete_topic: "выдаліць тэму"
       actions:
         people:
@@ -1486,6 +1496,7 @@ be:
       spreadsheet:
         about: "Аб тэме"
   admin_js:
+    settings: "Налады"
     admin:
       moderator: "Мадэратар"
       tags:
@@ -1647,15 +1658,20 @@ be:
           screened_emails: "Схаваныя емейлы"
           screened_ips: "Screened IPs"
           screened_urls: "Screened URLs"
-          security: "Бяспека"
-          spam: "Спам"
+      section_landing_pages:
+        account:
+          title: "Аккаўнт"
+          backups:
+            title: "Бэкапы"
       config_areas:
         about:
+          company_name: "імя"
           saved: "захавана!"
         flags:
           description: "Апісанне"
           edit: "рэдагаваць"
           delete: "Выдаліць"
+          flags_tab: "сцягі"
           form:
             save: "захаваць"
             name: "імя"
@@ -1683,7 +1699,7 @@ be:
         menu:
           backups: "Бэкапы"
           logs: "Логі"
-        none: "No backup available."
+        none: "No backup available"
         read_only:
           enable:
             title: "Ўключыць рэжым толькі для чытання"
@@ -1712,7 +1728,6 @@ be:
             title: "Remove the backup"
             confirm: "Are you sure you want to destroy this backup?"
           restore:
-            is_disabled: "Restore is disabled in the site settings."
             label: "Restore"
             title: "Restore the backup"
           rollback:
@@ -2127,6 +2142,8 @@ be:
         show_overriden: "Паказваць толькі перавызначаны"
         reset: "скінуць"
         none: "ёсць"
+        save: "стварыць..."
+        cancel: "адмена"
       site_settings:
         title: "Налады"
         no_results: "Няма вынікаў."
@@ -2231,12 +2248,13 @@ be:
         post_title: "Паведамленне"
         category_id: "ID катэгорыі"
         category_title: "Катэгорыя"
+        user_title: "карыстальнік"
         username: "Імя карыстальніка"
         delete_confirm: Вы ўпэўненыя, што жадаеце выдаліць гэта пастаянную спасылку?
         form:
           label: "новы:"
-          add: "Дадаць"
-          filter: "Пошук (URL або знешні URL)"
+          url: "URL спасылка"
+          save: "захаваць"
       reseed:
         modal:
           categories: "Катэгорыі"

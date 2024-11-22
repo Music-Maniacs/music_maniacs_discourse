@@ -41,10 +41,12 @@ ignored:
 reviewed:
   bundler:
     - activerecord # MIT
+    - benchmark # Ruby
     - coderay # MIT
     - concurrent-ruby # MIT
     - css_parser # MIT
     - drb # BSD-2-Clause
+    - dry-initializer # MIT
     - excon # MIT
     - faraday-em_http # MIT
     - faraday-em_synchrony # MIT
@@ -68,6 +70,7 @@ reviewed:
     - r2 # Apache-2.0 (Twitter)
     - raindrops # LGPL-2.1+
     - rubyzip # Ruby
+    - securerandom # Ruby
     - sidekiq # LGPL (Sidekiq)
     - tilt # MIT
     - unf # BSD-2-Clause

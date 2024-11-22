@@ -411,7 +411,7 @@ html.composer-open {
 
   #draft-status {
     margin-left: auto;
-    .d-icon-user-edit {
+    .d-icon-user-pen {
       color: var(--danger);
       font-size: 20px;
       vertical-align: -5.5px;
@@ -419,10 +419,6 @@ html.composer-open {
     + .btn-mini-toggle {
       margin-left: 0;
     }
-  }
-
-  #file-uploader {
-    display: none;
   }
 
   .composer-select-form-template {
@@ -643,7 +639,6 @@ body:not(.ios-safari-composer-hacks) {
       min-height: calc(var(--min-height) - 4em);
     }
     padding-bottom: var(--composer-ipad-padding);
-    padding-bottom: calc(10px + env(keyboard-inset-height));
     box-sizing: border-box;
   }
 }

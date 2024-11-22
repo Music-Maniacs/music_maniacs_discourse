@@ -5,10 +5,132 @@ describe Chat::Message do
 
   it { is_expected.to have_many(:chat_mentions).dependent(:destroy) }
 
+  it "supports custom fields" do
+    message.custom_fields["test"] = "test"
+    message.save_custom_fields
+    loaded_message = Chat::Message.find(message.id)
+    expect(loaded_message.custom_fields["test"]).to eq("test")
+    expect(Chat::MessageCustomField.first.message.id).to eq(message.id)
+  end
+
+  describe "normalization" do
+    context "when normalizing blocks" do
+      it "adds a schema version to the blocks" do
+        message.update!(
+          blocks: [
+            {
+              type: "actions",
+              elements: [{ text: { text: "Foo", type: "plain_text" }, type: "button" }],
+            },
+          ],
+        )
+
+        expect(message.blocks[0]["schema_version"]).to eq(1)
+      end
+
+      it "adds a schema version to the elements" do
+        message.update!(
+          blocks: [
+            {
+              type: "actions",
+              elements: [{ text: { text: "Foo", type: "plain_text" }, type: "button" }],
+            },
+          ],
+        )
+
+        expect(message.blocks[0]["elements"][0]["schema_version"]).to eq(1)
+      end
+
+      it "adds a block_id if not present" do
+        message.update!(
+          blocks: [
+            {
+              type: "actions",
+              elements: [{ text: { text: "Foo", type: "plain_text" }, type: "button" }],
+            },
+          ],
+        )
+
+        expect(message.blocks[0]["block_id"]).to be_present
+      end
+
+      it "adds an action_id if not present" do
+        message.update!(
+          blocks: [
+            {
+              type: "actions",
+              elements: [{ text: { text: "Foo", type: "plain_text" }, type: "button" }],
+            },
+          ],
+        )
+
+        expect(message.blocks[0]["elements"][0]["action_id"]).to be_present
+      end
+    end
+  end
+
   describe "validations" do
     subject(:message) { described_class.new(message: "") }
 
+    let(:blocks) { nil }
+
     it { is_expected.to validate_length_of(:cooked).is_at_most(20_000) }
+
+    context "when blocks format is invalid" do
+      let(:blocks) { [{ type: "actions", elements: [{ type: "buttoxn" }] }] }
+
+      it do
+        is_expected.to_not allow_value(blocks).for(:blocks).with_message(
+          [
+            "value at `/0/elements/0/type` is not one of: [\"button\"]",
+            "object at `/0/elements/0` is missing required properties: text",
+          ],
+        )
+      end
+    end
+
+    context "when action_id is duplicated" do
+      let(:blocks) do
+        [
+          {
+            type: "actions",
+            elements: [
+              { type: "button", text: { text: "Foo", type: "plain_text" }, action_id: "foo" },
+              { type: "button", text: { text: "Foo", type: "plain_text" }, action_id: "foo" },
+            ],
+          },
+        ]
+      end
+
+      it do
+        is_expected.to_not allow_value(blocks).for(:blocks).with_message(
+          "have duplicated action_id: foo",
+        )
+      end
+    end
+
+    context "when block_id is duplicated" do
+      let(:blocks) do
+        [
+          {
+            type: "actions",
+            block_id: "foo",
+            elements: [{ type: "button", text: { text: "Foo", type: "plain_text" } }],
+          },
+          {
+            type: "actions",
+            block_id: "foo",
+            elements: [{ type: "button", text: { text: "Foo", type: "plain_text" } }],
+          },
+        ]
+      end
+
+      it do
+        is_expected.to_not allow_value(blocks).for(:blocks).with_message(
+          "have duplicated block_id: foo",
+        )
+      end
+    end
   end
 
   describe ".in_thread?" do
@@ -61,16 +183,74 @@ describe Chat::Message do
       )
     end
 
-    it "does not support headings" do
-      cooked = described_class.cook("## heading 2")
+    it "supports kbd" do
+      cooked = described_class.cook <<~MD
+      <kbd>Esc</kbd> is pressed
+      MD
 
-      expect(cooked).to eq("<p>## heading 2</p>")
+      expect(cooked).to match_html <<~HTML
+      <p><kbd>Esc</kbd> is pressed</p>
+      HTML
+    end
+
+    context "when message is made by a bot user" do
+      it "supports headings" do
+        cooked = described_class.cook(<<~MD, user_id: -1)
+        # h1
+        ## h2
+        ### h3
+        #### h4
+        ##### h5
+        ###### h6
+        MD
+
+        expect(cooked).to match_html <<~HTML
+        <h1><a name="h1-1" class="anchor" href="#h1-1"></a>h1</h1>
+        <h2><a name="h2-2" class="anchor" href="#h2-2"></a>h2</h2>
+        <h3><a name="h3-3" class="anchor" href="#h3-3"></a>h3</h3>
+        <h4><a name="h4-4" class="anchor" href="#h4-4"></a>h4</h4>
+        <h5><a name="h5-5" class="anchor" href="#h5-5"></a>h5</h5>
+        <h6><a name="h6-6" class="anchor" href="#h6-6"></a>h6</h6>
+        HTML
+      end
+
+      it "cooks the grid bbcode" do
+        cooked = described_class.cook("[grid]\ntest\n[/grid]", user_id: -1)
+
+        expect(cooked).to match_html <<~HTML
+        <div class="d-image-grid">
+        <p>test</p>
+        </div>
+        HTML
+      end
+    end
+
+    it "doesn't support headings" do
+      cooked = described_class.cook("# test")
+
+      expect(cooked).to match_html <<~HTML
+      <p># test</p>
+      HTML
+    end
+
+    it "doesn't support grid" do
+      cooked = described_class.cook("[grid]\ntest\n[/grid]")
+
+      expect(cooked).to match_html <<~HTML
+      <p>[grid]<br>test<br>[/grid]</p>
+      HTML
     end
 
     it "supports horizontal replacement" do
       cooked = described_class.cook("---")
 
       expect(cooked).to eq("<p>—</p>")
+    end
+
+    it "supports escape sequence" do
+      cooked = described_class.cook('\*test\*')
+
+      expect(cooked).to eq("<p>*test*</p>")
     end
 
     it "supports backticks rule" do
@@ -509,7 +689,7 @@ describe Chat::Message do
     it "destroys upload_references" do
       message_1 = Fabricate(:chat_message)
       upload_reference_1 = Fabricate(:upload_reference, target: message_1)
-      upload_1 = Fabricate(:upload)
+      _upload_1 = Fabricate(:upload)
 
       message_1.destroy!
 

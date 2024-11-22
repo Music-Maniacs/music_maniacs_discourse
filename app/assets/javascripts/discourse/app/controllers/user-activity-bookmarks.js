@@ -9,7 +9,7 @@ import BulkSelectHelper from "discourse/lib/bulk-select-helper";
 import Bookmark from "discourse/models/bookmark";
 import { iconHTML } from "discourse-common/lib/icon-library";
 import discourseComputed from "discourse-common/utils/decorators";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 
 export default class UserActivityBookmarksController extends Controller {
   @service router;
@@ -30,17 +30,17 @@ export default class UserActivityBookmarksController extends Controller {
 
   @computed("q")
   get searchTerm() {
-    return this.q;
+    return this._searchTerm || this.q;
   }
 
   set searchTerm(value) {
-    /* noop */
+    this._searchTerm = value;
   }
 
   @discourseComputed()
   emptyStateBody() {
     return htmlSafe(
-      I18n.t("user.no_bookmarks_body", {
+      i18n("user.no_bookmarks_body", {
         icon: iconHTML("bookmark"),
       })
     );
@@ -59,7 +59,7 @@ export default class UserActivityBookmarksController extends Controller {
   @action
   search() {
     this.router.transitionTo({
-      queryParams: { q: this.searchTerm },
+      queryParams: { q: this._searchTerm },
     });
   }
 

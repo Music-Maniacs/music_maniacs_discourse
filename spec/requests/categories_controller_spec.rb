@@ -44,7 +44,12 @@ RSpec.describe CategoriesController do
     end
 
     it "respects permalinks before redirecting /category paths to /c paths" do
-      _perm = Permalink.create!(url: "category/something", category_id: category.id)
+      _perm =
+        Permalink.create!(
+          url: "category/something",
+          permalink_type_value: category.id,
+          permalink_type: "category",
+        )
 
       get "/category/something"
       expect(response).to have_http_status(:moved_permanently)
@@ -404,7 +409,7 @@ RSpec.describe CategoriesController do
       let!(:category2) { Fabricate(:category, user: admin) }
       let!(:category3) { Fabricate(:category, user: admin) }
 
-      it "paginates results wihen lazy_load_categories is enabled" do
+      it "paginates results when lazy_load_categories is enabled" do
         SiteSetting.lazy_load_categories_groups = "#{Group::AUTO_GROUPS[:everyone]}"
 
         stub_const(CategoryList, "CATEGORIES_PER_PAGE", 2) { get "/categories.json?page=1" }
@@ -416,7 +421,19 @@ RSpec.describe CategoriesController do
         expect(response.parsed_body["category_list"]["categories"].count).to eq(2)
       end
 
-      it "does not paginate results when lazy_load_categories is disabled" do
+      it "paginates results when there are many categories" do
+        stub_const(CategoryList, "MAX_UNOPTIMIZED_CATEGORIES", 2) do
+          stub_const(CategoryList, "CATEGORIES_PER_PAGE", 2) { get "/categories.json?page=1" }
+          expect(response.status).to eq(200)
+          expect(response.parsed_body["category_list"]["categories"].count).to eq(2)
+
+          stub_const(CategoryList, "CATEGORIES_PER_PAGE", 2) { get "/categories.json?page=2" }
+          expect(response.status).to eq(200)
+          expect(response.parsed_body["category_list"]["categories"].count).to eq(2)
+        end
+      end
+
+      it "does not paginate results by default" do
         stub_const(CategoryList, "CATEGORIES_PER_PAGE", 2) { get "/categories.json?page=1" }
         expect(response.status).to eq(200)
         expect(response.parsed_body["category_list"]["categories"].count).to eq(4)
@@ -424,6 +441,11 @@ RSpec.describe CategoriesController do
         stub_const(CategoryList, "CATEGORIES_PER_PAGE", 2) { get "/categories.json?page=2" }
         expect(response.status).to eq(200)
         expect(response.parsed_body["category_list"]["categories"].count).to eq(0)
+      end
+
+      it "does not error out if page is a nested parameter" do
+        get "/categories.json?page[foo]=2"
+        expect(response.status).to eq(200)
       end
     end
   end
@@ -517,7 +539,7 @@ RSpec.describe CategoriesController do
                  slug: "hello-cat",
                  auto_close_hours: 72,
                  search_priority: Searchable::PRIORITIES[:ignore],
-                 reviewable_by_group_name: group.name,
+                 moderating_group_ids: [group.id],
                  permissions: {
                    "everyone" => readonly,
                    "staff" => create_post,
@@ -527,7 +549,7 @@ RSpec.describe CategoriesController do
           expect(response.status).to eq(200)
           cat_json = response.parsed_body["category"]
           expect(cat_json).to be_present
-          expect(cat_json["reviewable_by_group_name"]).to eq(group.name)
+          expect(cat_json["moderating_group_ids"]).to eq([group.id])
           expect(cat_json["name"]).to eq("hello")
           expect(cat_json["slug"]).to eq("hello-cat")
           expect(cat_json["color"]).to eq("ff0")
@@ -634,6 +656,10 @@ RSpec.describe CategoriesController do
   end
 
   describe "#update" do
+    fab!(:mod_group_1) { Fabricate(:group) }
+    fab!(:mod_group_2) { Fabricate(:group) }
+    fab!(:mod_group_3) { Fabricate(:group) }
+
     before { Jobs.run_immediately! }
 
     it "requires the user to be logged in" do
@@ -870,6 +896,47 @@ RSpec.describe CategoriesController do
           expect(category.category_required_tag_groups).to eq([])
           expect(category.custom_fields).to eq({ "field_1" => "hi" })
           expect(category.form_template_ids.count).to eq(0)
+        end
+
+        it "doesn't set category moderation groups if the enable_category_group_moderation setting is false" do
+          SiteSetting.enable_category_group_moderation = false
+
+          put "/categories/#{category.id}.json", params: { moderating_group_ids: [mod_group_1.id] }
+          expect(response.status).to eq(200)
+          expect(category.reload.moderating_groups).to be_blank
+        end
+
+        it "sets category moderation groups if the enable_category_group_moderation setting is true" do
+          SiteSetting.enable_category_group_moderation = true
+
+          put "/categories/#{category.id}.json", params: { moderating_group_ids: [mod_group_1.id] }
+          expect(response.status).to eq(200)
+          expect(category.reload.moderating_groups).to contain_exactly(mod_group_1)
+        end
+
+        it "removes category moderation groups and adds groups according to the moderating_group_ids param" do
+          SiteSetting.enable_category_group_moderation = true
+
+          category.update!(moderating_group_ids: [mod_group_2.id])
+          expect(category.reload.moderating_groups).to contain_exactly(mod_group_2)
+
+          put "/categories/#{category.id}.json",
+              params: {
+                moderating_group_ids: [mod_group_1.id, mod_group_3.id],
+              }
+          expect(response.status).to eq(200)
+          expect(category.reload.moderating_groups).to contain_exactly(mod_group_1, mod_group_3)
+        end
+
+        it "can remove all category moderation groups" do
+          SiteSetting.enable_category_group_moderation = true
+
+          category.update!(moderating_group_ids: [mod_group_2.id, mod_group_1.id])
+          expect(category.reload.moderating_groups).to contain_exactly(mod_group_2, mod_group_1)
+
+          put "/categories/#{category.id}.json", params: { moderating_group_ids: [] }
+          expect(response.status).to eq(200)
+          expect(category.reload.moderating_groups).to be_blank
         end
       end
     end
@@ -1441,6 +1508,23 @@ RSpec.describe CategoriesController do
 
       expect(response.status).to eq(200)
       expect(response.parsed_body["categories"].map { |c| c["id"] }).not_to include(category.id)
+    end
+
+    context "when not logged in" do
+      before { ActionController::Base.allow_forgery_protection = true }
+      after { ActionController::Base.allow_forgery_protection = false }
+
+      it "works and is not CSRF protected" do
+        post "/categories/search.json", params: { term: "" }
+
+        expect(response.status).to eq(200)
+        expect(response.parsed_body["categories"].map { |c| c["id"] }).to contain_exactly(
+          SiteSetting.uncategorized_category_id,
+          category.id,
+          subcategory.id,
+          category2.id,
+        )
+      end
     end
   end
 

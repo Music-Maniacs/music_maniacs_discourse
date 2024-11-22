@@ -3,13 +3,13 @@ import { action } from "@ember/object";
 import { service } from "@ember/service";
 import { eq, or } from "truth-helpers";
 import DButton from "discourse/components/d-button";
-import i18n from "discourse-common/helpers/i18n";
+import { i18n } from "discourse-i18n";
 
 export default class AdminWatchedWord extends Component {
   @service dialog;
 
   get tags() {
-    return this.args.word.replacement.replacement.split(",");
+    return this.args.word.replacement.split(",");
   }
 
   @action
@@ -30,7 +30,7 @@ export default class AdminWatchedWord extends Component {
     <div class="watched-word">
       <DButton
         @action={{this.deleteWord}}
-        @icon="times"
+        @icon="xmark"
         class="btn-transparent delete-word-record"
       />
 

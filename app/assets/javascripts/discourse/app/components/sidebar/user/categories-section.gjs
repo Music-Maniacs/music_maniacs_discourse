@@ -4,8 +4,8 @@ import { action } from "@ember/object";
 import { service } from "@ember/service";
 import { hasDefaultSidebarCategories } from "discourse/lib/sidebar/helpers";
 import Category from "discourse/models/category";
-import i18n from "discourse-common/helpers/i18n";
 import { debounce } from "discourse-common/utils/decorators";
+import { i18n } from "discourse-i18n";
 import AllCategoriesSectionLink from "../common/all-categories-section-link";
 import CommonCategoriesSection from "../common/categories-section";
 import EditNavigationMenuCategoriesModal from "../edit-navigation-menu/categories-modal";
@@ -82,7 +82,7 @@ export default class SidebarUserCategoriesSection extends CommonCategoriesSectio
           title=(i18n "sidebar.sections.categories.header_action_title")
         )
       }}
-      @headerActionsIcon="pencil-alt"
+      @headerActionsIcon="pencil"
       @collapsable={{@collapsable}}
     >
 

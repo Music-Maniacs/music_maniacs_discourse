@@ -5,7 +5,6 @@ RSpec.describe "Glimmer Header", type: :system do
   let(:search) { PageObjects::Pages::Search.new }
   fab!(:current_user) { Fabricate(:user) }
   fab!(:topic)
-  before { SiteSetting.glimmer_header_mode = "enabled" }
 
   it "renders basics" do
     visit "/"
@@ -109,18 +108,6 @@ RSpec.describe "Glimmer Header", type: :system do
       header.get_computed_style_value(".d-header", "--header-offset") == "60px"
     end
     expect(header.get_computed_style_value(".d-header", "--header-offset")).to eq("60px")
-  end
-
-  it "body document is permanently docked regardless of scroll positioning" do
-    Fabricate.times(20, :topic)
-    sign_in(current_user)
-    visit "/"
-
-    expect(page).to have_selector("body.docked")
-    page.execute_script("window.scrollBy(0, 1000)")
-    expect(page).to have_selector("body.docked")
-    page.execute_script("window.scrollTo(0, 0)")
-    expect(page).to have_selector("body.docked")
   end
 
   it "moves focus between tabs using arrow keys" do

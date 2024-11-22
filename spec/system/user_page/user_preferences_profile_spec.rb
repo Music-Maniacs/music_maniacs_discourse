@@ -71,9 +71,21 @@ describe "User preferences | Profile", type: :system do
       find(".user-field-favourite-pokemon input").fill_in(with: "Mudkip")
       find(".save-button .btn-primary").click
 
+      expect(page).to have_selector(".pref-bio")
+
       visit("/")
 
       expect(page).to have_current_path("/")
+    end
+
+    it "allows enabling safe-mode" do
+      visit("/safe-mode")
+
+      expect(page).to have_current_path("/safe-mode")
+
+      page.find("#btn-enter-safe-mode").click
+
+      expect(page).to have_current_path("/u/#{user.username}/preferences/profile")
     end
   end
 end

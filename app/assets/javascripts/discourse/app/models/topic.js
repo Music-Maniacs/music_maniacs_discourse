@@ -1,4 +1,6 @@
+import { cached } from "@glimmer/tracking";
 import EmberObject, { computed } from "@ember/object";
+import { dependentKeyCompat } from "@ember/object/compat";
 import { alias, and, equal, notEmpty, or } from "@ember/object/computed";
 import { service } from "@ember/service";
 import { Promise } from "rsvp";
@@ -22,7 +24,7 @@ import deprecated from "discourse-common/lib/deprecated";
 import getURL from "discourse-common/lib/get-url";
 import { deepMerge } from "discourse-common/lib/object";
 import discourseComputed from "discourse-common/utils/decorators";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 import Category from "./category";
 
 export function loadTopicView(topic, args) {
@@ -392,10 +394,10 @@ export default class Topic extends RestModel {
       const createdAtStr = moment(createdAt).format(BUMPED_FORMAT);
 
       return bumpedAtStr !== createdAtStr
-        ? `${I18n.t("topic.created_at", {
+        ? `${i18n("topic.created_at", {
             date: longDate(createdAt),
-          })}\n${I18n.t("topic.bumped_at", { date: longDate(bumpedAt) })}`
-        : I18n.t("topic.created_at", { date: longDate(createdAt) });
+          })}\n${i18n("topic.bumped_at", { date: longDate(bumpedAt) })}`
+        : i18n("topic.created_at", { date: longDate(createdAt) });
     }
   }
 
@@ -430,18 +432,20 @@ export default class Topic extends RestModel {
     return newTags;
   }
 
-  @discourseComputed("related_messages")
-  relatedMessages(relatedMessages) {
-    if (relatedMessages) {
-      return relatedMessages.map((st) => this.store.createRecord("topic", st));
-    }
+  @dependentKeyCompat
+  @cached
+  get relatedMessages() {
+    return this.get("related_messages")?.map((st) =>
+      this.store.createRecord("topic", st)
+    );
   }
 
-  @discourseComputed("suggested_topics")
-  suggestedTopics(suggestedTopics) {
-    if (suggestedTopics) {
-      return suggestedTopics.map((st) => this.store.createRecord("topic", st));
-    }
+  @dependentKeyCompat
+  @cached
+  get suggestedTopics() {
+    return this.get("suggested_topics")?.map((st) =>
+      this.store.createRecord("topic", st)
+    );
   }
 
   @discourseComputed("posts_count")
@@ -474,7 +478,7 @@ export default class Topic extends RestModel {
       const reasonKey = Object.keys(TOPIC_VISIBILITY_REASONS).find(
         (key) => TOPIC_VISIBILITY_REASONS[key] === this.visibility_reason_id
       );
-      return I18n.t(`topic_statuses.visibility_reasons.${reasonKey}`);
+      return i18n(`topic_statuses.visibility_reasons.${reasonKey}`);
     }
 
     return "";
@@ -751,8 +755,8 @@ export default class Topic extends RestModel {
         if (
           opts.force_destroy ||
           (!deleted_by.staff &&
-            !deleted_by.groups.some(
-              (group) => group.name === this.category?.reviewable_by_group_name
+            !deleted_by.groups.some((group) =>
+              this.category?.moderating_group_ids?.includes(group.id)
             ) &&
             !deleted_by.can_delete_all_posts_and_topics)
         ) {

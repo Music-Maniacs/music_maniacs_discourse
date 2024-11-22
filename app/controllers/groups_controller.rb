@@ -179,7 +179,6 @@ class GroupsController < ApplicationController
       if params[:update_existing_users] == "true"
         update_existing_users(group.group_users, notification_level, categories, tags)
       end
-      AdminDashboardData.clear_found_problem("group_#{group.id}_email_credentials")
 
       # Redirect user to groups index page if they can no longer see the group
       return redirect_with_client_support groups_path if !guardian.can_see?(group)
@@ -596,7 +595,7 @@ class GroupsController < ApplicationController
     end
   end
 
-  MAX_NOTIFIED_OWNERS ||= 20
+  MAX_NOTIFIED_OWNERS = 20
 
   def request_membership
     params.require(:reason)

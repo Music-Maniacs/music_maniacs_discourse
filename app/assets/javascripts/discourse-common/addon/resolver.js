@@ -233,18 +233,18 @@ export function buildResolver(baseName) {
       return normalized;
     }
 
-    chooseModuleName(moduleName, parsedName) {
-      let resolved = super.chooseModuleName(moduleName, parsedName);
+    findModuleName(parsedName) {
+      let resolved = super.findModuleName(parsedName);
+
       if (resolved) {
         return resolved;
       }
 
       const standard = parsedName.fullNameWithoutType;
-
       let variants = [standard];
 
       if (standard.includes("/")) {
-        variants.push(parsedName.fullNameWithoutType.replace(/\//g, "-"));
+        variants.push(standard.replace(/\//g, "-"));
       }
 
       for (let name of variants) {
@@ -298,8 +298,17 @@ export function buildResolver(baseName) {
     }
 
     findMobileTemplate(parsedName) {
+      const result = this.findTemplate(parsedName, "mobile/");
+      if (result) {
+        deprecated(
+          `Mobile-specific hbs templates are deprecated. Use responsive CSS or {{#if this.site.mobileView}} instead. [${parsedName}]`,
+          {
+            id: "discourse.mobile-templates",
+          }
+        );
+      }
       if (_options.mobileView) {
-        return this.findTemplate(parsedName, "mobile/");
+        return result;
       }
     }
 

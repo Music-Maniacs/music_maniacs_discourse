@@ -2,8 +2,8 @@ import { render } from "@ember/test-helpers";
 import { hbs } from "ember-cli-htmlbars";
 import { module, test } from "qunit";
 import { setupRenderingTest } from "discourse/tests/helpers/component-test";
-import { count, query } from "discourse/tests/helpers/qunit-helpers";
-import I18n from "discourse-i18n";
+import { query } from "discourse/tests/helpers/qunit-helpers";
+import { i18n } from "discourse-i18n";
 import Theme from "admin/models/theme";
 
 module("Integration | Component | themes-list-item", function (hooks) {
@@ -14,7 +14,7 @@ module("Integration | Component | themes-list-item", function (hooks) {
 
     await render(hbs`<ThemesListItem @theme={{this.theme}} />`);
 
-    assert.strictEqual(count(".d-icon-check"), 1, "shows default theme icon");
+    assert.dom(".d-icon-check").exists("shows default theme icon");
   });
 
   test("pending updates", async function (assert) {
@@ -25,7 +25,7 @@ module("Integration | Component | themes-list-item", function (hooks) {
 
     await render(hbs`<ThemesListItem @theme={{this.theme}} />`);
 
-    assert.strictEqual(count(".d-icon-sync"), 1, "shows pending update icon");
+    assert.dom(".d-icon-arrows-rotate").exists("shows pending update icon");
   });
 
   test("broken theme", async function (assert) {
@@ -39,11 +39,7 @@ module("Integration | Component | themes-list-item", function (hooks) {
 
     await render(hbs`<ThemesListItem @theme={{this.theme}} />`);
 
-    assert.strictEqual(
-      count(".d-icon-exclamation-circle"),
-      1,
-      "shows broken theme icon"
-    );
+    assert.dom(".d-icon-circle-exclamation").exists("shows broken theme icon");
   });
 
   test("with children", async function (assert) {
@@ -76,7 +72,7 @@ module("Integration | Component | themes-list-item", function (hooks) {
     );
     assert.deepEqual(
       query(".others-count").innerText.trim(),
-      I18n.t("admin.customize.theme.and_x_more", { count: 1 }),
+      i18n("admin.customize.theme.and_x_more", { count: 1 }),
       "shows count of remaining children"
     );
   });

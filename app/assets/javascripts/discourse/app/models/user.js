@@ -38,8 +38,9 @@ import deprecated from "discourse-common/lib/deprecated";
 import { getOwnerWithFallback } from "discourse-common/lib/get-owner";
 import getURL, { getURLWithCDN } from "discourse-common/lib/get-url";
 import discourseLater from "discourse-common/lib/later";
+import { needsHbrTopicList } from "discourse-common/lib/raw-templates";
 import discourseComputed from "discourse-common/utils/decorators";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 
 export const SECOND_FACTOR_METHODS = {
   TOTP: 1,
@@ -108,6 +109,7 @@ let userOptionFields = [
   "dark_scheme_id",
   "dynamic_favicon",
   "enable_quoting",
+  "enable_smart_lists",
   "enable_defer",
   "automatically_unpin_topics",
   "digest_after_minutes",
@@ -120,7 +122,8 @@ let userOptionFields = [
   "allow_private_messages",
   "enable_allowed_pm_users",
   "homepage_id",
-  "hide_profile_and_presence",
+  "hide_profile",
+  "hide_presence",
   "text_size",
   "title_count_mode",
   "timezone",
@@ -182,10 +185,12 @@ export default class User extends RestModel.extend(Evented) {
   @userOption("mailing_list_mode") mailing_list_mode;
   @userOption("external_links_in_new_tab") external_links_in_new_tab;
   @userOption("enable_quoting") enable_quoting;
+  @userOption("enable_smart_lists") enable_smart_lists;
   @userOption("dynamic_favicon") dynamic_favicon;
   @userOption("automatically_unpin_topics") automatically_unpin_topics;
   @userOption("likes_notifications_disabled") likes_notifications_disabled;
-  @userOption("hide_profile_and_presence") hide_profile_and_presence;
+  @userOption("hide_profile") hide_profile;
+  @userOption("hide_presence") hide_presence;
   @userOption("title_count_mode") title_count_mode;
   @userOption("enable_defer") enable_defer;
   @userOption("timezone") timezone;
@@ -249,6 +254,11 @@ export default class User extends RestModel.extend(Evented) {
 
   // prevents staff property to be overridden
   set staff(value) {}
+
+  @computed("has_unseen_features")
+  get hasUnseenFeatures() {
+    return this.staff && this.get("has_unseen_features");
+  }
 
   destroySession() {
     return ajax(`/session/${this.username}`, { type: "DELETE" });
@@ -981,7 +991,7 @@ export default class User extends RestModel.extend(Evented) {
         data: { context: window.location.pathname },
       });
     } else {
-      return Promise.reject(I18n.t("user.delete_yourself_not_allowed"));
+      return Promise.reject(i18n("user.delete_yourself_not_allowed"));
     }
   }
 
@@ -1243,6 +1253,10 @@ export default class User extends RestModel.extend(Evented) {
   )
   trackedTags(trackedTags, watchedTags, watchingFirstPostTags) {
     return [...trackedTags, ...watchedTags, ...watchingFirstPostTags];
+  }
+
+  get canUseGlimmerTopicList() {
+    return this.use_glimmer_topic_list && !needsHbrTopicList();
   }
 }
 

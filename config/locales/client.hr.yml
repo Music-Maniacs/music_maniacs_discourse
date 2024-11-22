@@ -169,7 +169,6 @@ hr:
       topic_html: 'Tema: <span class="topic-title">%{topicTitle}</span>'
       post: "objava #%{postNumber} od @%{username}"
       close: "zatvori"
-      twitter: "Podijeli na Twitteru"
       facebook: "Podijeli na Facebooku"
       email: "Pošalji putem e-maila"
       url: "Kopiraj i podijeli URL"
@@ -344,7 +343,6 @@ hr:
       user_count: "Učlanjenja"
       active_user_count: "Aktivni korisnici"
       contact: "Kontaktirajte nas"
-      contact_info: "U slučaju kritičnog problema ili hitnosti koje utječu na rad stranice, kontaktirajte nas na %{contact_info}."
       activities:
         topics:
           one: "%{formatted_number} tema"
@@ -1324,7 +1322,7 @@ hr:
       ignored_users: "Ignorirao"
       ignored_users_instructions: "Suzbijte sve objave, obavijesti i PM-ove od tih korisnika."
       tracked_topics_link: "Pokaži"
-      automatically_unpin_topics: "Automatski otkvačite teme kada dođem do dna."
+      automatically_unpin_topics: "Automatski otkvačite teme kada dođem do dna"
       apps: "Aplikacije"
       revoke_access: "Opoziv pristupa"
       undo_revoke_access: "Poništi opozivanje pristupa"
@@ -1542,7 +1540,7 @@ hr:
         add_email: "Dodaj zamjensku e-poštu"
         auth_override_instructions: "E-pošta se može ažurirati od davatelja autentičnosti."
         no_secondary: "Nema sekundarnih e-pošta"
-        instructions: "Nikada neće biti javno prikazano."
+        instructions: "Nikada neće biti javno prikazano"
         admin_note: "Napomena: Administratorski korisnik koji mijenja e-adresu drugog ne-administrativnog korisnika znači da je korisnik izgubio pristup svom izvornom računu e-pošte, pa će se e-pošta za resetiranje lozinke poslati na njegovu novu adresu. E-adresa korisnika neće se mijenjati dok ne dovrše postupak resetiranja lozinke."
         ok: "Poslati ćemo vam e-mail za potvrdu"
         required: "Unesite e-mail adresu"
@@ -1569,19 +1567,19 @@ hr:
         action: "Kliknite ovdje kako bi aktivirali vaš korisnički račun"
         already_done: "Žao nam je, poveznica za aktivaciju računa više nije važeća. Možda vam je račun već aktivan?"
         please_continue: "Vaš novi račun je potvrđen, biti će te preusmjereni na glavnu stranicu."
-        continue_button: "Nastavite na %{site_name}"
+        continue_button: "Završi!"
         welcome_to: "Dobrodošli na %{site_name}"
         approval_required: "Moderator vam mora ručno odobriti račun da bi mogli pristupiti ovom forumu. Dobiti će te email kad vam račun bude odobren!"
       name:
         title: "Ime"
-        instructions: "Vaše ime i prezime (neobavezno)."
-        instructions_required: "Vaše ime i prezime."
+        instructions: "Vaše ime i prezime (neobavezno)"
+        instructions_required: "Vaše ime i prezime"
         required: "Unesite ime"
         too_short: "Ime vam je prekratko"
         ok: "Vaše ime dobro izgleda"
       username:
         title: "Korisničko ime"
-        instructions: "Jedinstveno, bez razmaka, kratko."
+        instructions: "Jedinstveno, bez razmaka, kratko"
         short_instructions: "Ljudi vas mogu spominjati kao @%{username}"
         available: "Vaše je korisničko ime slobodno"
         not_available: "Nije dostupno. Pokušajte %{suggestion}?"
@@ -1627,7 +1625,6 @@ hr:
       location: "Lokacija"
       website: "Web stranica"
       email_settings: "E-mail"
-      hide_profile_and_presence: "Sakrij moj javni profil i značajke prisutnosti"
       enable_physical_keyboard: "Omogućivanje podrške za fizičku tipkovnicu na iPad-u"
       text_size:
         title: "Veličina teksta"
@@ -1746,10 +1743,6 @@ hr:
           success: "Pozivnica uspješno napravljena"
           error: "Došlo je do pogreške generiranja linka za pozivnicu"
         invite:
-          new_title: "Stvori pozivnicu"
-          edit_title: "Uredi pozivnicu"
-          instructions: "Podijelite ovu vezu da biste odmah dodijelili pristup stranici:"
-          copy_link: "kopiraj link"
           expires_in_time: "Istječe za %{time}"
           expired_at_time: "Isteklo u %{time}"
           show_advanced: "Prikaži napredne mogućnosti"
@@ -1761,12 +1754,11 @@ hr:
           max_redemptions_allowed: "Max korisnika"
           add_to_groups: "Dodaj u grupe"
           invite_to_topic: "Dođite do teme"
-          expires_at: "Istječe nakon"
-          custom_message: "Izborna osobna poruka"
+          expires_after: "Istječe nakon"
           send_invite_email: "Spremi i pošalji e-mail"
           send_invite_email_instructions: "Ograničite pozivnicu na e-poštu za slanje e-pošte s pozivnicom"
-          save_invite: "Spremi pozivnicu"
-          invite_saved: "Pozivnica je spremljena."
+          update_invite: "Ažuriraj"
+          cancel: "Odustani"
         bulk_invite:
           none: "Nema pozivnica za prikaz na ovoj stranici."
           text: "Skupna pozivnica"
@@ -2015,13 +2007,16 @@ hr:
     search_hint: "korisničko ime, e-mail ili IP adresa"
     create_account:
       header_title: "Dobrodošli!"
-      subheader_title: "Kreirajmo vaš račun"
       disclaimer: "Registracijom pristajete na <a href='%{privacy_link}' target='blank'>politiku privatnosti</a> i <a href='%{tos_link}' target='blank'>uvjete korištenja</a>."
       title: "Učlani se"
       failed: "Nešto je pošlo krivo, možda je ovaj e-mail već registriran, pokušajte s poveznicom za zaboravljenu zaporku."
       associate: "Već imate račun? <a href='%{associate_link}'>Prijavite se</a> da biste povezali svoj %{provider} račun."
       activation_title: "Aktivirajte svoj račun"
       already_have_account: "Već imate račun?"
+      progress_bar:
+        signup: "Učlani se"
+        approve: "Odobri"
+        login: "Prijava"
     forgot_password:
       title: "Poništavanje lozinke"
       action: "Zaboravio/la sam zaporku"
@@ -2053,8 +2048,7 @@ hr:
       confirm_button: Završi prijavu
     login:
       header_title: "Dobro došli natrag"
-      subheader_title: "Prijavite se na svoj račun"
-      title: "Prijavite se"
+      title: "Prijava"
       username: "Korisnik"
       password: "Zaporka"
       show_password: "Pokaži"
@@ -2148,7 +2142,6 @@ hr:
       success: "Vaš račun je kreiran i sada ste prijavljeni."
       name_label: "Ime"
       password_label: "Lozinka"
-      existing_user_can_redeem: "Iskoristite svoju pozivnicu za temu ili grupu."
     password_reset:
       continue: "Nastavite na %{site_name}"
     emoji_set:
@@ -2461,6 +2454,10 @@ hr:
         few: "<span class='multi-user'>%{username} i %{count} druga</span> %{description}"
         other: "<span class='multi-user'>%{username} i %{count} drugih</span> %{description}"
       liked_by_2_users: "%{username}, %{username2}"
+      liked_by_multiple_users:
+        one: "%{username} i %{count} drugi"
+        few: "%{username} i %{count} druga"
+        other: "%{username} i %{count} drugih"
       liked_consolidated_description:
         one: "se sviđa vaš %{count} post"
         few: "se sviđa vaših %{count} postova"
@@ -2850,6 +2847,8 @@ hr:
         bookmarks: "U oznakama nema više spremljenih tema."
         filter: "Nema više tema."
     topic_bulk_actions:
+      dismiss:
+        name: "Skloni"
       close_topics:
         name: "Zatvori"
         optional: (opcionalno)
@@ -2887,6 +2886,8 @@ hr:
       move_to_inbox:
         title: "Premjesti u ulaznu poštu"
         help: "Premjestite poruku nazad u dolazni pretinac"
+      defer:
+        title: "Označi kao nepročitano"
       list: "Teme"
       new: "nova tema"
       unread: "nepročitano"
@@ -3413,16 +3414,20 @@ hr:
       few_likes_left: "Hvala za dijeljenje ljubavi! Za danas vam je ostalo samo nekoliko lajkova."
       controls:
         reply: "počnite sa sastavljanjem odgovora na ovu objavu"
+        like_action: "Like-aj"
         like: "Lajkuj objavu"
         has_liked: "sviđa vam se ova objava"
         read_indicator: "članovi koji su pročitali ovaj post"
+        undo_like_action: "Poništi sviđanje."
         undo_like: "poništi lajk"
         edit: "izmijeni ovu objavu"
         edit_action: "Izmijeni"
         edit_anonymous: "Žao nam je, morate biti prijavljeni da bi ste izmjenili ovu objavu."
+        flag_action: "Označi zastavicom"
         flag: "privatno označi objavu za pozornost ili pošalji privatnu obavijest o njoj"
         delete: "obriši ovu objavu"
         undelete: "poništi brisanje objave"
+        share_action: "Podijelite"
         share: "podijeli poveznicu na ovu objavu"
         more: "Više"
         delete_replies:
@@ -3437,6 +3442,7 @@ hr:
             other: "Da, i svih %{count} odgovora"
           just_the_post: "Ne, samo ovu objavu"
         admin: "administratorske akcije na objavi"
+        admin_action: "Administrator"
         permanently_delete: "Trajno izbriši"
         permanently_delete_confirmation: "Jeste li sigurni da trajno želite izbrisati ovaj post? Nećete ga moći oporaviti."
         wiki: "Učini zajedničkom, wiki objavom"
@@ -4345,6 +4351,8 @@ hr:
                 one: "%{count} na čekanju"
                 few: "%{count} na čekanju"
                 other: "%{count} na čekanju"
+            invite:
+              content: "Pozovite"
     welcome_topic_banner:
       title: "Kreirajte svoju temu dobrodošlice"
       description: "Vaša tema dobrodošlice prva je stvar koju će novi članovi pročitati. Zamislite to kao svoj \"elevator pitch\" ili \"izjavu o misiji\". Recite svima za koga je ova zajednica, što mogu očekivati da će ovdje pronaći i što biste željeli da prvo učine."
@@ -4394,6 +4402,7 @@ hr:
         about: "O nama"
   admin_js:
     type_to_filter: "upišite za filtriranje…"
+    settings: "Postavke"
     admin:
       title: "Administrator"
       moderator: "Moderator"
@@ -4423,6 +4432,7 @@ hr:
         installed_version: "Instalirano"
         latest_version: "Posljednje"
         problems_found: "Nekoliko savjeta na temelju vaših trenutnih postavki web mjesta"
+        dismiss_notice: "Skloni"
         new_features:
           title: "Što je novo"
           learn_more: "Saznajte više..."
@@ -4751,6 +4761,7 @@ hr:
           components:
             title: "Komponente"
       email_settings:
+        title: "E-mail postavke"
         sidebar_link:
           appearance: "Izgled"
           preview_summary: "Sažetak pregleda"
@@ -4769,11 +4780,17 @@ hr:
           screened_ips: "Provjereni IP-pvi"
           screened_urls: "Provjereni URL-ovi"
           search_logs: "Pretraživanje dnevnika"
-          security: "Sigurnost"
-          spam: "Nepoželjno"
+      section_landing_pages:
+        account:
+          title: "Račun"
+          backups:
+            title: "Sigurnosne kopije"
+          whats_new:
+            title: "Što je novo"
       config_areas:
         about:
           contact_url_placeholder: "https://johnny-smith.com/contact"
+          company_name: "Ime"
           optional: "(opcionalno)"
           update: "Ažuriraj"
           saved: "spremljeno!"
@@ -4783,6 +4800,7 @@ hr:
           edit: "Uredi"
           delete: "Pobriši"
           delete_confirm: 'Jeste li sigurni da želite izbrisati "%{name}"?'
+          flags_tab: "Oznake zastavicom"
           form:
             save: "Spremi"
             name: "Ime"
@@ -4790,9 +4808,11 @@ hr:
             invalid_applies_to: "Potrebno"
             topic: "tema"
             post: "objave"
+        look_and_feel:
+          themes:
+            title: "Teme"
       plugins:
         title: "Dodaci"
-        installed: "Instalirani dodaci"
         name: "Naziv"
         none_installed: "Nemate još instalirano dodatka."
         version: "Inačica"
@@ -4826,7 +4846,7 @@ hr:
         menu:
           backups: "Sigurnosne kopije"
           logs: "Zapisi"
-        none: "Nema dostupne kopije."
+        none: "Nema dostupne kopije"
         read_only:
           enable:
             title: "Omogući \"samo čitanje\" model."
@@ -4841,6 +4861,7 @@ hr:
         upload:
           label: "Učitaj"
           title: "Prenesite sigurnosnu kopiju na ovu instancu"
+          uploading: "Prijenos…"
           success: "'%{filename}' je uspješno učitan. Datoteka se procesira i potrajat će do minute kako bi bila prikazana na popisu."
           error: "Dogodila se greška pri učitavanju '%{filename}': %{message}"
         settings: "Postavke"
@@ -4857,12 +4878,11 @@ hr:
           download:
             label: "Preuzmi"
             title: "Pošaljite e-poštu s vezom za preuzimanje"
-            alert: "Veza za preuzimanje ove sigurnosne kopije poslana vam je e-poštom."
+            alert: "Veza za preuzimanje ove sigurnosne kopije poslana vam je e-poštom"
           destroy:
             title: "Ukloni kopiju"
             confirm: "Jeste li sigurni da želite uništiti ovu sigurnosnu kopiju?"
           restore:
-            is_disabled: "Obnova je onemogućena u postavkama stranice."
             label: "Obnovi"
             title: "Obnovi sig. kopiju"
             confirm: "Jeste li sigurni da želite vratiti ovu sigurnosnu kopiju?"
@@ -4871,7 +4891,6 @@ hr:
             title: "Vrati bazu podataka na prethodno radno stanje"
             confirm: "Jeste li sigurni da želite vratiti bazu podataka na prethodno radno stanje?"
         location:
-          local: "Lokalna pohrana"
           s3: "S3"
         backup_storage_error: "Pristup sigurnosnoj pohrani nije uspio: %{error_message}"
       export_csv:
@@ -4917,6 +4936,7 @@ hr:
           all_filter: "Sve"
           enabled_filter: "Omogućeno"
           disabled_filter: "Onemogućeno"
+          updates_available_filter: "Ažuriranja dostupna"
         theme:
           theme: "Tema"
           component: "Komponenta"
@@ -5095,6 +5115,7 @@ hr:
           all_filter: "Sve"
           active_filter: "Aktivno"
           inactive_filter: "Neaktivan"
+          updates_available_filter: "Ažuriranja dostupna"
           schema:
             fields:
               required: "*potrebno"
@@ -5637,7 +5658,6 @@ hr:
         time_read: "Vrijeme čitanja"
         post_edits_count: "Post izmjene"
         anonymize: "Anonimiziraj korisnika"
-        anonymize_confirm: "Jeste li sigurni da želite anonimizirati ovaj račun? To će promijeniti korisničko ime i e-mail, i resetirati sve informacije o profilu."
         anonymize_yes: "Da, anonimizirajte ovaj račun"
         anonymize_failed: "Došlo je do problema s anonimiziranjem računa."
         delete: "Obriši korisnika"
@@ -5695,7 +5715,6 @@ hr:
           one: "Ne možete obrisati sve objave jer korisnik ima više od %{count} objava. (briši_sve_objave_max)"
           few: "Ne možete obrisati sve objave jer korisnik ima više od %{count} objava. (briši_sve_objave_max)"
           other: "Ne možete obrisati sve objave jer korisnik ima više od %{count} objava. (briši_sve_objave_max)"
-        delete_confirm_title: "Jeste li SIGURNI da želite izbrisati ovog korisnika? Ovo je trajno!"
         delete_confirm: "Općenito je bolje anonimizirati korisnike umjesto brisanja, kako bi se izbjeglo uklanjanje sadržaja iz postojećih rasprava."
         delete_and_block: "Obriši i <b>block</b> ovaj email i IP adresu"
         delete_dont_block: "Samo obriši"
@@ -5848,6 +5867,8 @@ hr:
         history: "Prikaz povijesti promjena"
         reset: "resetiraj"
         none: "ništa"
+        save: "spremi"
+        cancel: "otkaži"
       site_settings:
         emoji_list:
           invalid_input: "Emotikona lista treba sadržavati samo važeća imena emoji, npr.: zagrljaji"
@@ -5978,10 +5999,6 @@ hr:
             with_post: <span class="username">%{username}</span> za objavu u %{link}
             with_post_time: <span class="username">%{username}</span> za objavu u %{link} u <span class="time">%{time}</span>
             with_time: <span class="username">%{username}</span> u <span class="time">%{time}</span>
-        badge_intro:
-          title: "Odaberite postojeću značku ili izradite novu da biste započeli"
-          what_are_badges_title: "Što su značke?"
-          badge_query_examples_title: "Primjeri upita za značke"
         mass_award:
           title: Skupna nagrada
           description: Dodijelite istu značku velikom broju korisnika odjednom.
@@ -5994,9 +6011,7 @@ hr:
           grant_existing_holders: Dodijelite dodatne značke postojećim nositeljima bedževa
       emoji:
         title: "Emoji"
-        help: "Dodajte nove emojije koji će biti dostupni svima. Povucite i ispustite više datoteka odjednom bez unosa naziva da biste stvorili emojije koristeći njihove nazive datoteka. Odabrana grupa će se koristiti za sve datoteke koje se dodaju u isto vrijeme. Također možete kliknuti \"Dodaj novi emoji\" da otvorite alat za odabir datoteka."
-        add: "Dodaj novi emoji"
-        choose_files: "Odaberite Datoteke"
+        uploading: "Prijenos…"
         name: "Ime"
         group: "Grupa"
         image: "Slika"
@@ -6035,16 +6050,17 @@ hr:
         category_id: "ID kategorije"
         category_title: "Kategorija"
         tag_name: "Naziv oznake"
+        tag_title: "Označiti"
         external_url: "Vanjski ili relativni URL"
+        user_title: "Korisnik"
         username: "Korisničko ime"
         destination: "Odredište"
         copy_to_clipboard: "Kopirajte stalnu vezu u međuspremnik"
         delete_confirm: Jeste li sigurni da želite izbrisati ovu stalnu vezu?
-        no_permalinks: "Još nemate nijednu trajnu vezu. Napravite novu stalnu vezu iznad kako biste ovdje počeli vidjeti popis svojih stalnih veza."
         form:
           label: "Novo:"
-          add: "Dodaj"
-          filter: "Pretraživanje (URL ili vanjski URL)"
+          url: "URL"
+          save: "Spremi"
       reseed:
         action:
           label: "Zamijeni tekst…"
@@ -6064,6 +6080,7 @@ hr:
       step-text: "Korak"
       step: "%{current} od %{total}"
       upload: "Učitaj datoteku"
+      uploading: "Prijenos…"
       upload_error: "Žao nam je, dogodila se greška pri učitavanju te datoteke. Molimo pokušajte ponovo."
       staff_count:
         one: "Vaša zajednica ima %{count} djelatnika (vi)."

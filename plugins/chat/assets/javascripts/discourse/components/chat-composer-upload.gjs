@@ -3,7 +3,7 @@ import DButton from "discourse/components/d-button";
 import concatClass from "discourse/helpers/concat-class";
 import { isImage } from "discourse/lib/uploads";
 import dIcon from "discourse-common/helpers/d-icon";
-import i18n from "discourse-common/helpers/i18n";
+import { i18n } from "discourse-i18n";
 
 export default class ChatComposerUpload extends Component {
   get isImage() {
@@ -35,7 +35,7 @@ export default class ChatComposerUpload extends Component {
               {{dIcon "far-image"}}
             {{/if}}
           {{else}}
-            {{dIcon "file-alt"}}
+            {{dIcon "file-lines"}}
           {{/if}}
         </div>
 
@@ -70,7 +70,7 @@ export default class ChatComposerUpload extends Component {
 
         <DButton
           @action={{@onCancel}}
-          @icon="times"
+          @icon="xmark"
           @title="chat.remove_upload"
           class="btn-flat chat-composer-upload__remove-btn"
         />

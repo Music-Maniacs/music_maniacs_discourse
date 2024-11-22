@@ -1,15 +1,16 @@
 import Component from "@glimmer/component";
+import { hash } from "@ember/helper";
 import { on } from "@ember/modifier";
 import { action } from "@ember/object";
 import { service } from "@ember/service";
+import PluginOutlet from "discourse/components/plugin-outlet";
 import NewListHeaderControls from "discourse/components/topic-list/new-list-header-controls";
 import TopicBulkSelectDropdown from "discourse/components/topic-list/topic-bulk-select-dropdown";
 import concatClass from "discourse/helpers/concat-class";
 import icon from "discourse-common/helpers/d-icon";
-import i18n from "discourse-common/helpers/i18n";
+import { i18n } from "discourse-i18n";
 
 export default class TopicListHeaderColumn extends Component {
-  @service modal;
   @service router;
 
   get localizedName() {
@@ -76,7 +77,7 @@ export default class TopicListHeaderColumn extends Component {
         "topic-list-data"
         @order
         (if @sortable "sortable")
-        (if @isSorting "sorting")
+        (if this.isSorting "sorting")
         (if @number "num")
       }}
       ...attributes
@@ -88,7 +89,7 @@ export default class TopicListHeaderColumn extends Component {
             title={{i18n "topics.bulk.toggle"}}
             class="btn-flat bulk-select"
           >
-            {{icon "tasks"}}
+            {{icon "list-check"}}
           </button>
         {{/if}}
 
@@ -122,20 +123,25 @@ export default class TopicListHeaderColumn extends Component {
             @changeNewListSubset={{@changeNewListSubset}}
           />
         {{else}}
-          <span
-            class={{if @screenreaderOnly "sr-only"}}
-            tabindex={{if @sortable "0"}}
-            role={{if @sortable "button"}}
-            aria-pressed={{this.isSorting}}
-          >
-            {{this.localizedName}}
-          </span>
+          {{#if @sortable}}
+            <button aria-pressed={{this.isSorting}}>
+              {{this.localizedName}}
+              {{#if this.isSorting}}
+                {{icon (if @ascending "chevron-up" "chevron-down")}}
+              {{/if}}
+            </button>
+          {{else}}
+            <span class={{if @screenreaderOnly "sr-only"}}>
+              {{this.localizedName}}
+            </span>
+          {{/if}}
         {{/if}}
       {{/unless}}
 
-      {{#if this.isSorting}}
-        {{icon (if @ascending "chevron-up" "chevron-down")}}
-      {{/if}}
+      <PluginOutlet
+        @name="topic-list-heading-bottom"
+        @outletArgs={{hash name=@name bulkSelectEnabled=@bulkSelectEnabled}}
+      />
     </th>
   </template>
 }

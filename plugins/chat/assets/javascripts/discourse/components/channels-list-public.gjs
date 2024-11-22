@@ -8,7 +8,7 @@ import { and } from "truth-helpers";
 import PluginOutlet from "discourse/components/plugin-outlet";
 import concatClass from "discourse/helpers/concat-class";
 import dIcon from "discourse-common/helpers/d-icon";
-import i18n from "discourse-common/helpers/i18n";
+import { i18n } from "discourse-i18n";
 import EmptyChannelsList from "discourse/plugins/chat/discourse/components/empty-channels-list";
 import ChatChannelRow from "./chat-channel-row";
 
@@ -31,6 +31,12 @@ export default class ChannelsListPublic extends Component {
 
   get hasThreadedChannels() {
     return this.chatChannelsManager.hasThreadedChannels;
+  }
+
+  get channelList() {
+    return this.args.sortByActivity === true
+      ? this.chatChannelsManager.publicMessageChannelsByActivity
+      : this.chatChannelsManager.publicMessageChannels;
   }
 
   @action
@@ -82,7 +88,7 @@ export default class ChannelsListPublic extends Component {
           class="btn no-text btn-flat open-browse-page-btn title-action"
           title={{i18n "chat.channels_list_popup.browse"}}
         >
-          {{dIcon "pencil-alt"}}
+          {{dIcon "pencil"}}
         </LinkTo>
       </div>
     {{/if}}
@@ -103,7 +109,7 @@ export default class ChannelsListPublic extends Component {
           @showCTA={{this.chatChannelsManager.displayPublicChannels}}
         />
       {{else}}
-        {{#each this.chatChannelsManager.publicMessageChannels as |channel|}}
+        {{#each this.channelList as |channel|}}
           <ChatChannelRow
             @channel={{channel}}
             @options={{hash settingsButton=true}}

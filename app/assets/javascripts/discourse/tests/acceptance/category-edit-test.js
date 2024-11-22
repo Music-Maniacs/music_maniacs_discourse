@@ -3,15 +3,9 @@ import { test } from "qunit";
 import sinon from "sinon";
 import DiscourseURL from "discourse/lib/url";
 import pretender from "discourse/tests/helpers/create-pretender";
-import {
-  acceptance,
-  count,
-  exists,
-  query,
-  visible,
-} from "discourse/tests/helpers/qunit-helpers";
+import { acceptance, query } from "discourse/tests/helpers/qunit-helpers";
 import selectKit from "discourse/tests/helpers/select-kit-helper";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 
 acceptance("Category Edit", function (needs) {
   needs.user();
@@ -27,19 +21,10 @@ acceptance("Category Edit", function (needs) {
       "it jumps to the correct screen"
     );
 
-    assert.strictEqual(
-      query(".category-breadcrumb .badge-category").innerText,
-      "bug"
-    );
-    assert.strictEqual(
-      query(".category-color-editor .badge-category").innerText,
-      "bug"
-    );
+    assert.dom(".category-breadcrumb .badge-category").hasText("bug");
+    assert.dom(".category-color-editor .badge-category").hasText("bug");
     await fillIn("input.category-name", "testing");
-    assert.strictEqual(
-      query(".category-color-editor .badge-category").innerText,
-      "testing"
-    );
+    assert.dom(".category-color-editor .badge-category").hasText("testing");
 
     await fillIn(".edit-text-color input", "ff0000");
 
@@ -77,19 +62,19 @@ acceptance("Category Edit", function (needs) {
   test("Editing required tag groups", async function (assert) {
     await visit("/c/bug/edit/tags");
 
-    assert.ok(exists(".minimum-required-tags"));
+    assert.dom(".minimum-required-tags").exists();
 
-    assert.ok(exists(".required-tag-groups"));
-    assert.strictEqual(count(".required-tag-group-row"), 0);
-
-    await click(".add-required-tag-group");
-    assert.strictEqual(count(".required-tag-group-row"), 1);
+    assert.dom(".required-tag-groups").exists();
+    assert.dom(".required-tag-group-row").doesNotExist();
 
     await click(".add-required-tag-group");
-    assert.strictEqual(count(".required-tag-group-row"), 2);
+    assert.dom(".required-tag-group-row").exists({ count: 1 });
+
+    await click(".add-required-tag-group");
+    assert.dom(".required-tag-group-row").exists({ count: 2 });
 
     await click(".delete-required-tag-group");
-    assert.strictEqual(count(".required-tag-group-row"), 1);
+    assert.dom(".required-tag-group-row").exists({ count: 1 });
 
     const tagGroupChooser = selectKit(
       ".required-tag-group-row .tag-group-chooser"
@@ -98,13 +83,13 @@ acceptance("Category Edit", function (needs) {
     await tagGroupChooser.selectRowByValue("TagGroup1");
 
     await click("#save-category");
-    assert.strictEqual(count(".required-tag-group-row"), 1);
+    assert.dom(".required-tag-group-row").exists({ count: 1 });
 
     await click(".delete-required-tag-group");
-    assert.strictEqual(count(".required-tag-group-row"), 0);
+    assert.dom(".required-tag-group-row").doesNotExist();
 
     await click("#save-category");
-    assert.strictEqual(count(".required-tag-group-row"), 0);
+    assert.dom(".required-tag-group-row").doesNotExist();
   });
 
   test("Editing allowed tags and tag groups", async function (assert) {
@@ -191,7 +176,7 @@ acceptance("Category Edit", function (needs) {
       "/c/1-category/edit/general",
       "it goes to the general tab"
     );
-    assert.strictEqual(query("input.category-name").value, "bug");
+    assert.dom("input.category-name").hasValue("bug");
   });
 
   test("Error Saving", async function (assert) {
@@ -201,13 +186,13 @@ acceptance("Category Edit", function (needs) {
 
     assert.strictEqual(
       query(".dialog-body").textContent.trim(),
-      I18n.t("generic_error_with_reason", {
+      i18n("generic_error_with_reason", {
         error: "duplicate email",
       })
     );
 
     await click(".dialog-footer .btn-primary");
-    assert.ok(!visible(".dialog-body"));
+    assert.dom(".dialog-body").doesNotExist();
   });
 
   test("Nested subcategory error when saving", async function (assert) {
@@ -221,39 +206,37 @@ acceptance("Category Edit", function (needs) {
 
     assert.strictEqual(
       query(".dialog-body").textContent.trim(),
-      I18n.t("generic_error_with_reason", {
+      i18n("generic_error_with_reason", {
         error: "subcategory nested under another subcategory",
       })
     );
 
     await click(".dialog-footer .btn-primary");
-    assert.ok(!visible(".dialog-body"));
+    assert.dom(".dialog-body").doesNotExist();
 
-    assert.ok(
-      !visible(".category-breadcrumb .category-drop-header[data-value='1002']"),
-      "it doesn't show the nested subcategory in the breadcrumb"
-    );
+    assert
+      .dom(".category-breadcrumb .category-drop-header[data-value='1002']")
+      .doesNotExist("doesn't show the nested subcategory in the breadcrumb");
 
-    assert.ok(
-      !visible(".category-breadcrumb .single-select-header[data-value='1002']"),
-      "it clears the category chooser"
-    );
+    assert
+      .dom(".category-breadcrumb .single-select-header[data-value='1002']")
+      .doesNotExist("clears the category chooser");
   });
 
   test("Subcategory list settings", async function (assert) {
     await visit("/c/bug/edit/settings");
 
-    assert.ok(
-      !visible(".subcategory-list-style-field"),
-      "subcategory list style isn't visible by default"
-    );
+    assert
+      .dom(".subcategory-list-style-field")
+      .doesNotExist("subcategory list style isn't visible by default");
 
     await click(".show-subcategory-list-field input[type=checkbox]");
 
-    assert.ok(
-      visible(".subcategory-list-style-field"),
-      "subcategory list style is shown if show subcategory list is checked"
-    );
+    assert
+      .dom(".subcategory-list-style-field")
+      .exists(
+        "subcategory list style is shown if show subcategory list is checked"
+      );
 
     await visit("/c/bug/edit/general");
 
@@ -265,14 +248,14 @@ acceptance("Category Edit", function (needs) {
 
     await visit("/c/bug/edit/settings");
 
-    assert.ok(
-      !visible(".show-subcategory-list-field"),
-      "show subcategory list isn't visible for child categories"
-    );
-    assert.ok(
-      !visible(".subcategory-list-style-field"),
-      "subcategory list style isn't visible for child categories"
-    );
+    assert
+      .dom(".show-subcategory-list-field")
+      .doesNotExist("show subcategory list isn't visible for child categories");
+    assert
+      .dom(".subcategory-list-style-field")
+      .doesNotExist(
+        "subcategory list style isn't visible for child categories"
+      );
   });
 });
 

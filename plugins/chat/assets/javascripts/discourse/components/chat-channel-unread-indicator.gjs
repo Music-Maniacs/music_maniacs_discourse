@@ -11,34 +11,46 @@ export default class ChatChannelUnreadIndicator extends Component {
   get showUnreadIndicator() {
     return (
       this.args.channel.tracking.unreadCount > 0 ||
-      // We want to do this so we don't show a blue dot if the user is inside
-      // the channel and a new unread thread comes in.
-      (this.chat.activeChannel?.id !== this.args.channel.id &&
-        this.args.channel.unreadThreadsCountSinceLastViewed > 0)
+      this.args.channel.tracking.mentionCount > 0 ||
+      this.args.channel.unreadThreadsCountSinceLastViewed > 0
     );
   }
 
-  get unreadCount() {
-    if (this.#hasChannelMentions()) {
+  get urgentCount() {
+    if (this.hasChannelMentions) {
       return this.args.channel.tracking.mentionCount;
+    }
+    if (this.hasWatchedThreads) {
+      return this.args.channel.tracking.watchedThreadsUnreadCount;
     }
     return this.args.channel.tracking.unreadCount;
   }
 
   get isUrgent() {
-    if (this.#onlyMentions()) {
-      return this.#hasChannelMentions();
+    if (this.onlyMentions) {
+      return this.hasChannelMentions;
     }
     return (
-      this.args.channel.isDirectMessageChannel || this.#hasChannelMentions()
+      this.isDirectMessage || this.hasChannelMentions || this.hasWatchedThreads
     );
   }
 
-  #hasChannelMentions() {
+  get isDirectMessage() {
+    return (
+      this.args.channel.isDirectMessageChannel &&
+      this.args.channel.tracking.unreadCount > 0
+    );
+  }
+
+  get hasChannelMentions() {
     return this.args.channel.tracking.mentionCount > 0;
   }
 
-  #onlyMentions() {
+  get hasWatchedThreads() {
+    return this.args.channel.tracking.watchedThreadsUnreadCount > 0;
+  }
+
+  get onlyMentions() {
     return hasChatIndicator(this.currentUser).ONLY_MENTIONS;
   }
 
@@ -52,7 +64,7 @@ export default class ChatChannelUnreadIndicator extends Component {
       >
         <div class="chat-channel-unread-indicator__number">{{#if
             this.isUrgent
-          }}{{this.unreadCount}}{{else}}&nbsp;{{/if}}</div>
+          }}{{this.urgentCount}}{{else}}&nbsp;{{/if}}</div>
       </div>
     {{/if}}
   </template>

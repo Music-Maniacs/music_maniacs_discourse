@@ -3,7 +3,7 @@ import { test } from "qunit";
 import PreloadStore from "discourse/lib/preload-store";
 import pretender, { response } from "discourse/tests/helpers/create-pretender";
 import { acceptance } from "discourse/tests/helpers/qunit-helpers";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 
 function setAuthenticationData(hooks, json) {
   hooks.beforeEach(() => {
@@ -72,7 +72,7 @@ acceptance("Invite accept", function (needs) {
     assert
       .dom(".col-form")
       .includesText(
-        I18n.t("invites.social_login_available"),
+        i18n("invites.social_login_available"),
         "shows social login hint"
       );
 
@@ -80,6 +80,7 @@ acceptance("Invite accept", function (needs) {
   });
 
   test("invite link", async function (assert) {
+    this.siteSettings.login_required = true;
     PreloadStore.store("invite_info", {
       invited_by: {
         id: 123,
@@ -166,7 +167,9 @@ acceptance("Invite accept", function (needs) {
   test("invite name is required only if full name is required", async function (assert) {
     preloadInvite();
     await visit("/invites/my-valid-invite-token");
-    assert.dom(".name-input .required").exists("Full name is required");
+    assert
+      .dom(".name-input .required")
+      .doesNotExist("Full name is implicitly required");
   });
 });
 
@@ -279,7 +282,7 @@ acceptance("Invite link with authentication data", function (needs) {
 
     assert
       .dom("#account-email-validation")
-      .hasText(I18n.t("user.email.authenticated", { provider: "Facebook" }));
+      .hasText(i18n("user.email.authenticated", { provider: "Facebook" }));
 
     assert
       .dom("#new-account-username")
@@ -308,7 +311,7 @@ acceptance("Email Invite link with authentication data", function (needs) {
     assert
       .dom("#account-email-validation")
       .hasText(
-        I18n.t("user.email.invite_auth_email_invalid", { provider: "Facebook" })
+        i18n("user.email.invite_auth_email_invalid", { provider: "Facebook" })
       );
 
     assert.dom("form").doesNotExist("does not display the form");
@@ -346,7 +349,7 @@ acceptance(
 
       assert
         .dom("#account-email-validation")
-        .hasText(I18n.t("user.email.authenticated", { provider: "Facebook" }));
+        .hasText(i18n("user.email.authenticated", { provider: "Facebook" }));
 
       assert
         .dom("#new-account-username")
@@ -408,7 +411,7 @@ acceptance(
 
       assert
         .dom("#account-email-validation")
-        .hasText(I18n.t("user.email.authenticated_by_invite"));
+        .hasText(i18n("user.email.authenticated_by_invite"));
     });
   }
 );
@@ -435,7 +438,7 @@ acceptance(
         .dom("#new-account-email")
         .doesNotExist("does not show email field");
 
-      assert.dom("#account-email-validation").hasText(I18n.t("user.email.ok"));
+      assert.dom("#account-email-validation").hasText(i18n("user.email.ok"));
     });
   }
 );

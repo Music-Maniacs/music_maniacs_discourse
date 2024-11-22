@@ -59,7 +59,8 @@ RSpec.shared_examples "finding and showing post" do
       end
 
       it "can find posts in the allowed category" do
-        post.topic.category.update!(reviewable_by_group_id: group.id, topic_id: topic.id)
+        post.topic.category.update!(topic_id: topic.id)
+        Fabricate(:category_moderation_group, category: post.topic.category, group:)
         get url
         expect(response.status).to eq(200)
       end
@@ -206,6 +207,31 @@ RSpec.describe PostsController do
       expect(json[0]["id"]).to eq(child.id)
       expect(json[0]["user_custom_fields"]["hello"]).to eq("world")
       expect(json[0]["user_custom_fields"]["hidden"]).to be_blank
+    end
+
+    it "supports pagination" do
+      parent = Fabricate(:post)
+      30.times do
+        reply = Fabricate(:post, topic: parent.topic, reply_to_post_number: parent.post_number)
+        PostReply.create!(post: parent, reply:)
+      end
+
+      get "/posts/#{parent.id}/replies.json", params: { after: parent.post_number }
+      expect(response.status).to eq(200)
+      replies = response.parsed_body
+      expect(replies.size).to eq(20)
+
+      after = replies.last["post_number"]
+
+      get "/posts/#{parent.id}/replies.json", params: { after: }
+      expect(response.status).to eq(200)
+      replies = response.parsed_body
+      expect(replies.size).to eq(10)
+      expect(replies[0][:post_number]).to eq(after + 1)
+
+      get "/posts/#{parent.id}/replies.json", params: { after: 999_999 }
+      expect(response.status).to eq(200)
+      expect(response.parsed_body.size).to eq(0)
     end
   end
 
@@ -602,7 +628,8 @@ RSpec.describe PostsController do
 
       before do
         SiteSetting.enable_category_group_moderation = true
-        post.topic.category.update!(reviewable_by_group_id: group.id, topic_id: topic.id)
+        Fabricate(:category_moderation_group, category: post.topic.category, group:)
+        post.topic.category.update!(topic_id: topic.id)
         sign_in(user_gm)
       end
 
@@ -2105,6 +2132,41 @@ RSpec.describe PostsController do
       end
     end
 
+    context "when the history on a specific post is hidden" do
+      it "works when hiding a revision" do
+        sign_in(admin)
+
+        message =
+          MessageBus
+            .track_publish("/topic/#{post.topic.id}") do
+              put "/posts/#{post_revision.post_id}/revisions/#{post_revision.number}/hide"
+            end
+            .first
+
+        expect(response.status).to eq(200)
+        expect(message.data[:type]).to eq(:revised)
+        expect(message.data[:version]).to eq(2)
+        expect(post_revision.reload[:hidden]).to eq(true)
+      end
+
+      it "works when showing a revision" do
+        post_revision.update!(hidden: true)
+        sign_in(admin)
+
+        message =
+          MessageBus
+            .track_publish("/topic/#{post.topic.id}") do
+              put "/posts/#{post_revision.post_id}/revisions/#{post_revision.number}/show"
+            end
+            .first
+
+        expect(response.status).to eq(200)
+        expect(message.data[:type]).to eq(:revised)
+        expect(message.data[:version]).to eq(2)
+        expect(post_revision.reload[:hidden]).to eq(false)
+      end
+    end
+
     context "when post is hidden" do
       before do
         post.hidden = true
@@ -2568,8 +2630,8 @@ RSpec.describe PostsController do
       expect(body).to include(public_post.topic.slug)
     end
 
-    it "returns 404 if `hide_profile_and_presence` user option is checked" do
-      user.user_option.update_columns(hide_profile_and_presence: true)
+    it "returns 404 if `hide_profile` user option is checked" do
+      user.user_option.update_columns(hide_profile: true)
 
       get "/u/#{user.username}/activity.rss"
       expect(response.status).to eq(404)
@@ -2579,7 +2641,7 @@ RSpec.describe PostsController do
     end
 
     it "succeeds when `allow_users_to_hide_profile` is false" do
-      user.user_option.update_columns(hide_profile_and_presence: true)
+      user.user_option.update_columns(hide_profile: true)
       SiteSetting.allow_users_to_hide_profile = false
 
       get "/u/#{user.username}/activity.rss"
@@ -2845,7 +2907,7 @@ RSpec.describe PostsController do
 
       before do
         SiteSetting.enable_category_group_moderation = true
-        topic.category.update!(reviewable_by_group_id: group.id)
+        Fabricate(:category_moderation_group, category: topic.category, group:)
 
         sign_in(user)
       end
@@ -2868,8 +2930,7 @@ RSpec.describe PostsController do
       end
 
       it "prevents a group moderator from altering notes outside of their category" do
-        moderatable_group = Fabricate(:group)
-        topic.category.update!(reviewable_by_group_id: moderatable_group.id)
+        topic.category.category_moderation_groups.where(group:).delete_all
 
         put "/posts/#{public_post.id}/notice.json", params: { notice: "Hello" }
 

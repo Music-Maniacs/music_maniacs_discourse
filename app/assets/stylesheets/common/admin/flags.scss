@@ -1,31 +1,16 @@
-.admin-flag-item {
-  &__name {
-    font-weight: bold;
-    padding-bottom: 0;
-    margin-bottom: 0;
-  }
-  &__description {
-    margin-top: 0.5em;
-  }
-  &__options {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .d-toggle-switch__label {
-    margin-bottom: 0;
-  }
-  .d-toggle-switch {
-    margin-right: 2em;
-  }
-  .btn-secondary {
-    padding: 0.25em 0.325em;
-    margin-right: 0.75em;
-  }
-  .flag-menu-trigger {
-    padding: 0.25em 0.325em;
-  }
+.admin-flags {
+  table.d-admin-table {
+    td:first-child {
+      width: 70%;
 
+      @include breakpoint("tablet") {
+        width: auto;
+      }
+    }
+  }
+}
+
+.admin-flag-item {
   &__delete.btn,
   &__delete.btn:hover {
     border-top: 1px solid var(--primary-low);

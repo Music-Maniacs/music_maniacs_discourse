@@ -14,7 +14,7 @@ import replaceEmoji from "discourse/helpers/replace-emoji";
 import { popupAjaxError } from "discourse/lib/ajax-error";
 import icon from "discourse-common/helpers/d-icon";
 import { bind } from "discourse-common/utils/decorators";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 import ChannelIcon from "discourse/plugins/chat/discourse/components/channel-icon";
 import ChannelName from "discourse/plugins/chat/discourse/components/channel-name";
 import ChatChannelMetadata from "discourse/plugins/chat/discourse/components/chat-channel-metadata";
@@ -132,11 +132,11 @@ export default class ChatChannelRow extends Component {
   }
 
   get leaveDirectMessageLabel() {
-    return I18n.t("chat.direct_messages.close");
+    return i18n("chat.direct_messages.close");
   }
 
   get leaveChannelLabel() {
-    return I18n.t("chat.channel_settings.leave_channel");
+    return i18n("chat.channel_settings.leave_channel");
   }
 
   get channelHasUnread() {
@@ -196,11 +196,8 @@ export default class ChatChannelRow extends Component {
       >
         <ChannelIcon @channel={{@channel}} />
         <div class="chat-channel-row__info">
-          <ChannelName @channel={{@channel}} />
-          <ChatChannelMetadata
-            @channel={{@channel}}
-            @unreadIndicator={{true}}
-          />
+          <ChannelName @channel={{@channel}} @unreadIndicator={{true}} />
+          <ChatChannelMetadata @channel={{@channel}} />
           {{#if this.shouldRenderLastMessage}}
             <div class="chat-channel__last-message">
               {{replaceEmoji (htmlSafe @channel.lastMessage.excerpt)}}
@@ -216,7 +213,7 @@ export default class ChatChannelRow extends Component {
             @options={{hash
               leaveClass="btn-flat chat-channel-leave-btn"
               labelType="none"
-              leaveIcon="times"
+              leaveIcon="xmark"
               leaveTitle=(if
                 @channel.isDirectMessageChannel
                 this.leaveDirectMessageLabel
@@ -234,7 +231,7 @@ export default class ChatChannelRow extends Component {
             (if this.isAtThreshold "-at-threshold" "-not-at-threshold")
           }}
         >
-          {{icon "times-circle"}}
+          {{icon "circle-xmark"}}
         </div>
       {{/if}}
     </LinkTo>

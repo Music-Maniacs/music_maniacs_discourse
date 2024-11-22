@@ -12,7 +12,8 @@ class FlagSerializer < ApplicationSerializer
              :enabled,
              :is_flag,
              :applies_to,
-             :is_used
+             :is_used,
+             :auto_action_type
 
   def i18n_prefix
     "#{@options[:target] || "post_action"}_types.#{object.name_key}"
@@ -24,7 +25,11 @@ class FlagSerializer < ApplicationSerializer
   end
 
   def description
-    I18n.t("#{i18n_prefix}.description", default: object.description)
+    I18n.t(
+      "#{i18n_prefix}.description",
+      default: object.description.to_s,
+      base_path: Discourse.base_path,
+    )
   end
 
   def short_description

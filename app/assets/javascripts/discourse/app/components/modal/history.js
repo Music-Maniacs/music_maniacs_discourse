@@ -7,7 +7,7 @@ import { sanitizeAsync } from "discourse/lib/text";
 import Category from "discourse/models/category";
 import Post from "discourse/models/post";
 import { iconHTML } from "discourse-common/lib/icon-library";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 
 function customTagArray(val) {
   if (!val) {
@@ -24,6 +24,7 @@ export default class History extends Component {
   @service site;
   @service currentUser;
   @service siteSettings;
+  @service appEvents;
 
   @tracked loading;
   @tracked postRevision;
@@ -84,11 +85,11 @@ export default class History extends Component {
   }
 
   get revisionsText() {
-    return I18n.t(
+    return i18n(
       "post.revisions.controls.comparing_previous_to_current_out_of_total",
       {
         previous: this.previousVersion,
-        icon: iconHTML("arrows-alt-h"),
+        icon: iconHTML("left-right"),
         current: this.postRevision?.current_version,
         total: this.postRevision?.version_count,
       }
@@ -163,19 +164,35 @@ export default class History extends Component {
 
   get revertToRevisionText() {
     if (this.previousVersion) {
-      return I18n.t("post.revisions.controls.revert", {
+      return i18n("post.revisions.controls.revert", {
         revision: this.previousVersion,
       });
     }
   }
 
-  refresh(postId, postVersion) {
+  async refresh(postId, postVersion) {
     this.loading = true;
-    Post.loadRevision(postId, postVersion).then((result) => {
+    try {
+      const result = await Post.loadRevision(postId, postVersion);
       this.postRevision = result;
+    } catch (error) {
+      this.args.closeModal();
+      this.dialog.alert(error.jqXHR.responseJSON.errors[0]);
+
+      const postStream = this.args.model.post?.topic?.postStream;
+      if (!postStream) {
+        return;
+      }
+
+      postStream
+        .triggerChangedPost(postId, this.args.model)
+        .then(() =>
+          this.appEvents.trigger("post-stream:refresh", { id: postId })
+        );
+    } finally {
       this.loading = false;
       this.initialLoad = false;
-    });
+    }
   }
 
   hide(postId, postVersion) {
@@ -313,7 +330,7 @@ export default class History extends Component {
   @action
   permanentlyDeleteVersions() {
     this.dialog.yesNoConfirm({
-      message: I18n.t("post.revisions.controls.destroy_confirm"),
+      message: i18n("post.revisions.controls.destroy_confirm"),
       didConfirm: () => {
         Post.permanentlyDeleteRevisions(this.postRevision.post_id).then(() => {
           this.args.closeModal();

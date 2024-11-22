@@ -1,4 +1,5 @@
-import Component from "@ember/component";
+import Component from "@glimmer/component";
+import { cached, tracked } from "@glimmer/tracking";
 import { action } from "@ember/object";
 import { schedule } from "@ember/runloop";
 import { service } from "@ember/service";
@@ -6,108 +7,90 @@ import { isEmpty } from "@ember/utils";
 import { tagName } from "@ember-decorators/component";
 import { Promise } from "rsvp";
 import { popupAjaxError } from "discourse/lib/ajax-error";
-import { i18n, propertyEqual } from "discourse/lib/computed";
-import { bufferedProperty } from "discourse/mixins/buffered-content";
-import discourseComputed from "discourse-common/utils/decorators";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 import UserField from "admin/models/user-field";
 
 @tagName("")
-export default class AdminUserFieldItem extends Component.extend(
-  bufferedProperty("userField")
-) {
+export default class AdminUserFieldItem extends Component {
   @service adminCustomUserFields;
   @service dialog;
 
-  isEditing = false;
+  @tracked isEditing = false;
+  @tracked
+  editableDisabled = this.args.userField.requirement === "for_all_users";
 
-  @propertyEqual("userField", "firstField") cantMoveUp;
-  @propertyEqual("userField", "lastField") cantMoveDown;
+  originalRequirement = this.args.userField.requirement;
 
-  @i18n("admin.user_fields.description") userFieldsDescription;
-
-  @discourseComputed("buffered.field_type")
-  bufferedFieldType(fieldType) {
-    return UserField.fieldTypeById(fieldType);
+  get fieldName() {
+    return UserField.fieldTypeById(this.fieldType)?.name;
   }
 
-  didInsertElement() {
-    super.didInsertElement(...arguments);
-
-    this._focusName();
+  get cantMoveUp() {
+    return this.args.userField.id === this.args.firstField?.id;
   }
 
-  _focusName() {
-    schedule("afterRender", () => {
-      document.querySelector(".user-field-name")?.focus();
-    });
+  get cantMoveDown() {
+    return this.args.userField.id === this.args.lastField?.id;
   }
 
-  @discourseComputed("userField.field_type")
-  fieldName(fieldType) {
-    return UserField.fieldTypeById(fieldType)?.name;
+  get isNewRecord() {
+    return isEmpty(this.args.userField?.id);
   }
 
-  @discourseComputed(
-    "userField.{editable,show_on_profile,show_on_user_card,searchable}"
-  )
-  flags(userField) {
-    const ret = [];
-    if (userField.editable) {
-      ret.push(I18n.t("admin.user_fields.editable.enabled"));
-    }
-    if (userField.show_on_profile) {
-      ret.push(I18n.t("admin.user_fields.show_on_profile.enabled"));
-    }
-    if (userField.show_on_user_card) {
-      ret.push(I18n.t("admin.user_fields.show_on_user_card.enabled"));
-    }
-    if (userField.searchable) {
-      ret.push(I18n.t("admin.user_fields.searchable.enabled"));
-    }
+  get flags() {
+    const flags = [
+      "editable",
+      "show_on_profile",
+      "show_on_user_card",
+      "searchable",
+    ];
 
-    return ret.join(", ");
+    return flags
+      .map((flag) => {
+        if (this.args.userField[flag]) {
+          return i18n(`admin.user_fields.${flag}.enabled`);
+        }
+      })
+      .filter(Boolean)
+      .join(", ");
   }
 
-  @discourseComputed("buffered.requirement")
-  editableDisabled(requirement) {
-    return requirement === "for_all_users";
-  }
-
-  @action
-  changeRequirementType(requirement) {
-    this.buffered.set("requirement", requirement);
-    this.buffered.set("editable", requirement === "for_all_users");
-  }
-
-  async _confirmChanges() {
-    return new Promise((resolve) => {
-      this.dialog.yesNoConfirm({
-        message: I18n.t("admin.user_fields.requirement.confirmation"),
-        didCancel: () => resolve(false),
-        didConfirm: () => resolve(true),
-      });
-    });
-  }
-
-  @action
-  async save() {
-    const attrs = this.buffered.getProperties(
+  @cached
+  get formData() {
+    return this.args.userField.getProperties(
+      "field_type",
       "name",
       "description",
-      "field_type",
-      "editable",
       "requirement",
+      "editable",
       "show_on_profile",
       "show_on_user_card",
       "searchable",
       "options",
       ...this.adminCustomUserFields.additionalProperties
     );
+  }
 
+  @action
+  setRequirement(value, { set }) {
+    set("requirement", value);
+
+    if (value === "for_all_users") {
+      this.editableDisabled = true;
+      set("editable", true);
+    } else {
+      this.editableDisabled = false;
+    }
+  }
+
+  @action
+  async save(data) {
     let confirm = true;
 
-    if (attrs.requirement === "for_all_users") {
+    if (
+      data.requirement === "for_all_users" &&
+      this.originalRequirement !== "for_all_users"
+    ) {
       confirm = await this._confirmChanges();
     }
 
@@ -115,32 +98,46 @@ export default class AdminUserFieldItem extends Component.extend(
       return;
     }
 
-    return this.userField
-      .save(attrs)
+    return this.args.userField
+      .save(data)
       .then(() => {
         if (this.isDestroying || this.isDestroyed) {
           return;
         }
 
-        this.set("isEditing", false);
-        this.commitBuffer();
+        this.originalRequirement = data.requirement;
+        this.isEditing = false;
       })
       .catch(popupAjaxError);
   }
 
+  async _confirmChanges() {
+    return new Promise((resolve) => {
+      this.dialog.yesNoConfirm({
+        message: i18n("admin.user_fields.requirement.confirmation"),
+        didCancel: () => resolve(false),
+        didConfirm: () => resolve(true),
+      });
+    });
+  }
+
   @action
   edit() {
-    this.set("isEditing", true);
-    this._focusName();
+    this.isEditing = true;
   }
 
   @action
   cancel() {
-    if (isEmpty(this.userField?.id)) {
-      this.destroyAction(this.userField);
+    if (this.isNewRecord) {
+      this.args.destroyAction(this.args.userField);
     } else {
-      this.rollbackBuffer();
-      this.set("isEditing", false);
+      this.isEditing = false;
     }
+  }
+
+  _focusName() {
+    schedule("afterRender", () =>
+      document.querySelector(".user-field-name")?.focus()
+    );
   }
 }

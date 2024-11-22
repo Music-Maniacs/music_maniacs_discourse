@@ -8,6 +8,7 @@ describe "Admin Flags Page", type: :system do
   let(:admin_flags_page) { PageObjects::Pages::AdminFlags.new }
   let(:admin_flag_form_page) { PageObjects::Pages::AdminFlagForm.new }
   let(:flag_modal) { PageObjects::Modals::Flag.new }
+  let(:admin_header) { PageObjects::Components::AdminHeader.new }
 
   before do
     sign_in(admin)
@@ -25,7 +26,10 @@ describe "Admin Flags Page", type: :system do
       "Something Else",
     )
 
-    admin_flags_page.visit.toggle("spam")
+    admin_flags_page.visit
+    expect(page).to have_css(".admin-page-header")
+
+    admin_flags_page.toggle("spam")
     topic_page.visit_topic(post.topic).open_flag_topic_modal
 
     expect(flag_modal).to have_choices("It's Inappropriate", "It's Illegal", "Something Else")
@@ -77,6 +81,7 @@ describe "Admin Flags Page", type: :system do
     expect(admin_flags_page).to have_add_flag_button_enabled
 
     admin_flags_page.click_add_flag
+    expect(page).not_to have_css(".admin-page-header")
     admin_flag_form_page
       .fill_in_name("Vulgar")
       .fill_in_description("New flag description")
@@ -107,7 +112,8 @@ describe "Admin Flags Page", type: :system do
     )
 
     # update
-    admin_flags_page.visit.click_edit_flag("vulgar")
+    admin_flags_page.visit.click_edit_flag("custom_vulgar")
+    expect(page).not_to have_css(".admin-page-header")
     admin_flag_form_page.fill_in_name("Tasteless").click_save
 
     expect(admin_flags_page).to have_flags(
@@ -131,9 +137,9 @@ describe "Admin Flags Page", type: :system do
     )
 
     # delete
-    admin_flags_page.visit.click_delete_flag("tasteless").confirm_delete
+    admin_flags_page.visit.click_delete_flag("custom_tasteless").confirm_delete
 
-    expect(admin_flags_page).to have_no_flag("tasteless")
+    expect(admin_flags_page).to have_no_flag("custom_tasteless")
 
     expect(admin_flags_page).to have_add_flag_button_enabled
 
@@ -145,6 +151,63 @@ describe "Admin Flags Page", type: :system do
       "It's Illegal",
       "Something Else",
     )
+  end
+
+  it "has settings tab" do
+    admin_flags_page.visit
+
+    expect(admin_header).to have_tabs(
+      [I18n.t("admin_js.settings"), I18n.t("admin_js.admin.config_areas.flags.flags_tab")],
+    )
+
+    admin_flags_page.click_settings_tab
+    expect(page.all(".setting-label h3").map(&:text)).to eq(
+      [
+        "silence new user sensitivity",
+        "num users to silence new user",
+        "flag sockpuppets",
+        "num flaggers to close topic",
+        "auto respond to flag actions",
+        "high trust flaggers auto hide posts",
+        "max flags per day",
+        "tl2 additional flags per day multiplier",
+        "tl3 additional flags per day multiplier",
+        "tl4 additional flags per day multiplier",
+      ],
+    )
+  end
+
+  it "allows to create custom flag with same name as system flag" do
+    admin_flags_page.visit
+    admin_flags_page.click_add_flag
+    admin_flag_form_page
+      .fill_in_name("Inappropriate")
+      .fill_in_description("New flag description")
+      .select_applies_to("Topic")
+      .select_applies_to("Post")
+      .click_save
+
+    expect(admin_flags_page).to have_flags(
+      "Send @%{username} a message",
+      "Off-Topic",
+      "Inappropriate",
+      "Spam",
+      "Illegal",
+      "Something Else",
+      "Inappropriate",
+    )
+
+    topic_page.visit_topic(post.topic).open_flag_topic_modal
+
+    expect(flag_modal).to have_choices(
+      "It's Inappropriate",
+      "It's Spam",
+      "It's Illegal",
+      "Something Else",
+      "Inappropriate",
+    )
+
+    admin_flags_page.visit.click_delete_flag("custom_inappropriate").confirm_delete
   end
 
   it "does not allow to move notify user flag" do

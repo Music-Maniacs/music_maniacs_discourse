@@ -4,7 +4,7 @@ import { service } from "@ember/service";
 import { INPUT_DELAY } from "discourse-common/config/environment";
 import discourseDebounce from "discourse-common/lib/debounce";
 import discourseComputed from "discourse-common/utils/decorators";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 
 export default class GroupsIndexController extends Controller {
   @service router;
@@ -23,22 +23,11 @@ export default class GroupsIndexController extends Controller {
 
     if (typeFilters) {
       typeFilters.forEach((type) =>
-        types.push({ id: type, name: I18n.t(`groups.index.${type}_groups`) })
+        types.push({ id: type, name: i18n(`groups.index.${type}_groups`) })
       );
     }
 
     return types;
-  }
-
-  loadGroups(params) {
-    this.set("isLoading", true);
-
-    this.store
-      .findAll("group", params)
-      .then((groups) => {
-        this.set("groups", groups);
-      })
-      .finally(() => this.set("isLoading", false));
   }
 
   @action

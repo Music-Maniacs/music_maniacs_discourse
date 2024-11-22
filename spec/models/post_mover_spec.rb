@@ -308,6 +308,26 @@ RSpec.describe PostMover do
               ),
             ).to eq(true)
             expect(TopicUser.exists?(user_id: user, topic_id: new_topic.id)).to eq(true)
+
+            # moved_post records are created correctly
+            expect(
+              MovedPost.exists?(
+                new_topic: new_topic,
+                new_post_id: p2.id,
+                old_topic: topic,
+                old_post_id: p2.id,
+                created_new_topic: true,
+              ),
+            ).to eq(true)
+            expect(
+              MovedPost.exists?(
+                new_topic: new_topic,
+                new_post_id: p4.id,
+                old_topic: topic,
+                old_post_id: p4.id,
+                created_new_topic: true,
+              ),
+            ).to eq(true)
           end
 
           it "moving all posts will close the topic" do
@@ -670,6 +690,25 @@ RSpec.describe PostMover do
             expect(
               TopicUser.find_by(user_id: user.id, topic_id: topic.id).last_read_post_number,
             ).to eq(p3.post_number)
+
+            expect(
+              MovedPost.exists?(
+                new_topic: destination_topic,
+                new_post_id: p2.id,
+                old_topic: topic,
+                old_post_id: p2.id,
+                created_new_topic: false,
+              ),
+            ).to eq(true)
+            expect(
+              MovedPost.exists?(
+                new_topic: destination_topic,
+                new_post_id: p4.id,
+                old_topic: topic,
+                old_post_id: p4.id,
+                created_new_topic: false,
+              ),
+            ).to eq(true)
           end
 
           it "moving all posts will close the topic" do
@@ -2538,6 +2577,64 @@ RSpec.describe PostMover do
         expect(event[:event_name]).to eq(:post_moved)
         expect(event[:params][0]).to eq(post_2)
         expect(event[:params][1]).to eq(topic_1.id)
+      end
+    end
+
+    context "with modifier" do
+      fab!(:topic_1) { Fabricate(:topic) }
+      fab!(:topic_2) { Fabricate(:topic) }
+      fab!(:post_1) { Fabricate(:post, topic: topic_1) }
+      fab!(:user)
+
+      before { SiteSetting.delete_merged_stub_topics_after_days = 0 }
+      let(:modifier_block) do
+        Proc.new do |is_currently_allowed_to_delete, topic, who_is_merging|
+          expect(is_currently_allowed_to_delete).to eq(false)
+          expect(topic).to eq(topic_1)
+          user.id == who_is_merging.id
+        end
+      end
+      it "lets user merge topics immediately" do
+        plugin_instance = Plugin::Instance.new
+        plugin_instance.register_modifier(:is_allowed_to_delete_after_merge, &modifier_block)
+        topic_1.move_posts(user, topic_1.posts.map(&:id), destination_topic_id: topic_2.id)
+
+        expect(topic_1.deleted_at).not_to be_nil
+        expect(topic_2.posts.count).to eq(1)
+      ensure
+        DiscoursePluginRegistry.unregister_modifier(
+          plugin_instance,
+          :is_allowed_to_delete_after_merge,
+          &modifier_block
+        )
+      end
+
+      it "allows specific user to merge topics" do
+        special_user = Fabricate(:user)
+        plugin_instance = Plugin::Instance.new
+
+        plugin_instance.register_modifier(:is_allowed_to_delete_after_merge, &modifier_block)
+        topic_1.move_posts(special_user, topic_1.posts.map(&:id), destination_topic_id: topic_2.id)
+
+        expect(topic_1.deleted_at).to be_nil
+        topic_1.move_posts(user, topic_1.posts.map(&:id), destination_topic_id: topic_2.id)
+        expect(topic_1.deleted_at).not_to be_nil
+      ensure
+        DiscoursePluginRegistry.unregister_modifier(
+          plugin_instance,
+          :is_allowed_to_delete_after_merge,
+          &modifier_block
+        )
+      end
+
+      it "works fine without modifier" do
+        topic_1.move_posts(user, topic_1.posts.map(&:id), destination_topic_id: topic_2.id)
+
+        expect(topic_1.deleted_at).to be_nil
+
+        topic_1.move_posts(admin, topic_1.posts.map(&:id), destination_topic_id: topic_2.id)
+
+        expect(topic_1.deleted_at).not_to be_nil
       end
     end
   end

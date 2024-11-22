@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 class TranslationOverride < ActiveRecord::Base
+  # TODO: Remove once
+  # 20240711123755_drop_compiled_js_from_translation_overrides has been
+  # promoted to pre-deploy
+  self.ignored_columns = %w[compiled_js]
+
   # Allowlist i18n interpolation keys that can be included when customizing translations
   ALLOWED_CUSTOM_INTERPOLATION_KEYS = {
     %w[
@@ -64,7 +69,7 @@ class TranslationOverride < ActiveRecord::Base
 
     translation_override = find_or_initialize_by(params)
     sanitized_value =
-      translation_override.sanitize_field(value, additional_attributes: ["data-auto-route"])
+      translation_override.sanitize_field(value, additional_attributes: %w[data-auto-route target])
     original_translation =
       I18n.overrides_disabled { I18n.t(transform_pluralized_key(key), locale: :en) }
 
@@ -216,7 +221,6 @@ end
 #  value                :string           not null
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
-#  compiled_js          :text
 #  original_translation :text
 #  status               :integer          default("up_to_date"), not null
 #
