@@ -2,9 +2,15 @@ import DiscourseRoute from "discourse/routes/discourse";
 import { hash } from "rsvp";
 import { isEmpty } from "@ember/utils";
 import { ajax } from "discourse/lib/ajax";
+import dIcon from "discourse-common/helpers/d-icon";
 
 export default class Artists extends DiscourseRoute{
   async model(params) {
+    // return RSVP.hash({
+    //   artist: artistData,
+    //   reviews: reviewsJson.reviews,
+    //   wikipediaExtract: wikipediaJson.wikipediaExtract
+    // });
     return this.store.find('artist', params.id);
   }
 
