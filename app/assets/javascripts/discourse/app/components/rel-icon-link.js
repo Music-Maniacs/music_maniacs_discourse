@@ -2,7 +2,6 @@ import Component from '@glimmer/component';
 
 export default class RelIconLink extends Component {
   iconName(relName, relValue) {
-    console.log(relName, relValue);
     switch(relName) {
       case "streaming":
       case "free streaming":
