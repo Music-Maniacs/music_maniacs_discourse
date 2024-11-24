@@ -273,6 +273,10 @@ gem "csv", require: false
 gem "iso8601"
 gem "rrule"
 
+
+# MusicManiacs gems
+gem 'musicbrainz'
+
 group :migrations, optional: true do
   gem "extralite-bundle", require: "extralite"
 
