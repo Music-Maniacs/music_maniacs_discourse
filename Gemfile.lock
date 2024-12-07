@@ -262,6 +262,9 @@ GEM
     multi_json (1.15.0)
     multi_xml (0.7.1)
       bigdecimal (~> 3.1)
+    musicbrainz (0.8.0)
+      faraday
+      nokogiri
     mustache (1.1.1)
     mutex_m (0.3.0)
     net-http (0.5.0)
@@ -671,6 +674,7 @@ DEPENDENCIES
   minio_runner
   mocha
   multi_json
+  musicbrainz
   mustache
   net-http
   net-imap
