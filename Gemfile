@@ -273,10 +273,6 @@ gem "csv", require: false
 gem "iso8601"
 gem "rrule"
 
-
-# MusicManiacs gems
-gem 'musicbrainz'
-
 group :migrations, optional: true do
   gem "extralite-bundle", require: "extralite"
 
@@ -293,3 +289,8 @@ end
 gem "dry-initializer", "~> 3.1"
 
 gem "parallel"
+
+
+#### MusicManiacs ###
+
+gem 'active_musicbrainz', github: 'gravityblast/active_musicbrainz', branch: 'master'

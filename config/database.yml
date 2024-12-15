@@ -19,6 +19,14 @@ development:
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 
+music_brainz:
+  adapter: postgresql
+  host: 'localhost'
+  port: '5433'
+  database: 'musicbrainz_db'
+  username: 'musicbrainz'
+  password: 'musicbrainz'
+
 <%
   test_db = ENV["RAILS_DB"]
   if !test_db.present?

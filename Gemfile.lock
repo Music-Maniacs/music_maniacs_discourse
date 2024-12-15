@@ -1,3 +1,11 @@
+GIT
+  remote: https://github.com/gravityblast/active_musicbrainz.git
+  revision: 701898aadb0a998b0dda56ff18138fc97cfa3adb
+  branch: master
+  specs:
+    active_musicbrainz (0.3.2)
+      activerecord
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -262,9 +270,6 @@ GEM
     multi_json (1.15.0)
     multi_xml (0.7.1)
       bigdecimal (~> 3.1)
-    musicbrainz (0.8.0)
-      faraday
-      nokogiri
     mustache (1.1.1)
     mutex_m (0.3.0)
     net-http (0.5.0)
@@ -609,6 +614,7 @@ DEPENDENCIES
   actionview (~> 7.1.0)
   actionview_precompiler
   active_model_serializers (~> 0.8.3)
+  active_musicbrainz!
   activemodel (~> 7.1.0)
   activerecord (~> 7.1.0)
   activesupport (~> 7.1.0)
@@ -674,7 +680,6 @@ DEPENDENCIES
   minio_runner
   mocha
   multi_json
-  musicbrainz
   mustache
   net-http
   net-imap
