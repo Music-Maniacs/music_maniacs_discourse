@@ -115,3 +115,10 @@ To guide our ongoing effort to build accessible software we follow the [W3C’s 
 ## Dedication
 
 Discourse is built with [love, Internet style.](https://www.youtube.com/watch?v=Xe1TZaElTAs)
+
+
+
+## Feature Proposals
+
+
+
