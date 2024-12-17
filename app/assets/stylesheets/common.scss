@@ -22,3 +22,13 @@
 @import "common/table-builder/_index";
 @import "common/post-action-feedback";
 @import "common/form-kit/_index";
+
+
+.horizontal-list {
+  display: flex;
+  list-style: none; /* removes the bullet points from the list */
+}
+
+.horizontal-list li {
+  margin-right: 20px; /* adds spacing between each list item */
+}

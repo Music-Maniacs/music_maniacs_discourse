@@ -289,3 +289,8 @@ end
 gem "dry-initializer", "~> 3.1"
 
 gem "parallel"
+
+
+#### MusicManiacs ###
+
+gem 'active_musicbrainz', github: 'gravityblast/active_musicbrainz', branch: 'master'

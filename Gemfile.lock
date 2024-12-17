@@ -1,3 +1,11 @@
+GIT
+  remote: https://github.com/gravityblast/active_musicbrainz.git
+  revision: 701898aadb0a998b0dda56ff18138fc97cfa3adb
+  branch: master
+  specs:
+    active_musicbrainz (0.3.2)
+      activerecord
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -606,6 +614,7 @@ DEPENDENCIES
   actionview (~> 7.1.0)
   actionview_precompiler
   active_model_serializers (~> 0.8.3)
+  active_musicbrainz!
   activemodel (~> 7.1.0)
   activerecord (~> 7.1.0)
   activesupport (~> 7.1.0)
