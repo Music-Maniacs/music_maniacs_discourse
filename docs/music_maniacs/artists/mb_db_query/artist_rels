@@ -1,0 +1,61 @@
+WITH  artist_rels AS (
+  SELECT a.gid AS artist_mbid
+      , array_agg(distinct(ARRAY[lt.name, url])) AS artist_links
+    FROM musicbrainz.artist a
+    JOIN musicbrainz.l_artist_url lau ON lau.entity0 = a.id -> artist.l_artist_urls
+    JOIN musicbrainz.url u ON lau.entity1 = u.id -> lau.url
+    JOIN musicbrainz.link l ON lau.link = l.id -> lau.link || ActiveMusicBrainz::Model.find(lau.link)
+    JOIN musicbrainz.link_type lt ON l.link_type = lt.id -> link.link_type
+
+  WHERE lt.gid IN ('99429741-f3f6-484b-84f8-23af51991770', 'fe33d22f-c3b0-4d68-bd53-a856badf2b15', '689870a4-a1e4-4912-b17f-7b2664215698', '93883cf6-e818-4938-990e-75863f8db2d3', '6f77d54e-1d81-4e1a-9ea5-37947577151b', 'e4d73442-3762-45a8-905c-401da65544ed', '611b1862-67af-4253-a64f-34adba305d1d', 'f8319a2f-f824-4617-81c8-be6560b3b203', '34ae77fe-defb-43ea-95d4-63c7540bac78', '769085a1-c2f7-4c24-a532-2375a77693bd', '63cc5d1f-f096-4c94-a43f-ecb32ea94161', '6a540e5b-58c6-4192-b6ba-dbc71ec8fcf0')
+    AND NOT l.ended
+GROUP BY a.gid
+)
+
+
+Rails
+
+ActiveMusicbrainz::Model::Artist Load (2.6ms):
+SELECT "artist".* FROM "artist"
+  INNER JOIN "l_artist_url" ON "l_artist_url"."entity0" = "artist"."id"
+  INNER JOIN "link" ON "link"."id" = "l_artist_url"."link"
+  INNER JOIN "link_type" ON "link_type"."id" = "link"."link_type" /* loading for pp */ LIMIT $1  [["LIMIT", 11]]
+
+ActiveMusicbrainz::Model::Artist.joins(l_artist_urls: { link: :link_type, url: :l_artist_url })
+
+ActiveMusicbrainz::Model::Artist Load (1.4ms):
+SELECT "artist".* FROM "artist"
+  INNER JOIN "l_artist_url" ON "l_artist_url"."entity0" = "artist"."id"
+  INNER JOIN "link" ON "link"."id" = "l_artist_url"."link"
+  INNER JOIN "link_type" ON "link_type"."id" = "link"."link_type"
+  INNER JOIN "url" ON "url"."id" = "l_artist_url"."entity1" /* loading for pp */ LIMIT $1  [["LIMIT", 11]]
+
+
+
+artist_rels.each do |artist_rel|
+  puts artist_rel.name
+  puts artist_rel.artist_links
+end
+
+
+                    #.where(link_types: { gid: ['99429741-f3f6-484b-84f8-23af51991770', 'fe33d22f-c3b0-4d68-bd53-a856badf2b15', '689870a4-a1e4-4912-b17f-7b2664215698', '93883cf6-e818-4938-990e-75863f8db2d3', '6f77d54e-1d81-4e1a-9ea5-37947577151b', 'e4d73442-3762-45a8-905c-401da65544ed', '611b1862-67af-4253-a64f-34adba305d1d', 'f8319a2f-f824-4617-81c8-be6560b3b203', '34ae77fe-defb-43ea-95d4-63c7540bac78', '769085a1-c2f7-4c24-a532-2375a77693bd', '63cc5d1f-f096-4c94-a43f-ecb32ea94161', '6a540e5b-58c6-4192-b6ba-dbc71ec8fcf0'] })
+artist_rels = ActiveMusicbrainz::Model::Artist.joins(l_artist_urls: { link: :link_type }).joins(l_artist_urls: :url).group('artists.gid').select('artists.gid AS artist_mbid, array_agg(DISTINCT ARRAY[link_types.name, urls.url]) AS artist_links')
+
+
+
+artist_rels = ActiveMusicbrainz::Model::Artist.joins(l_artist_urls: { link: :link_type })
+                    .joins(l_artist_urls: :url)
+                    .group('artist.gid')
+
+
+
+artist_rels = ActiveMusicbrainz::Model::Artist.joins(l_artist_urls: { link: :link_type })
+                    .joins(l_artist_urls: :url)
+                    .group('artist.gid')
+                    .select('artist.gid, array_agg(DISTINCT ARRAY[link_type.name, url.url]) AS artist_links')
+
+artist_rels.each do |artist_rel|
+  puts artist_rel.artist_mbid
+  puts artist_rel.artist_links
+end
+
