@@ -12,7 +12,6 @@ ListenBrainz query:
                   ON lau.link = l.id
                 JOIN musicbrainz.link_type lt
                   ON l.link_type = lt.id
-                
                WHERE lt.gid IN ('99429741-f3f6-484b-84f8-23af51991770', 'fe33d22f-c3b0-4d68-bd53-a856badf2b15', '689870a4-a1e4-4912-b17f-7b2664215698', '93883cf6-e818-4938-990e-75863f8db2d3', '6f77d54e-1d81-4e1a-9ea5-37947577151b', 'e4d73442-3762-45a8-905c-401da65544ed', '611b1862-67af-4253-a64f-34adba305d1d', 'f8319a2f-f824-4617-81c8-be6560b3b203', '34ae77fe-defb-43ea-95d4-63c7540bac78', '769085a1-c2f7-4c24-a532-2375a77693bd', '63cc5d1f-f096-4c94-a43f-ecb32ea94161', '6a540e5b-58c6-4192-b6ba-dbc71ec8fcf0')
                  AND NOT l.ended
             GROUP BY a.gid
@@ -26,7 +25,6 @@ ListenBrainz query:
                   ON at.tag = t.id
            LEFT JOIN musicbrainz.genre g
                   ON t.name = g.name
-                
                WHERE count > 0
             GROUP BY a.gid
      ), rg_cover_art AS (
@@ -55,7 +53,6 @@ ListenBrainz query:
                   ON caa.release = caa_rel.id
            LEFT JOIN cover_art_archive.cover_art_type cat
                   ON cat.id = caa.id
-                
                WHERE type_id = 1
                  AND mime_type != 'application/pdf'
             ORDER BY rg.id
@@ -93,12 +90,10 @@ ListenBrainz query:
                   ON rg.type = rgpt.id
            LEFT JOIN rg_cover_art rgca
                   ON rgca.release_group = rg.id
-          -- need a second join to artist_credit_name/artist to gather other release group artists' names
                 JOIN musicbrainz.artist_credit_name acn2
                   ON rg.artist_credit = acn2.artist_credit
                 JOIN musicbrainz.artist a2
                   ON acn2.artist = a2.id
-                
             GROUP BY a.gid
                    , rg.gid
                    , rg.name
@@ -131,9 +126,6 @@ ListenBrainz query:
                               rgd.caa_release_mbid
                           ) ORDER BY rgd.date
                      )
-                      -- if the artist has no release groups, left join will cause a NULL row to be
-                      -- added to the array, filter ensures that it is removed
-                      FILTER (WHERE rgd.release_group_mbid IS NOTNULL) AS release_groups
                 FROM musicbrainz.artist a
            LEFT JOIN musicbrainz.artist_type at
                   ON a.type = at.id
@@ -147,7 +139,6 @@ ListenBrainz query:
                   ON ats.artist_mbid = a.gid
            LEFT JOIN release_group_data rgd
                   ON rgd.artist_mbid = a.gid
-                
             GROUP BY a.gid
                    , a.name
                    , a.begin_date_year
@@ -168,6 +159,7 @@ rows:
 ,"artist_links"
 ,"artist_tags"
 ,"release_groups"
+
 
 
 

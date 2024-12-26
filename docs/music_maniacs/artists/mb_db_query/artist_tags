@@ -1,0 +1,72 @@
+with artist_tags AS (
+              SELECT a.gid AS artist_mbid
+                   , array_agg(jsonb_build_array(t.name, count, a.gid, g.gid)) AS artist_tags
+                FROM musicbrainz.artist a
+                JOIN musicbrainz.artist_tag at
+                  ON at.artist = a.id
+                JOIN musicbrainz.tag t
+                  ON at.tag = t.id
+           LEFT JOIN musicbrainz.genre g
+                  ON t.name = g.name
+
+               WHERE count > 0
+            GROUP BY a.gid
+     )
+select * from artist_tags
+
+SELECT "artist".* FROM "artist"
+  INNER JOIN "artist_tag" ON "artist_tag"."artist" = "artist"."id"
+  INNER JOIN "tag" ON "tag"."id" = "artist_tag"."tag"
+  LEFT JOIN genre g ON tag.name = g.name
+
+
+artist_tags = ActiveMusicbrainz::Model::Artist.joins(artist_tags: :tag)
+                    .left_joins(tag: :genre)
+                    .where('artist_tags.count > 0')
+                    .group('artists.gid')
+                    .select('artists.gid AS artist_mbid, array_agg(jsonb_build_array(tags.name, artist_tags.count, artists.gid, genres.gid)) AS artist_tags')
+
+
+artist_tags = Artist.joins(artist_tags: :tag).left_joins(tag: :genre)
+
+artist_tags = Artist.joins(artist_tags: :tag)
+                    .left_joins(tag: :genre)
+                    .where('artist_tags.count > 0')
+                    .group('artists.gid')
+                    .select('artists.gid AS artist_mbid, array_agg(jsonb_build_array(tags.name, artist_tags.count, artists.gid, genres.gid)) AS artist_tags')
+
+artist_tags.each do |artist_tag|
+  puts "Artist MBID: #{artist_tag.artist_mbid}, Artist Tags: #{artist_tag.artist_tags}"
+end
+
+
+
+artist_tags = Artist.joins(artist_tags: :tag).joins('LEFT JOIN musicbrainz.genre g ON tags.name = g.name')
+
+
+
+ActiveMusicbrainz::Model::Artist Load (286.5ms)
+SELECT "artist".* FROM "artist"
+  INNER JOIN "artist_tag" ON "artist_tag"."artist" = "artist"."id"
+  INNER JOIN "tag" ON "tag"."id" = "artist_tag"."tag"
+  LEFT JOIN genre g ON tag.name = g.name
+
+
+
+  artist_tags = Artist.joins(artist_tags: :tag)
+                    .joins('LEFT JOIN genre g ON tag.name = g.name')
+                    .where('artist_tags.count > 10')
+                    .group('artist.gid, g.gid')
+                    .select('artists.gid AS artist_mbid, array_agg(jsonb_build_array(tags.name, artist_tags.count, artists.gid, g.gid)) AS artist_tags')
+
+artist_tags.each do |artist_tag|
+  puts "Artist MBID: #{artist_tag.artist_mbid}, Artist Tags: #{artist_tag.artist_tags}"
+end
+
+
+[114] pry(main)> artist_tags = ActiveMusicbrainz::Model::Artist.joins(artist_tags: :tag)
+.joins('LEFT JOIN genre g ON tag.name = g.name')
+.where('artist_tag.count > 10')
+.group('artist.gid')
+.select('artist.gid AS artist_mbid, array_agg(jsonb_build_array(tag.name, artist_tag.count, artist.gid, g.gid)) as artist_tagsss')
+
