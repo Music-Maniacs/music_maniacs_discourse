@@ -1,7 +1,5 @@
-GIT
-  remote: https://github.com/gravityblast/active_musicbrainz.git
-  revision: 701898aadb0a998b0dda56ff18138fc97cfa3adb
-  branch: master
+PATH
+  remote: /home/xeitor/github_projects/active_musicbrainz
   specs:
     active_musicbrainz (0.3.2)
       activerecord
