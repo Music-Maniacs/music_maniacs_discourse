@@ -24,8 +24,16 @@ class ActiveMusicbrainz::Model::Artist
 
   def tags_list
     artist_tags.joins(:tag).joins('LEFT JOIN genre g ON tag.name = g.name').map do |at|
-      { name: at.tag.name, count: at.count, genre: at.tag.genre.gid }
+      { name: at.tag.name, count: at.count, genre: at.tag&.genre&.gid }
     end
+  end
+
+  def only_tags
+    artist_tags.joins(:tag).joins('LEFT JOIN genre g ON tag.name = g.name').where('g.gid IS NULL')
+  end
+
+  def only_genres
+    artist_tags.joins(:tag).joins('LEFT JOIN genre g ON tag.name = g.name').where('g.gid IS NOT NULL')
   end
 
   def rels
