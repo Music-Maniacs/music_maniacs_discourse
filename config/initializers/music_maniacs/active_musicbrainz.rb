@@ -2,6 +2,7 @@
 
 ActiveMusicbrainz::Model::Base.establish_connection(:music_brainz)
 ActiveMusicbrainz.init
+AMBM = ActiveMusicbrainz::Model
 
 class ActiveMusicbrainz::Model::Artist
   LINK_GIDS = [
@@ -30,7 +31,6 @@ class ActiveMusicbrainz::Model::Artist
   def rels
     l_artist_urls.joins({ link: :link_type })
                  .joins(:url)
-                 .where(link_type: { gid: LINK_GIDS })
                  .where('link.ended = ?', false)
                  .map do |lau|
                   { name: lau.link.link_type.name, url: lau.url.url }

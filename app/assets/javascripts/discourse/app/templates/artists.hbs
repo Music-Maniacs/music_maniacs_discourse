@@ -53,5 +53,30 @@
     {{/if}}
   </div>
   <div className="entity-page-content">
+    <div className="tracks">
+      <div className="header">
+        <h3 className="header-with-line">
+          Popular tracks
+          {Boolean(listensFromPopularRecordings?.length) && (
+            <button
+              type="button"
+              className="btn btn-info btn-rounded play-tracks-button"
+              title="Play popular tracks"
+              onClick={() => {
+                window.postMessage(
+                  {
+                    brainzplayer_event: "play-listen",
+                    payload: listensFromPopularRecordings,
+                  },
+                  window.location.origin
+                );
+              }}
+            >
+              <FontAwesomeIcon icon={faPlayCircle} fixedWidth /> Play all
+            </button>
+          )}
+        </h3>
+      </div>
+    </div>
   </div>
 </div>

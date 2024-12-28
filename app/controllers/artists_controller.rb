@@ -8,4 +8,9 @@ class ArtistsController < ApplicationController
     @mb_artist.merge!(id: params[:id]) if @mb_artist
     render json: @mb_artist.present? ? { artist: @mb_artist } : { error: "Artist not found" }
   end
+
+  # release_group: name, data, cover_art, listens?
+  def new_show
+
+  end
 end
