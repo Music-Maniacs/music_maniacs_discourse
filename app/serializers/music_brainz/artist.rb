@@ -2,7 +2,7 @@
 
 module MusicBrainz
   class Artist < ApplicationSerializer
-    class LArtistUrl < ApplicationSerializer
+    class Link < ApplicationSerializer
 
       attributes :name, :url
       def name
@@ -15,13 +15,22 @@ module MusicBrainz
     end
 
     attributes :name,
-               :begin_date_year,
-               :end_date_year
+               :begin_year,
+               :end_year,
+               :area
 
-    has_many :rels, serializer: LArtistUrl, embed: :objects
+    has_many :rels, serializer: Link, embed: :objects
 
     def area
       object.area&.name
+    end
+
+    def begin_year
+      object.begin_date_year
+    end
+
+    def end_year
+      object.begin_date_year
     end
 
     def rels
