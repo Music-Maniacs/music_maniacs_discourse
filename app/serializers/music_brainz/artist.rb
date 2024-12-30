@@ -34,7 +34,8 @@ module MusicBrainz
       end
     end
 
-    attributes :name,
+    attributes :id,
+               :name,
                :begin_year,
                :end_year,
                :area
@@ -42,6 +43,10 @@ module MusicBrainz
     has_many :rels, serializer: Link, embed: :objects
     has_many :tags, serializer: Tag, embed: :objects
     has_many :genres, serializer: Genre, embed: :objects
+
+    def id
+      object.gid
+    end
 
     def area
       object.area&.name
