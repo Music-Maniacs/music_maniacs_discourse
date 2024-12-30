@@ -8,10 +8,9 @@ export default class ArtistController extends Controller {
   @tracked wikipediaData;
   @tracked reviewsData;
 
-  @computed('model.artist.tag.[]')
+  @computed('model.tags.[]')
   get formattedTags() {
-    console.log(this.model.artist.tag.artist);
-    return this.model.artist.tag.artist.map(tag => ({
+    return this.model.tags.map(tag => ({
       count: tag.count,
       label: tag.tag
     }));

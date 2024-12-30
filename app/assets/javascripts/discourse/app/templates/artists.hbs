@@ -5,13 +5,13 @@
       {{html-safe this.model.coverArt}}
     </div>
     <div class="artist-info">
-      <h1>{{this.model.artist.name}}</h1>
+      <h1>{{this.model.name}}</h1>
       <div class="details">
         <small class="help-block">
-          {{this.model.artist.begin_year}}
-          {{#if this.model.artist.end_year}} — {{this.model.artist.end_year}}{{/if}}
+          {{this.model.begin_year}}
+          {{#if this.model.end_year}} — {{this.model.end_year}}{{/if}}
           <br>
-          {{this.model.artist.area}}
+          {{this.model.area}}
         </small>
       </div>
       {{#if this.wikipediaData}}
@@ -25,14 +25,14 @@
     </div>
     <div class="right-side">
       <div class="entity-rels">
-        {{#if this.model.artist.rels}}
+        {{#if this.model.rels}}
           {{#each-in this.model.artist.rels as |key value|}}
             <RelIconLink @relName={{key}} @relValue={{value}}/>
           {{/each-in}}
         {{/if}}
         <OpenInMusicBrainzButton
           @entityType="artist"
-          @entityMBID={{this.model.artist.mbid}}
+          @entityMBID={{this.model.id}}
         />
       </div>
     </div>
@@ -51,32 +51,5 @@
     {{else}}
       <p>No genres available for this artist.</p>
     {{/if}}
-  </div>
-  <div className="entity-page-content">
-    <div className="tracks">
-      <div className="header">
-        <h3 className="header-with-line">
-          Popular tracks
-          {Boolean(listensFromPopularRecordings?.length) && (
-            <button
-              type="button"
-              className="btn btn-info btn-rounded play-tracks-button"
-              title="Play popular tracks"
-              onClick={() => {
-                window.postMessage(
-                  {
-                    brainzplayer_event: "play-listen",
-                    payload: listensFromPopularRecordings,
-                  },
-                  window.location.origin
-                );
-              }}
-            >
-              <FontAwesomeIcon icon={faPlayCircle} fixedWidth /> Play all
-            </button>
-          )}
-        </h3>
-      </div>
-    </div>
   </div>
 </div>
