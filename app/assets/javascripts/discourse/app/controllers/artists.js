@@ -15,4 +15,12 @@ export default class ArtistController extends Controller {
       label: tag.tag
     }));
   }
+
+  @computed('model.genres.[]')
+  get formattedGenres() {
+    return this.model.genres.map(genre => ({
+      count: genre.count,
+      label: genre.tag
+    }));
+  }
 }

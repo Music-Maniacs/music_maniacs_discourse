@@ -37,14 +37,29 @@
       </div>
     </div>
   </div>
-  <div class="artist-genres tags">
-    <h2>Genres</h2>
+  <div class="artist-tags">
+    <h2>Tags</h2>
     {{#if this.formattedTags}}
       <ul class="horizontal-list">
         {{#each this.formattedTags as |tag|}}
           <li>
             {{tag.label}}
-            <span class="genre-count">({{tag.count}} {{if (eq tag.count 1) "vote" "votes"}})</span>
+            <span class="tag-count">({{tag.count}} {{if (eq tag.count 1) "vote" "votes"}})</span>
+          </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <p>No tags available for this artist.</p>
+    {{/if}}
+  </div>
+  <div class="artist-genres">
+    <h2>Genres</h2>
+    {{#if this.formattedGenres}}
+      <ul class="horizontal-list">
+        {{#each this.formattedGenres as |genre|}}
+          <li>
+            {{genre.label}}
+            <span class="genre-count">({{genre.count}} {{if (eq genre.count 1) "vote" "votes"}})</span>
           </li>
         {{/each}}
       </ul>
