@@ -12,7 +12,7 @@ export default class ArtistController extends Controller {
   get formattedTags() {
     return this.model.tags.map(tag => ({
       count: tag.count,
-      label: tag.tag
+      label: tag.name
     }));
   }
 
@@ -20,7 +20,7 @@ export default class ArtistController extends Controller {
   get formattedGenres() {
     return this.model.genres.map(genre => ({
       count: genre.count,
-      label: genre.tag
+      label: genre.name
     }));
   }
 }
