@@ -1,0 +1,51 @@
+with
+	oldest_release_group as (
+		select
+			rec.id as recording_id,
+			aggregate_function(
+				
+					rgm.first_release_date_year,
+					rgm.first_release_date_month,
+					rgm.first_release_date_day
+				)
+			) as first_release_date
+		from
+			recording rec
+			join track t on t.recording = rec.id
+			join medium m on m.id = t.medium
+			join release r on r.id = m.release
+			join release_group rg on rg.id = r.release_group
+			join release_group_meta rgm on rgm.id = rg.id
+			join artist_credit_name acn on acn.artist_credit = rec.artist_credit
+		where
+			acn.artist = 358288
+		group by
+			rec.id
+	)
+select
+	rec.id as recording_id,
+	rec.name as recording_name,
+	rg.id as release_group_id,
+	rg.gid as release_group_gid,
+	rg.name as release_group_name,
+	rg.type as primary_type_id,
+	rg.artist_credit as artist_credit_id,
+	rg.edits_pending,
+	rgm.first_release_date_year,
+	rgm.first_release_date_month,
+	rgm.first_release_date_day
+from
+	recording rec
+	join track t on t.recording = rec.id
+	join medium m on m.id = t.medium
+	join release r on r.id = m.release
+	join release_group rg on rg.id = r.release_group
+	join release_group_meta rgm on rgm.id = rg.id
+	join artist_credit_name acn on acn.artist_credit = rec.artist_credit
+	join oldest_release_group org on org.recording_id = rec.id
+where
+	acn.artist = 358288
+order by
+	rgm.first_release_date_year,
+	rgm.first_release_date_month,
+	rgm.first_release_date_day;
