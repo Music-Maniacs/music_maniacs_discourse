@@ -22,10 +22,11 @@ development:
 music_brainz:
   adapter: postgresql
   host: 'localhost'
-  port: '5433'
+  port: '5432'
   database: 'musicbrainz_db'
-  username: 'musicbrainz'
-  password: 'musicbrainz'
+  username: 'postgres'
+  password: 'postgres'
+  schema_search_path: 'musicbrainz'
 
 <%
   test_db = ENV["RAILS_DB"]
