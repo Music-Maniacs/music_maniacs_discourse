@@ -155,13 +155,20 @@ class ActiveMusicbrainz::Model::Recording
 
   class ActiveMusicbrainz::Model::Artist
     def recordings_with_release_date
-      ActiveMusicbrainz::Model::Recording.releases_for_artist(id)
+      recordings.with_first_release_date
     end
   end
 
   class ActiveMusicbrainz::Model::Recording
+
+    def self.with_first_release_date_selected
+      select('recording.*, RECORDINGS_FIRST_RELEASE_DATE.first_release_date as frd')
+      .joins("INNER JOIN (#{with_first_release_date_subquery.to_sql}) RECORDINGS_FIRST_RELEASE_DATE ON RECORDINGS_FIRST_RELEASE_DATE.RECORDING_ID = recording.id")
+    end
+
     def self.with_first_release_date
-      select('recording.id as recording_id, RECORDINGS_FIRST_RELEASE_DATE.first_release_date as frd').joins("INNER JOIN (#{with_first_release_date_subquery.to_sql}) RECORDINGS_FIRST_RELEASE_DATE ON RECORDINGS_FIRST_RELEASE_DATE.RECORDING_ID = recording.id")
+      joins("INNER JOIN (#{with_first_release_date_subquery.to_sql}) RECORDINGS_FIRST_RELEASE_DATE ON RECORDINGS_FIRST_RELEASE_DATE.RECORDING_ID = recording.id")
+      .order('RECORDINGS_FIRST_RELEASE_DATE.first_release_date desc')
     end
 
     def self.with_first_release_date_subquery
