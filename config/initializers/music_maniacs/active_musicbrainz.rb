@@ -160,6 +160,7 @@ class ActiveMusicbrainz::Model::Recording
   end
 
   class ActiveMusicbrainz::Model::Recording
+    has_one :first_release_date, class_name: 'Views::RecordingWithFirstReleaseDate'
 
     def self.with_first_release_date_selected
       select('recording.*, RECORDINGS_FIRST_RELEASE_DATE.first_release_date as frd')
