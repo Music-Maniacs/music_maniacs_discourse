@@ -88,39 +88,61 @@ class ActiveMusicbrainz::Model::Artist
   end
 end
 
+class ActiveMusicbrainz::Model::RecordingFirstReleaseDate
+  belongs_to :recording, foreign_key: :recording
+end
+
 class ActiveMusicbrainz::Model::Recording
-  has_one :first_release_date, class_name: 'Views::RecordingWithFirstReleaseDate'
+  has_one :recording_first_release_date, foreign_key: :recording
 
-  def self.with_first_release_date_selected
-    select('recording.*, RECORDINGS_FIRST_RELEASE_DATE.first_release_date as frd')
-    .joins("INNER JOIN (#{with_first_release_date_subquery.to_sql}) RECORDINGS_FIRST_RELEASE_DATE ON RECORDINGS_FIRST_RELEASE_DATE.RECORDING_ID = recording.id")
+  def first_release_date
+    date = recording_first_release_date if recording_first_release_date.present?
+
+    first_release_date_query.first
   end
 
-  def self.with_first_release_date
-    joins("INNER JOIN (#{with_first_release_date_subquery.to_sql}) RECORDINGS_FIRST_RELEASE_DATE ON RECORDINGS_FIRST_RELEASE_DATE.RECORDING_ID = recording.id")
-    .order('RECORDINGS_FIRST_RELEASE_DATE.first_release_date desc')
+  def first_release_date_query
+    ActiveMusicbrainz::Model::Track.select('DISTINCT ON (track.recording) track.recording, rd.date_year AS year, rd.date_month AS month, rd.date_day AS day')
+                                   .joins(:medium)
+                                   .joins("LEFT JOIN (
+                                     SELECT release, date_year, date_month, date_day FROM release_country
+                                     UNION ALL
+                                     SELECT release, date_year, date_month, date_day FROM release_unknown_country
+                                   ) rd ON rd.release = medium.release")
+                                   .where(recording: id)
+                                   .order('track.recording, rd.date_year NULLS LAST, rd.date_month NULLS LAST, rd.date_day NULLS LAST')
   end
 
-  def self.with_first_release_date_subquery
-    select('recording.id AS recording_id, MIN(
-      CASE
-        WHEN release_group_meta.first_release_date_month IS NOT NULL
-            AND release_group_meta.first_release_date_day IS NOT NULL THEN make_date(
-          release_group_meta.first_release_date_year,
-          release_group_meta.first_release_date_month,
-          release_group_meta.first_release_date_day
-        )
-        WHEN release_group_meta.first_release_date_month IS NOT NULL THEN make_date(
-          release_group_meta.first_release_date_year,
-          release_group_meta.first_release_date_month,
-          1
-        )
-        WHEN release_group_meta.first_release_date_year IS NOT NULL THEN make_date(release_group_meta.first_release_date_year, 1, 1)
-      END
-    ) AS first_release_date')
-    .joins(tracks: { medium: { release: { release_group: :release_group_meta } } })
-    .joins(:artist_credit_names)
-    .where('release_group_meta.first_release_date_year IS NOT NULL')
-    .group('recording.id')
-  end
+  # def self.with_first_release_date_selected
+  #   select('recording.*, RECORDINGS_FIRST_RELEASE_DATE.first_release_date as frd')
+  #   .joins("INNER JOIN (#{with_first_release_date_subquery.to_sql}) RECORDINGS_FIRST_RELEASE_DATE ON RECORDINGS_FIRST_RELEASE_DATE.RECORDING_ID = recording.id")
+  # end
+  #
+  # def self.with_first_release_date
+  #   joins("INNER JOIN (#{with_first_release_date_subquery.to_sql}) RECORDINGS_FIRST_RELEASE_DATE ON RECORDINGS_FIRST_RELEASE_DATE.RECORDING_ID = recording.id")
+  #   .order('RECORDINGS_FIRST_RELEASE_DATE.first_release_date desc')
+  # end
+  #
+  # def self.with_first_release_date_subquery
+  #   select('recording.id AS recording_id, MIN(
+  #     CASE
+  #       WHEN release_group_meta.first_release_date_month IS NOT NULL
+  #           AND release_group_meta.first_release_date_day IS NOT NULL THEN make_date(
+  #         release_group_meta.first_release_date_year,
+  #         release_group_meta.first_release_date_month,
+  #         release_group_meta.first_release_date_day
+  #       )
+  #       WHEN release_group_meta.first_release_date_month IS NOT NULL THEN make_date(
+  #         release_group_meta.first_release_date_year,
+  #         release_group_meta.first_release_date_month,
+  #         1
+  #       )
+  #       WHEN release_group_meta.first_release_date_year IS NOT NULL THEN make_date(release_group_meta.first_release_date_year, 1, 1)
+  #     END
+  #   ) AS first_release_date')
+  #   .joins(tracks: { medium: { release: { release_group: :release_group_meta } } })
+  #   .joins(:artist_credit_names)
+  #   .where('release_group_meta.first_release_date_year IS NOT NULL')
+  #   .group('recording.id')
+  # end
 end
