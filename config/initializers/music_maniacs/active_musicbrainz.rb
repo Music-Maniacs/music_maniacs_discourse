@@ -80,8 +80,6 @@ class ActiveMusicbrainz::Model::ReleaseGroup
   has_one :release_group_meta, foreign_key: :id
 end
 
-
-
 class ActiveMusicbrainz::Model::Artist
   def recordings_with_release_date
     recordings.with_first_release_date
@@ -95,8 +93,13 @@ end
 class ActiveMusicbrainz::Model::Recording
   has_one :recording_first_release_date, foreign_key: :recording
 
+  scope :order_by_first_release_date, -> (direction = :desc) {
+    joins(:recording_first_release_date)
+      .order("recording_first_release_date.year #{direction} NULLS LAST, recording_first_release_date.month #{direction} NULLS LAST, recording_first_release_date.day #{direction} NULLS LAST")
+  }
+
   def first_release_date
-    date = recording_first_release_date if recording_first_release_date.present?
+    return recording_first_release_date if recording_first_release_date.present?
 
     first_release_date_query.first
   end
