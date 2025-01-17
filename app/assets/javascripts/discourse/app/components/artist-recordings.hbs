@@ -1,0 +1,15 @@
+<div class="artist-recordings">
+  <h2>Recordings</h2>
+  {{#if this.recordings}}
+    <ul>
+      {{#each this.recordings as |recording|}}
+       {{log recording}}
+        <li>
+          <strong>{{recording.name}}</strong> - {{format-track-length recording.length}}
+        </li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <p>Loading recordings...</p>
+  {{/if}}
+</div>
