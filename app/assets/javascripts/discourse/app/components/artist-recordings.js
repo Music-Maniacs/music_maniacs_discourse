@@ -18,7 +18,7 @@ export default class ArtistRecordingsComponent extends Component {
     const artistId = this.args.artistId;
     console.log(`Fetching recordings for artist ID: ${artistId}`);
     try {
-      const response = await fetch(`/artists/${artistId}/recordings.json`);
+      const response = await fetch(`/artists/${artistId}/top_recordings.json`);
       if (!response.ok) {
         throw new Error(`Failed to fetch recordings: ${response.statusText}`);
       }
