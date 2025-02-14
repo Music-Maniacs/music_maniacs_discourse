@@ -83,6 +83,7 @@ Discourse::Application.routes.draw do
 
     resources :artists, only: [:show] do
       member do
+        get :top_recordings
         get :recordings
       end
     end

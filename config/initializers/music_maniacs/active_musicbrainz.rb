@@ -90,12 +90,34 @@ class ActiveMusicbrainz::Model::RecordingFirstReleaseDate
   belongs_to :recording, foreign_key: :recording
 end
 
+class ActiveMusicbrainz::Model::RecordingMeta
+  belongs_to :recording, foreign_key: :id
+end
+
 class ActiveMusicbrainz::Model::Recording
   has_one :recording_first_release_date, foreign_key: :recording
+  has_one :recording_meta, foreign_key: :id
 
   scope :order_by_first_release_date, -> (direction = :desc) {
     joins(:recording_first_release_date)
       .order("recording_first_release_date.year #{direction} NULLS LAST, recording_first_release_date.month #{direction} NULLS LAST, recording_first_release_date.day #{direction} NULLS LAST")
+  }
+
+  scope :order_by_rating, -> (direction = :desc) {
+    joins(:recording_meta).order("recording_meta.rating #{direction} nulls last")
+  }
+
+  def self.bayessian_rating_average
+    m = all.average(:rating)
+    c = 100
+  end
+
+  scope :order_by_bayesian_average, -> (direction = :desc) {
+    overall_avg_rating = ActiveMusicbrainz::Model::RecordingMeta.average(:rating)
+    avg_num_votes = ActiveMusicbrainz::Model::RecordingMeta.average(:rating_count)
+    joins(:recording_meta)
+      .select('recordings.*, recording_meta.*, ((? * ?) + (recording_meta.rating * recording_meta.rating_count)) / (? + recording_meta.rating_count) AS bayesian_average', avg_num_votes, overall_avg_rating, avg_num_votes)
+      .order("bayesian_average #{direction} NULLS LAST")
   }
 
   def first_release_date
