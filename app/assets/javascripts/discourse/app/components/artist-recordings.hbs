@@ -3,13 +3,7 @@
   {{#if this.recordings}}
     <div class="recording-cards">
       {{#each this.recordings as |recording|}}
-        <div class="recording-card">
-          <img class="cover-art" src="{{recording.cover_art_url}}" alt="{{recording.name}} Cover Art" />
-          <div class="recording-info">
-            <h3 class="recording-name">{{recording.name}}</h3>
-            <p class="recording-duration">{{format-track-length recording.length}}</p>
-          </div>
-        </div>
+        <RecordingCard @recording={{recording}} />
       {{/each}}
     </div>
   {{else}}

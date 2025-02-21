@@ -5,7 +5,7 @@ import { inject as service } from '@ember/service';
 
 export default class ArtistRecordingsComponent extends Component {
   @service store;
-  @tracked recordings = null;
+  @tracked recordings = [];
 
   constructor() {
     super(...arguments);

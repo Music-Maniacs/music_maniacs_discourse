@@ -138,6 +138,10 @@ class ActiveMusicbrainz::Model::Recording
                                    .order('track.recording, rd.date_year NULLS LAST, rd.date_month NULLS LAST, rd.date_day NULLS LAST')
   end
 
+  def canonical_release_mbid
+    releases.first&.gid
+  end
+
   # def self.with_first_release_date_selected
   #   select('recording.*, RECORDINGS_FIRST_RELEASE_DATE.first_release_date as frd')
   #   .joins("INNER JOIN (#{with_first_release_date_subquery.to_sql}) RECORDINGS_FIRST_RELEASE_DATE ON RECORDINGS_FIRST_RELEASE_DATE.RECORDING_ID = recording.id")

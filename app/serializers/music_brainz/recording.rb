@@ -2,6 +2,6 @@
 
 module MusicBrainz
   class Recording < ApplicationSerializer
-    attributes :name, :length
+    attributes :name, :length, :canonical_release_mbid
   end
 end
