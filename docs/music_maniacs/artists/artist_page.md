@@ -10,6 +10,9 @@ Todo:
 
 1. missing icons
 2. cover art
+3. top recordings
+  - cover art
+  - artist credits
 
 
 
