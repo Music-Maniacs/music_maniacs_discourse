@@ -13,7 +13,7 @@ class ArtistsController < ApplicationController
 
     recordings = @mb_artist.recordings
     recordings = apply_ordering(recordings)
-    render json: ActiveModel::ArraySerializer.new(@mb_artist.recordings, each_serializer: MusicBrainz::Recording)
+    render json: ActiveModel::ArraySerializer.new(recordings.limit(20), each_serializer: MusicBrainz::Recording)
   end
 
   def recordings
