@@ -1,11 +1,23 @@
-<div class="artist-recordings">
-  <h2>Recordings</h2>
+<div class="container popular-tracks">
+  <div class="heading">
+    <h2>Popular tracks</h2>
+    <DButton 
+      @class="play-all-btn" 
+      @icon="play"
+      @label="Play all"
+      @action={{this.playAll}} />
+  </div>
   {{#if this.recordings}}
-    <div class="recording-cards">
+    <ul class="track-list">
       {{#each this.recordings as |recording|}}
-        <RecordingCard @recording={{recording}} />
+        <RecordingItem 
+          @recording={{recording}}
+          @onPlay={{this.playTrack}}
+          @onFavorite={{this.toggleFavorite}}
+          @onAdd={{this.addToPlaylist}}
+          @onMore={{this.showMoreOptions}} />
       {{/each}}
-    </div>
+    </ul>
   {{else}}
     <p>Loading recordings...</p>
   {{/if}}

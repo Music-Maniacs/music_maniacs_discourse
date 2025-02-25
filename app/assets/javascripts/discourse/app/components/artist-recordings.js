@@ -29,4 +29,30 @@ export default class ArtistRecordingsComponent extends Component {
       console.error('Error fetching recordings:', error);
     }
   }
+
+  @action
+  playAll() {
+    // Implement play all functionality
+    console.log('Playing all tracks');
+  }
+
+  @action
+  playTrack(recording) {
+    console.log('Playing track:', recording.name);
+  }
+
+  @action
+  toggleFavorite(recording) {
+    console.log('Toggle favorite for:', recording.name);
+  }
+
+  @action
+  addToPlaylist(recording) {
+    console.log('Add to playlist:', recording.name);
+  }
+
+  @action
+  showMoreOptions(recording) {
+    console.log('Show more options for:', recording.name);
+  }
 }
