@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 
-export default class ChipComponent extends Component {
+export default class Chip extends Component {
   @tracked count = 1;
   @tracked showControls = false;
 

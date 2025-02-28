@@ -24,11 +24,11 @@
 }
 
 .chip-content {
+  color: #3f51b5;
   display: flex;
   align-items: center;
   padding: 6px 12px;
   cursor: pointer;
-  min-width: 110px; /* Ensure text has enough space */
 }
 
 .chip-controls {
@@ -43,10 +43,6 @@
 .chip:hover .chip-controls {
   width: 48px; /* Width of both buttons */
   border-left: 1px solid #e0e0e0;
-}
-
-.chip.post-rock {
-  color: #3f51b5;
 }
 
 .chip-text {
@@ -94,3 +90,5 @@
 .control-btn.add {
   border-right: 1px solid #e0e0e0;
 }
+
+
