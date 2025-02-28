@@ -40,14 +40,15 @@
   <div class="artist-tags">
     <h2>Tags</h2>
     {{#if this.formattedTags}}
-      <ul class="horizontal-list">
+      <div class="tag-chip-list">
         {{#each this.formattedTags as |tag|}}
-          <li>
-            {{tag.label}}
-            <span class="tag-count">({{tag.count}} {{if (eq tag.count 1) "vote" "votes"}})</span>
-          </li>
+          <ChipComponent 
+            @genre={{tag.label}} 
+            @count={{tag.count}} 
+            @onCountChange={{this.updateTagCount}} 
+          />
         {{/each}}
-      </ul>
+      </div>
     {{else}}
       <p>No tags available for this artist.</p>
     {{/if}}
@@ -55,14 +56,15 @@
   <div class="artist-genres">
     <h2>Genres</h2>
     {{#if this.formattedGenres}}
-      <ul class="horizontal-list">
+      <div class="tag-chip-list">
         {{#each this.formattedGenres as |genre|}}
-          <li>
-            {{genre.label}}
-            <span class="genre-count">({{genre.count}} {{if (eq genre.count 1) "vote" "votes"}})</span>
-          </li>
+          <ChipComponent 
+            @genre={{genre.label}} 
+            @count={{genre.count}} 
+            @onCountChange={{this.updateGenreCount}} 
+          />
         {{/each}}
-      </ul>
+      </div>
     {{else}}
       <p>No genres available for this artist.</p>
     {{/if}}
