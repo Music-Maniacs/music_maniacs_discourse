@@ -42,10 +42,10 @@
     {{#if this.formattedTags}}
       <div class="tag-chip-list">
         {{#each this.formattedTags as |tag|}}
-          <ChipComponent 
-            @genre={{tag.label}} 
-            @count={{tag.count}} 
-            @onCountChange={{this.updateTagCount}} 
+          <Chip
+            @genre={{tag.label}}
+            @count={{tag.count}}
+            @onCountChange={{this.updateTagCount}}
           />
         {{/each}}
       </div>
@@ -58,10 +58,10 @@
     {{#if this.formattedGenres}}
       <div class="tag-chip-list">
         {{#each this.formattedGenres as |genre|}}
-          <ChipComponent 
-            @genre={{genre.label}} 
-            @count={{genre.count}} 
-            @onCountChange={{this.updateGenreCount}} 
+          <Chip
+            @genre={{genre.label}}
+            @count={{genre.count}}
+            @onCountChange={{this.updateGenreCount}}
           />
         {{/each}}
       </div>
