@@ -1,0 +1,7 @@
+<div class="chip-scrolling-container">
+  <div class="chip-container">
+    {{#each this.genres as |genre|}}
+      <Chip @genre={{genre.label}} />
+    {{/each}}
+  </div>
+</div>
