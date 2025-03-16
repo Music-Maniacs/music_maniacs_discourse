@@ -95,6 +95,70 @@ class ActiveMusicbrainz::Model::RecordingMeta
 end
 
 class ActiveMusicbrainz::Model::Recording
+
+  def self.load_recordings_from_mbids(mbids)
+    # Return empty hash if no mbids provided
+    return {} if mbids.blank?
+
+    # Build the VALUES clause for the query
+    mbid_values = mbids.map { |mbid| "(#{self.connection.quote(mbid)})" }.join(", ")
+
+    query = <<-SQL
+      SELECT mbc.recording_mbid::TEXT
+        , release_mbid::TEXT
+        , artist_mbids::TEXT[]
+        , artist_data->>'name' AS artist
+        , (artist_data->>'artist_credit_id')::bigint AS artist_credit_id
+        , recording_data->>'name' AS title
+        , (recording_data->>'length')::bigint AS length
+        , release_data->>'name' AS release
+        , (release_data->>'caa_id')::bigint AS caa_id
+        , release_data->>'caa_release_mbid' AS caa_release_mbid
+        , array_agg(artist->>'name' ORDER BY position) AS ac_names
+        , array_agg(artist->>'join_phrase' ORDER BY position) AS ac_join_phrases
+      FROM (VALUES #{mbid_values}) AS m (recording_mbid)
+      JOIN mapping.mb_metadata_cache mbc
+        ON mbc.recording_mbid = m.recording_mbid::uuid
+      JOIN LATERAL jsonb_array_elements(artist_data->'artists') WITH ORDINALITY artists(artist, position)
+        ON TRUE
+      GROUP BY mbc.recording_mbid
+        , release_mbid
+        , artist_mbids
+        , artist_data->>'name'
+        , artist_data->>'artist_credit_id'
+        , recording_data->>'name'
+        , recording_data->>'length'
+        , release_data->>'name'
+        , release_data->>'caa_id'
+        , release_data->>'caa_release_mbid'
+    SQL
+
+    # Execute query and process results
+    results = self.connection.execute(query)
+
+    results.each_with_object({}) do |row, recordings|
+      data = row.stringify_keys
+      recording_mbid = data["recording_mbid"]
+
+      # Parse arrays from PostgreSQL format
+      ac_names = data.delete("ac_names").tr('{}', '').split(',')
+      ac_join_phrases = data.delete("ac_join_phrases").tr('{}', '').split(',')
+      artist_mbids = data["artist_mbids"].tr('{}', '').split(',')
+
+      # Build artists array
+      artists = artist_mbids.zip(ac_names, ac_join_phrases).map do |mbid, name, join_phrase|
+        {
+          "artist_mbid" => mbid,
+          "artist_credit_name" => name,
+          "join_phrase" => join_phrase
+        }
+      end
+
+      data["artists"] = artists
+      recordings[recording_mbid] = data
+    end
+  end
+
   has_one :recording_first_release_date, foreign_key: :recording
   has_one :recording_meta, foreign_key: :id
 
@@ -138,6 +202,7 @@ class ActiveMusicbrainz::Model::Recording
                                    .order('track.recording, rd.date_year NULLS LAST, rd.date_month NULLS LAST, rd.date_day NULLS LAST')
   end
 
+  # TODO: use most canonical release mbid
   def canonical_release_mbid
     releases.first&.gid
   end
