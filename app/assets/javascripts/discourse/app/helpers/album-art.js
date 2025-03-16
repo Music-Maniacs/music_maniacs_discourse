@@ -27,11 +27,9 @@ export const getAlbumArtFromReleaseMBID = async (userSubmittedReleaseMBID, optio
       return undefined;
     }
 
-    console.log("Fetching cover art for release MBID:", userSubmittedReleaseMBID);
     const response = await fetch(`https://coverartarchive.org/release/${userSubmittedReleaseMBID}`);
     if (response.ok) {
       const body = await response.json();
-      console.log("Cover Art Archive response:", body);
       const coverArt = getThumbnailFromCAAResponse(body, optionalSize);
       if (coverArt) {
         return coverArt;

@@ -16,10 +16,6 @@ export default class RecordingItemComponent extends Component {
   @action
   async loadCoverArt() {
     try {
-      console.log(
-        "Fetching cover art for release MBID:",
-        this.recording
-      )
       const coverArt = await getAlbumArtFromReleaseMBID(this.recording.canonical_release_mbid);
       this.recording = { ...this.recording, cover_art_url: coverArt };
     } catch (error) {
