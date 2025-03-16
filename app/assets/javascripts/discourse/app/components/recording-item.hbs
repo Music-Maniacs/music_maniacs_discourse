@@ -7,36 +7,14 @@
       {{this.recording.name}}
       <span class="track-duration">{{format-track-length this.recording.length}}</span>
     </div>
-    <div class="track-artist">{{this.recording.artist_name}}</div>
-  </div>
-  <div class="track-controls">
-    <DButton
-      class="icon-btn favorite {{if this.isFavorite 'active'}}"
-      @icon="heart"
-      @action={{@onFavorite}}
-      @translatedTitle="Add to favorites" />
-
-    <DButton
-      class="icon-btn add"
-      @icon="plus"
-      @action={{@onAdd}}
-      @translatedTitle="Add to playlist" />
-
-    <DButton
-      class="icon-btn more"
-      @icon="ellipsis-v"
-      @action={{@onMore}}
-      @translatedTitle="More options" />
-
-    <DButton
-      class="play-button"
-      @icon="play"
-      @action={{@onPlay}}
-      @translatedTitle="Play track" />
-
-    <div class="play-count">
-      {{d-icon "play"}}
-      <span>{{format-number 10 compact=true}}</span>
+    <div class="track-artist">
+      {{log this.recording.artist_credits}}
+      {{#each this.recording.artist_credits as |artist|}}
+        <LinkTo @route="artists" @model={{artist.artist_mbid}} @title={{artist.artist_credit_name}}>
+          {{artist.artist_credit_name}}
+        </LinkTo>
+        {{artist.join_phrase}}
+      {{/each}}
     </div>
   </div>
 </li>
