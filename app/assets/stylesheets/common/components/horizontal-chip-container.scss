@@ -24,16 +24,3 @@
 .chip-container {
     min-width: max-content;
 }
-
-.chip {
-    display: inline-flex;
-    align-items: center;
-    border-radius: 4px;
-    font-size: 14px;
-    user-select: none;
-    background-color: #f0f0f0;
-    border: 1px solid #e0e0e0;
-    transition: all 0.3s ease;
-    position: relative;
-}
-
