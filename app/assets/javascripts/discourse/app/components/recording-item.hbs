@@ -1,0 +1,20 @@
+<li class="track-item">
+  <div class="album-art">
+    <img src={{this.recording.cover_art_url}} alt="{{this.recording.name}} album art">
+  </div>
+  <div class="track-info">
+    <div class="track-title">
+      {{this.recording.name}}
+      <span class="track-duration">{{format-track-length this.recording.length}}</span>
+    </div>
+    <div class="track-artist">
+      {{log this.recording.artist_credits}}
+      {{#each this.recording.artist_credits as |artist|}}
+        <LinkTo @route="artists" @model={{artist.artist_mbid}} @title={{artist.artist_credit_name}}>
+          {{artist.artist_credit_name}}
+        </LinkTo>
+        {{artist.join_phrase}}
+      {{/each}}
+    </div>
+  </div>
+</li>

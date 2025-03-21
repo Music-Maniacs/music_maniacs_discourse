@@ -1,0 +1,26 @@
+.chip-scrolling-container {
+    width: 100%;
+    overflow-x: auto;
+    padding: 15px 5px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Hide scrollbar but keep functionality */
+.chip-scrolling-container::-webkit-scrollbar {
+    height: 4px;
+}
+
+.chip-scrolling-container::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+}
+
+.chip-scrolling-container::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+.chip-container {
+    min-width: max-content;
+}

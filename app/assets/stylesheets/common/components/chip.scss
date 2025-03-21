@@ -1,0 +1,94 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.chip-container {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 4px;
+  font-size: 14px;
+  user-select: none;
+  background-color: #f0f0f0;
+  border: 1px solid #e0e0e0;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.chip-content {
+  color: #3f51b5;
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.chip-controls {
+  display: flex;
+  width: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  height: 100%;
+  border-left: 0px solid #e0e0e0;
+}
+
+.chip:hover .chip-controls {
+  width: 48px; /* Width of both buttons */
+  border-left: 1px solid #e0e0e0;
+}
+
+.chip-text {
+  font-weight: 500;
+  white-space: nowrap; /* Prevent text from wrapping */
+}
+
+.chip-separator {
+  display: inline-block;
+  width: 1px;
+  height: 12px;
+  background-color: #d0d0d0;
+  margin: 0 6px;
+  opacity: 0.7;
+  flex-shrink: 0; /* Prevent separator from shrinking */
+}
+
+.chip-count {
+  font-size: 12px;
+  font-weight: 400;
+  opacity: 0.8;
+  min-width: 8px; /* Ensure count has enough space */
+  text-align: center;
+}
+
+.control-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 100%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #666;
+  font-size: 16px;
+  font-weight: bold;
+  flex-shrink: 0; /* Prevent buttons from shrinking */
+}
+
+.control-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.control-btn.add {
+  border-right: 1px solid #e0e0e0;
+}
+
+

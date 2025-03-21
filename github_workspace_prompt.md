@@ -1,0 +1,1 @@
+this repo is discourse fork and i am using musicbrarinz public database to build an online community for music related topics discurssion. i am working on the artists pages and need to write an ember component that fetches data from the /artists/:id/recordings which i already built to display info about the artists recordings

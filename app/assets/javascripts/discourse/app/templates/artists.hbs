@@ -1,0 +1,58 @@
+{{outlet}}
+<div id="entity-page" class="artist-page" role="main">
+  <div class="entity-page-header flex">
+    <div class="cover-art" title="Album art for {{this.model.artist.name}}">
+      {{html-safe this.model.coverArt}}
+    </div>
+    <div class="artist-info">
+      <h1>{{this.model.name}}</h1>
+      <div class="details">
+        <small class="help-block">
+          {{this.model.begin_year}}
+          {{#if this.model.end_year}} — {{this.model.end_year}}{{/if}}
+          <br>
+          {{this.model.area}}
+        </small>
+      </div>
+      {{#if this.wikipediaData}}
+        <div class="wikipedia-extract">
+          <div class="content">{{html-safe this.wikipediaData.content}}</div>
+          <a class="btn btn-link pull-right" href={{this.wikipediaData.url}} target="_blank" rel="noopener noreferrer">
+            Read on Wikipedia…
+          </a>
+        </div>
+      {{/if}}
+    </div>
+    <div class="right-side">
+      <div class="entity-rels">
+        {{#if this.model.rels}}
+          {{#each-in this.model.artist.rels as |key value|}}
+            <RelIconLink @relName={{key}} @relValue={{value}}/>
+          {{/each-in}}
+        {{/if}}
+        <OpenInMusicBrainzButton
+          @entityType="artist"
+          @entityMBID={{this.model.id}}
+        />
+      </div>
+    </div>
+  </div>
+  <div class="artist-tags">
+    <h2>Tags</h2>
+    {{#if this.formattedTags}}
+      <HorizontalChipContainer @genres={{this.formattedTags}} />
+    {{else}}
+      <p>No tags available for this artist.</p>
+    {{/if}}
+  </div>
+  <div class="artist-genres">
+    <h2>Genres</h2>
+    {{#if this.formattedGenres}}
+      <HorizontalChipContainer @genres={{this.formattedGenres}} />
+    {{else}}
+      <p>No genres available for this artist.</p>
+    {{/if}}
+  </div>
+</div>
+
+<ArtistRecordings @artistId={{this.model.id}} />

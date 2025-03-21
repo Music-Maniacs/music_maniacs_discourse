@@ -1,0 +1,42 @@
+<li class="track-item">
+  <div class="album-art">
+    <img src={{@recording.cover_art_url}} alt="{{@recording.name}} album art">
+  </div>
+  <div class="track-info">
+    <div class="track-title">
+      {{@recording.name}}
+      <span class="track-duration">{{format-track-length @recording.length}}</span>
+    </div>
+    <div class="track-artist">{{@recording.artist_name}}</div>
+  </div>
+  <div class="track-controls">
+    <DButton
+      class="icon-btn favorite {{if this.isFavorite 'active'}}"
+      @icon="heart"
+      @action={{@onFavorite}}
+      @translatedTitle="Add to favorites" />
+
+    <DButton
+      class="icon-btn add"
+      @icon="plus"
+      @action={{@onAdd}}
+      @translatedTitle="Add to playlist" />
+
+    <DButton
+      class="icon-btn more"
+      @icon="ellipsis-v"
+      @action={{@onMore}}
+      @translatedTitle="More options" />
+
+    <DButton
+      class="play-button"
+      @icon="play"
+      @action={{@onPlay}}
+      @translatedTitle="Play track" />
+
+    <div class="play-count">
+      {{d-icon "play"}}
+      <span>{{format-number 10 compact=true}}</span>
+    </div>
+  </div>
+</li>

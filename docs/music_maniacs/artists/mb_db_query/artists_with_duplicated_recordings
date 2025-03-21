@@ -1,0 +1,6 @@
+SELECT DISTINCT acn.artist
+FROM artist_credit_name acn
+JOIN recording rec ON acn.artist_credit = rec.artist_credit
+JOIN track t ON t.recording = rec.id
+GROUP BY acn.artist, rec.id
+HAVING COUNT(t.id) > 1;

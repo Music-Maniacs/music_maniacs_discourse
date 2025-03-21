@@ -1,0 +1,11 @@
+1. https://coverartarchive.org/
+2. https://musicbrainz.org/doc/Cover_Art_Archive/API
+3. https://github.com/metabrainz/artwork-indexer?tab=readme-ov-file#installation
+4. https://github.com/metabrainz/libcoverart
+5. https://github.com/metabrainz/listenbrainz-server/pull/2044/files
+6. https://tickets.metabrainz.org/browse/LB-1103
+7. https://github.com/search?q=repo%3Ametabrainz%2Flistenbrainz-server+user+release+MBID&type=commits
+8. https://github.com/metabrainz/listenbrainz-server/commit/09e98a8c1e893458423aa8d1b52995dd72f0ccdf
+9. https://github.com/lyarenei/jellyfin-plugin-listenbrainz/issues/52
+10. https://tickets.metabrainz.org/browse/LB-1116
+11. https://github.com/metabrainz/listenbrainz-server/pull/2464

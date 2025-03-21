@@ -81,6 +81,13 @@ Discourse::Application.routes.draw do
 
     resources :directory_items, only: [:index]
 
+    resources :artists, only: [:show] do
+      member do
+        get :top_recordings
+        get :recordings
+      end
+    end
+
     get "site" => "site#site"
     namespace :site do
       get "settings"

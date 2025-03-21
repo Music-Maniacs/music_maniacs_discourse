@@ -289,3 +289,9 @@ end
 gem "dry-initializer", "~> 3.1"
 
 gem "parallel"
+
+
+#### MusicManiacs ###
+
+# gem 'active_musicbrainz', github: 'gravityblast/active_musicbrainz', branch: 'master'
+gem "active_musicbrainz", path: '/home/xeitor/github_projects/active_musicbrainz'
